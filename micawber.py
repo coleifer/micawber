@@ -1,3 +1,5 @@
+import hashlib
+import pickle
 import re
 import socket
 import urllib2
@@ -23,6 +25,37 @@ block_elements = set([
     'ins', 'map', 'object', 'script', '[document]'
 ])
 
+
+class Cache(object):
+    def __init__(self, filename='cache.db'):
+        self.filename = filename
+        self._cache = self.load()
+    
+    def load(self):
+        try:
+            fh = open(self.filename)
+            contents = fh.read()
+            fh.close()
+        except IOError:
+            return {}
+        else:
+            return pickle.loads(contents)
+
+    def save(self):
+        try:
+            fh = open(self.filename, 'w')
+            fh.write(pickle.dumps(self._cache))
+            fh.close()
+        except IOError:
+            return False
+        else:
+            return True
+
+    def get(self, k):
+        return self._cache.get(k)
+
+    def set(self, k, v):
+        self._cache[k] = v
 
 class ProviderException(Exception):
     pass
@@ -72,9 +105,28 @@ class Provider(object):
             raise ProviderException('Error fetching "%s"' % endpoint_url)
 
 
+def make_key(*args, **kwargs):
+    return hashlib.md5(pickle.dumps((args, kwargs))).hexdigest()
+
+def url_cache(fn):
+    def inner(self, url, **params):
+        if self.cache:
+            key = make_key(url, params)
+            data = self.cache.get(key)
+            if not data:
+                data = fn(self, url, **params)
+                self.cache.set(key, data)
+            return data
+        return fn(self, url, **params)
+    return inner
+
 class ProviderRegistry(object):
-    def __init__(self):
+    def __init__(self, cache=None):
         self._registry = {}
+        self.cache = cache
+
+    def flush(self):
+        self.cache.save()
 
     def register(self, regex, provider):
         self._registry[regex] = provider
@@ -90,6 +142,7 @@ class ProviderRegistry(object):
             if re.match(regex, url):
                 return provider
 
+    @url_cache
     def request(self, url, **params):
         provider = self.provider_for_url(url)
         if provider:
@@ -227,8 +280,8 @@ def _inside_a(soup_elem):
     return False
 
 
-def bootstrap_basic():
-    pr = ProviderRegistry()
+def bootstrap_basic(cache=None):
+    pr = ProviderRegistry(cache)
     pr.register('http://\S*?flickr.com/\S*', Provider('http://www.flickr.com/services/oembed/'))
     pr.register('http://\S*.youtu(\.be|be\.com)/watch\S*', Provider('http://www.youtube.com/oembed'))
     pr.register('http://www.hulu.com/watch/\S*', Provider('http://www.hulu.com/api/oembed.json'))
@@ -236,11 +289,11 @@ def bootstrap_basic():
     pr.register('http://www.slideshare.net/[^\/]+/\S*', Provider('http://www.slideshare.net/api/oembed/2'))
     return pr
 
-def bootstrap_embedly(**params):
+def bootstrap_embedly(cache=None, **params):
     endpoint = 'http://api.embed.ly/1/oembed'
     schema_url = 'http://api.embed.ly/1/services/python'
 
-    pr = ProviderRegistry()
+    pr = ProviderRegistry(cache)
 
     # fetch the schema
     resp = urllib2.urlopen(schema_url)
