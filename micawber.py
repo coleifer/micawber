@@ -237,7 +237,7 @@ def parse_text(text, providers, urlize_all=True, handler=full_handler, block_han
 
     return '\n'.join(parsed)
 
-def parse_html(html, providers, urlize_all, handler=full_handler, block_handler=inline_handler, **params):
+def parse_html(html, providers, urlize_all=True, handler=full_handler, block_handler=inline_handler, **params):
     if not BeautifulSoup:
         raise Exception('Unable to parse HTML, please install BeautifulSoup or use the text parser')
 
@@ -251,11 +251,11 @@ def parse_html(html, providers, urlize_all, handler=full_handler, block_handler=
                 url_handler = inline_handler
 
             replacement = parse_text_full(str(url), providers, urlize_all, url_handler, **params)
-            user_url.replaceWith(BeautifulSoup(replacement))
+            url.replaceWith(BeautifulSoup(replacement))
 
     return unicode(soup)
 
-def extract_html(html):
+def extract_html(html, providers, **params):
     if not BeautifulSoup:
         raise Exception('Unable to parse HTML, please install BeautifulSoup or use the text parser')
 
@@ -265,7 +265,7 @@ def extract_html(html):
 
     for url in soup.findAll(text=re.compile(url_re)):
         if not _inside_a(url):
-            block_all, block_ext = block_parser.extract_urls(unicode(user_url))
+            block_all, block_ext = extract(unicode(url), providers, **params)
             all_urls.update(block_all)
             extracted_urls.update(block_ext)
 
