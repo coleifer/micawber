@@ -1,13 +1,17 @@
 #!/usr/bin/env python
-import os
+import sys
 import unittest
 
+from micawber import tests
 
-def collect():
-    start_dir = os.path.abspath(os.path.dirname(__file__))
-    return unittest.defaultTestLoader.discover(start_dir)
-
+def runtests(*test_args):
+    suite = unittest.TestLoader().loadTestsFromModule(tests)
+    result = unittest.TextTestRunner(verbosity=2).run(suite)
+    if result.failures:
+        sys.exit(1)
+    elif result.errors:
+        sys.exit(2)
+    sys.exit(0)
 
 if __name__ == '__main__':
-    unittest.main(module='tests')
-
+    runtests(*sys.argv[1:])

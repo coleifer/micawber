@@ -13,7 +13,11 @@ setup(
     author='Charles Leifer',
     author_email='coleifer@gmail.com',
     url='http://github.com/coleifer/micawber/',
-    py_modules=['micawber'],
+    packages=find_packages(),
+    package_data = {
+        'micawber': [
+        ],
+    },
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
@@ -21,6 +25,7 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
+        'Framework :: Django',
     ],
-    test_suite='runtests.collect',
+    test_suite='runtests.runtests',
 )
