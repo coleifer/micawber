@@ -5,6 +5,7 @@ except ImportError:
     import json
 
 from micawber import *
+from micawber.providers import make_key
 
 
 class TestProvider(Provider):
