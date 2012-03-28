@@ -19,7 +19,7 @@ except ImportError:
 __ALL__ = [
     'Cache', 'PickleCache', 'ProviderException', 'Provider', 'ProviderRegistry',
     'extract', 'extract_html', 'parse_text', 'parse_text_full', 'parse_html',
-    'bootstrap_basic', 'bootstrap_embedly',
+    'bootstrap_basic', 'bootstrap_embedly', 'make_key',
 ]
 
 
@@ -231,7 +231,7 @@ def parse_text(text, providers, urlize_all=True, handler=full_handler, block_han
             else:
                 line = handler(url, response, **params)
         else:
-            line = parse_text_full(text, providers, urlize_all, block_handler, **params)
+            line = parse_text_full(line, providers, urlize_all, block_handler, **params)
 
         parsed.append(line)
 
