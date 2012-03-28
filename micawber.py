@@ -1,8 +1,11 @@
+from __future__ import with_statement
 import hashlib
+import os
 import pickle
 import re
 import socket
 import urllib2
+from contextlib import closing
 from urllib import urlencode
 try:
     import simplejson as json
@@ -12,6 +15,13 @@ try:
     from BeautifulSoup import BeautifulSoup
 except ImportError:
     BeautifulSoup = None
+
+__ALL__ = [
+    'Cache', 'PickleCache', 'ProviderException', 'Provider', 'ProviderRegistry',
+    'extract', 'extract_html', 'parse_text', 'parse_text_full', 'parse_html',
+    'bootstrap_basic', 'bootstrap_embedly',
+]
+
 
 url_pattern = '(https?://[-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@#/%=~_|])'
 url_re = re.compile(url_pattern)
@@ -27,35 +37,32 @@ block_elements = set([
 
 
 class Cache(object):
-    def __init__(self, filename='cache.db'):
-        self.filename = filename
-        self._cache = self.load()
-    
-    def load(self):
-        try:
-            fh = open(self.filename)
-            contents = fh.read()
-            fh.close()
-        except IOError:
-            return {}
-        else:
-            return pickle.loads(contents)
-
-    def save(self):
-        try:
-            fh = open(self.filename, 'w')
-            fh.write(pickle.dumps(self._cache))
-            fh.close()
-        except IOError:
-            return False
-        else:
-            return True
+    def __init__(self):
+        self._cache = {}
 
     def get(self, k):
         return self._cache.get(k)
 
     def set(self, k, v):
         self._cache[k] = v
+
+
+class PickleCache(Cache):
+    def __init__(self, filename='cache.db'):
+        self.filename = filename
+        self._cache = self.load()
+    
+    def load(self):
+        if os.path.exists(self.filename):
+            with closing(open(self.filename)) as fh:
+                contents = fh.read()
+            return pickle.loads(contents)
+        return {}
+
+    def save(self):
+        with closing(open(self.filename, 'w')) as fh:
+            fh.write(pickle.dumps(self._cache))
+
 
 class ProviderException(Exception):
     pass
@@ -88,7 +95,7 @@ class Provider(object):
         params = dict(self.base_params)
         params.update(extra_params)
         params['url'] = url
-        encoded_params = urlencode(params)
+        encoded_params = urlencode(sorted(params.items()))
 
         endpoint_url = self.endpoint
         if '?' in endpoint_url:
@@ -99,7 +106,8 @@ class Provider(object):
         response = self.fetch(endpoint_url)
         if response:
             json_data = json.loads(response)
-            json_data['url'] = url
+            if 'url' not in json_data:
+                json_data['url'] = url
             return json_data
         else:
             raise ProviderException('Error fetching "%s"' % endpoint_url)
@@ -124,9 +132,6 @@ class ProviderRegistry(object):
     def __init__(self, cache=None):
         self._registry = {}
         self.cache = cache
-
-    def flush(self):
-        self.cache.save()
 
     def register(self, regex, provider):
         self._registry[regex] = provider
@@ -153,7 +158,7 @@ class ProviderRegistry(object):
 def full_handler(url, response_data, **params):
     if response_data['type'] == 'link':
         return '<a href="%(url)s" title="%(title)s">%(title)s</a>' % response_data
-    elif response_data['type'] == 'image':
+    elif response_data['type'] == 'photo':
         return '<a href="%(url)s" title="%(title)s"><img alt="%(title)s" src="%(url)s" /></a>' % response_data
     else:
         return response_data['html']
