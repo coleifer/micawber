@@ -273,14 +273,14 @@ class ParserTestCase(BaseTestCase):
 
         for url, expected in self.data_pairs.items():
             all_urls, extracted = extract(frame % (url, blank, url, blank), pr)
-            self.assertEqual(all_urls, set([blank, url]))
+            self.assertEqual(all_urls, [url, blank])
 
             if 'url' not in expected:
                 expected['url'] = url
             self.assertEqual(extracted, {url: expected})
 
             all_urls, extracted = extract_html(frame_html % (url, url, blank, blank), pr)
-            self.assertEqual(all_urls, set([blank, url]))
+            self.assertEqual(all_urls, [url, blank])
 
             if 'url' not in expected:
                 expected['url'] = url

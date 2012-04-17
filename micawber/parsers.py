@@ -39,16 +39,22 @@ def urlize(url):
     return '<a href="%s">%s</a>' % (url, url)
 
 def extract(text, providers, **params):
-    all_urls = set(re.findall(url_re, text))
+    all_urls = set()
+    urls = []
     extracted_urls = {}
 
-    for url in all_urls:
+    for url in re.findall(url_re, text):
+        if url in all_urls:
+            continue
+        
+        all_urls.add(url)
+        urls.append(url)
         try:
             extracted_urls[url] = providers.request(url, **params)
         except ProviderException:
             pass
 
-    return all_urls, extracted_urls
+    return urls, extracted_urls
 
 def parse_text_full(text, providers, urlize_all=True, handler=full_handler, **params):
     all_urls, extracted_urls = extract(text, providers, **params)
@@ -130,15 +136,23 @@ def extract_html(html, providers, **params):
 
     soup = BeautifulSoup(html)
     all_urls = set()
+    urls = []
     extracted_urls = {}
 
     for url in soup.findAll(text=re.compile(url_re)):
-        if not _inside_a(url):
-            block_all, block_ext = extract(unicode(url), providers, **params)
-            all_urls.update(block_all)
+        if _inside_a(url):
+            continue
+    
+        block_all, block_ext = extract(unicode(url), providers, **params)
+        for extracted_url in block_all:
+            if extracted_url in all_urls:
+                continue
+            
             extracted_urls.update(block_ext)
+            urls.append(extracted_url)
+            all_urls.add(extracted_url)
 
-    return all_urls, extracted_urls
+    return urls, extracted_urls
 
 def _is_standalone(soup_elem):
     if standalone_url_re.match(soup_elem):
