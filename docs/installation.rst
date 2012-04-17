@@ -25,7 +25,7 @@ Installing via git
 ::
 
     git clone https://github.com/coleifer/micawber.git
-    cd django-utils
+    cd micawber
     python setup.py test
     sudo python setup.py install
 

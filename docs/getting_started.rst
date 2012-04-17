@@ -3,6 +3,47 @@
 Getting Started
 ===============
 
+If you want the dead simple get-me-up-and-running, try the following:
+
+.. code-block:: python
+
+    >>> import micawber
+    >>> providers = micawber.bootstrap_embedly() # may take a second
+    >>> print micawber.parse_text('this is a test:\nhttp://www.youtube.com/watch?v=54XHDUOHuzU', providers)
+    this is a test:
+    <iframe width="640" height="360" src="http://www.youtube.com/embed/54XHDUOHuzU?fs=1&feature=oembed" frameborder="0" allowfullscreen></iframe>
+
+Using django?  Add ``micawber.contrib.mcdjango`` to your ``INSTALLED_APP``, then
+in your templates:
+
+.. code-block:: html
+
+    {% load micawber_tags %}
+    {# show a flash player for the youtube video #}
+    {{ "http://www.youtube.com/watch?v=mQEWI1cn7HY"|oembed }}
+
+Using flask?  Use the ``add_oembed_filters`` function to register two jinja
+template filters, ``oembed`` and ``extract_oembed``:
+
+.. code-block:: python
+
+    from flask import Flask
+    from micawber.providers import bootstrap_basic
+    from micawber.contrib.mcflask import add_oembed_filters
+    
+    app = Flask(__name__)
+    
+    oembed_providers = bootstrap_basic()
+    add_oembed_filters(app, oembed_providers)
+
+.. code-block:: html
+
+    {# show a flash player for the youtube video #}
+    {{ "http://www.youtube.com/watch?v=mQEWI1cn7HY"|oembed() }}
+
+Overview
+--------
+
 micawber is rather simple.  It is built to use the `oembed <http://oembed.com/>`_ spec,
 which is designed for converting URLs into rich, embeddable content.  Many popular sites
 support this, including youtube and flickr.  There is also a 3rd-party service called
