@@ -122,5 +122,5 @@ def bootstrap_embedly(cache=None, **params):
 
     for provider_meta in json_data:
         for regex in provider_meta['regex']:
-            pr.register(regex, Provider(endpoint))
+            pr.register(regex, Provider(endpoint, **params))
     return pr
