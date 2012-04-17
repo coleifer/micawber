@@ -65,6 +65,8 @@ here is a quick example:
     # returns the following html:
     <p><iframe width="459" height="344" src="http://www.youtube.com/embed/54XHDUOHuzU?fs=1&amp;feature=oembed" frameborder="0" allowfullscreen="allowfullscreen"></iframe></p>
 
+check out the :ref:`examples page <examples>` for more.
+
 
 integration with web frameworks
 -------------------------------
@@ -79,8 +81,10 @@ Contents:
    :glob:
 
    installation
+   getting_started
    flask
    django
+   api
 
 
 Indices and tables
