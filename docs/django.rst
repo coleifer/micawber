@@ -15,11 +15,13 @@ so that we can use the template filters it defines.
         'micawber.contrib.mcdjango',
     ]
 
-micawber provides 2 template filters for converting URLs contained within
+micawber provides 4 template filters for converting URLs contained within
 text or HTML to rich content:
 
 * :py:func:`~micawber.contrib.mcdjango.oembed` for plain text
 * :py:func:`~micawber.contrib.mcdjango.oembed_html` for html
+* :py:func:`~micawber.contrib.mcdjango.extract_oembed` for extracting url data from plain text
+* :py:func:`~micawber.contrib.mcdjango.extract_oembed_html` for extracting url data from html
 
 These filters are registered in the ``micawber_tags`` library, which can be
 invoked in your templates:
@@ -65,6 +67,29 @@ The following filters are exposed via the :py:mod:`micawber.contrib.mcdjango` mo
     .. code-block:: python
 
         {{ blog_entry.body|markdown|oembed_html:"600x600" }}
+
+.. py:function:: extract_oembed(text[, width_height=None])
+
+    Parse the given text, returning a list of 2-tuples containing url and metadata
+    about the url.
+
+    Usage within a django template:
+
+    .. code-block:: python
+
+        {% for url, metadata in blog_entry.body|extract_oembed:"600x600" %}
+          <img src="{{ metadata.thumbnail_url }}" />
+        {% endfor %}
+
+    :param text: the text to be parsed **do not use HTML**
+    :param width_height: string containing maximum for width and optionally height, of
+        format "WIDTHxHEIGHT" or "WIDTH", e.g. "500x500" or "800"
+    :rtype: 2-tuples containing the URL and a dictionary of metadata
+
+.. py:function:: extract_oembed_html(html[, width_height=None])
+
+    Exactly the same as above except for usage *with html*
+
 
 Extending the filters
 ---------------------
@@ -114,6 +139,8 @@ Some examples of keyword arguments to override are:
 * html (default ``False``): whether to parse as plaintext or html
 * handler: function used to render metadata as markup
 * block_handler: function used to render inline links with rich metadata
+* text_fn: function to use when parsing text
+* html_fn: function to use when parsing html
 
 The magic happens in :py:func:`micawber.contrib.mcdjango.extension` -- check
 out the `source code <https://github.com/coleifer/micawber/blob/master/micawber/contrib/mcdjango/__init__.py>`_ for more details.
