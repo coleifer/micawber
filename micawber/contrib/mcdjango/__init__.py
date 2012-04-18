@@ -23,6 +23,15 @@ if callable(providers):
 register = template.Library()
 
 
+def fix_width_height(width_height, params):
+    if width_height:
+        if 'x' in width_height:
+            params['maxwidth'], params['maxheight'] = map(int, width_height.split('x'))
+        else:
+            params['maxwidth'] = int(width_height[0])
+            params.pop('maxheight', None)
+    return params
+
 def extension(filter_name, providers=providers, urlize_all=True, html=False, handler=full_handler, 
               block_handler=inline_handler, text_fn=parse_text, html_fn=parse_html, **kwargs):
     if html:
@@ -32,12 +41,7 @@ def extension(filter_name, providers=providers, urlize_all=True, html=False, han
     def _extension(s, width_height=None):
         params = getattr(settings, 'MICAWBER_DEFAULT_SETTINGS', {})
         params.update(kwargs)
-        if width_height:
-            if 'x' in width_height:
-                params['maxwidth'], params['maxheight'] = map(int, width_height.split('x'))
-            else:
-                params['maxwidth'] = int(width_height[0])
-                params.pop('maxheight', None)
+        params = fix_width_height(width_height, params)
         return mark_safe(fn(s, providers, urlize_all, handler, block_handler, **params))
     register.filter(filter_name, _extension)
     return _extension
@@ -51,12 +55,7 @@ def _extract_oembed(text, width_height=None, html=False):
     else:
         fn = extract
     params = getattr(settings, 'MICAWBER_DEFAULT_SETTINGS', {})
-    if width_height:
-        if 'x' in width_height:
-            params['maxwidth'], params['maxheight'] = map(int, width_height.split('x'))
-        else:
-            params['maxwidth'] = int(width_height[0])
-            params.pop('maxheight', None)
+    params = fix_width_height(width_height, params)
     url_list, url_data = fn(text, providers, **params)
     return [(u, url_data[u]) for u in url_list if u in url_data]
 
