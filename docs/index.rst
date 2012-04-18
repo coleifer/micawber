@@ -65,7 +65,7 @@ here is a quick example:
     # returns the following html:
     <p><iframe width="459" height="344" src="http://www.youtube.com/embed/54XHDUOHuzU?fs=1&amp;feature=oembed" frameborder="0" allowfullscreen="allowfullscreen"></iframe></p>
 
-check out the :ref:`examples page <examples>` for more.
+check out the :ref:`getting started <getting_started>` for more examples
 
 
 integration with web frameworks
