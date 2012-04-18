@@ -18,6 +18,16 @@ setup(
         'micawber': [
         ],
     },
+    package_data = {
+        'examples': [
+            #'requirements.txt',
+            #'static/*.css',
+            #'templates/*.html',
+            #'templates/*/*.html',
+        ],
+        'micawber': [
+        ],
+    },
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
