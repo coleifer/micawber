@@ -82,6 +82,7 @@ Contents:
 
    installation
    getting_started
+   examples
    flask
    django
    api
