@@ -7,7 +7,7 @@ f.close()
 
 setup(
     name='micawber',
-    version="0.2.1",
+    version="0.2.2",
     description='a small library for extracting rich content from urls',
     long_description=readme,
     author='Charles Leifer',
@@ -21,9 +21,8 @@ setup(
     package_data = {
         'examples': [
             #'requirements.txt',
-            #'static/*.css',
-            #'templates/*.html',
-            #'templates/*/*.html',
+            '*/static/*.css',
+            '*/templates/*.html',
         ],
         'micawber': [
         ],
