@@ -3,13 +3,128 @@
 Django integration
 ==================
 
-micawber provides several template filters for use within
-your django project.
+First be sure you have added ``micawber.contrib.mcdjango`` to ``INSTALLED_APPS``
+so that we can use the template filters it defines.
 
-Setting configuration
+.. code-block:: python
+
+    # settings.py
+
+    INSTALLED_APPS = [
+        # ...
+        'micawber.contrib.mcdjango',
+    ]
+
+micawber provides 2 template filters for converting URLs contained within
+text or HTML to rich content:
+
+* :py:func:`~micawber.contrib.mcdjango.oembed` for plain text
+* :py:func:`~micawber.contrib.mcdjango.oembed_html` for html
+
+These filters are registered in the ``micawber_tags`` library, which can be
+invoked in your templates:
+
+.. code-block:: html
+
+    {% load micawber_tags %}
+
+    <p>{{ object.body|oembed:"600x600" }}</p>
+
+Each filter accepts one argument and one optional argument, due to django's template
+filters being wack.
+
+
+Django filter API
+-----------------
+
+.. py:module:: micawber.contrib.mcdjango
+
+The following filters are exposed via the :py:mod:`micawber.contrib.mcdjango` module:
+
+.. py:function:: oembed(text[, width_height=None])
+
+    Parse the given text, rendering URLs as rich media
+
+    Usage within a django template:
+
+    .. code-block:: python
+
+        {{ blog_entry.body|oembed:"600x600" }}
+
+    :param text: the text to be parsed **do not use HTML**
+    :param width_height: string containing maximum for width and optionally height, of
+        format "WIDTHxHEIGHT" or "WIDTH", e.g. "500x500" or "800"
+    :rtype: parsed text with rich content embedded
+
+.. py:function:: oembed_html(html[, width_height=None])
+
+    Exactly the same as above except for usage *with html*
+
+    Usage within a django template:
+
+    .. code-block:: python
+
+        {{ blog_entry.body|markdown|oembed_html:"600x600" }}
+
+Extending the filters
 ---------------------
 
-First be sure you have added ``micawber.contrib.mcdjango`` to ``settings.INSTALLED_APPS``
+For simplicity, micawber provides a setting allowing you to create custom template
+filters.  An example use case would be to add a template filter that could embed
+rich content, but did not automatically "urlize" all links.
+
+Extensions are configured in the ``settings`` module and take the form of a list of
+2-tuples containing:
+
+1. the name for the custom filter
+2. a dictionary of keyword arguments to pass in to the ``parse`` function
+
+.. code-block:: python
+
+    MICAWBER_TEMPLATE_EXTENSIONS = [
+        ('oembed_no_urlize', {'urlize_all': False}),
+    ]
+
+Assume this is our template:
+
+.. code-block:: html
+
+    {% load micawber_tags %}
+
+    DEFAULT:
+    {{ "http://foo.com/ and http://bar.com/"|oembed }}
+
+    CUSTOM:
+    {{ "http://foo.com/ and http://bar.com/"|oembed_no_urlize }}
+
+Rendering the above template will produce the following output:
+
+.. code-block:: html
+
+    DEFAULT:
+    <a href="http://foo.com/">http://foo.com/</a> and <a href="http://bar.com/">http://bar.com/</a>
+
+    CUSTOM:
+    http://foo.com/ and http://bar.com/
+
+Some examples of keyword arguments to override are:
+
+* providers: a :py:class:`~micawber.providers.ProviderRegistry` instance
+* urlize_all (default ``True``): whether to convert *all* URLs to clickable links
+* html (default ``False``): whether to parse as plaintext or html
+* handler: function used to render metadata as markup
+* block_handler: function used to render inline links with rich metadata
+
+The magic happens in :py:func:`micawber.contrib.mcdjango.extension` -- check
+out the `source code <https://github.com/coleifer/micawber/blob/master/micawber/contrib/mcdjango/__init__.py>`_ for more details.
+
+.. note:: 
+    The ``MICAWBER_EXTENSIONS`` setting can also be a string path to
+    a module and an attribute containing a similar data structure.
+
+
+Additional settings
+-------------------
 
 Providers
 ^^^^^^^^^
@@ -20,25 +135,8 @@ be a ProviderRegistry instance or a callable.  The default is:
 
 ``MICAWBER_PROVIDERS = 'micawber.contrib.mcdjango.providers.bootstrap_basic'``
 
-Suppose you want to customize this:
-
-``MICAWBER_PROVIDERS = 'my_app.micawber_providers.oembed_providers'``
-
-That module might look something like:
-
-.. code-block:: python
-
-    from django.core.cache import cache
-    from micawber.providers import Provider, bootstrap_basic
-
-    oembed_providers = boostrap_basic(cache)
-    oembed_providers.register('http://example.com/\S*', Provider('http://example.com/oembed/'))
-
-
-Using with Embed.ly
-^^^^^^^^^^^^^^^^^^^
-
-You can use the bootstrap embedly function:
+You can use the bootstrap embedly function, but beware this may take a few
+seconds to load up:
 
 ``MICAWBER_PROVIDERS = 'micawber.contrib.mcdjango.providers.bootstrap_embedly'``
 
@@ -46,6 +144,29 @@ If you want to use the embedly endpoints and have an API key, you can specify
 that in the settings:
 
 ``MICAWBER_EMBEDLY_KEY = 'foo'``
+
+You can also customize this with your own set of providers.  This must be either
+
+* the module path to a :py:class:`~micawber.providers.ProviderRegistry` instance
+* the module path to a callable which returns a :py:class:`~micawber.providers.ProviderRegistry` instance
+
+Here is a quick example showing a custom ``ProviderRegistry``:
+
+.. code-block:: python
+
+    # settings.py
+    MICAWBER_PROVIDERS = 'my_app.micawber_providers.oembed_providers'
+
+.. code-block:: python
+
+    # my_app/micawber_providers.py
+    from django.core.cache import cache
+    from micawber.providers import Provider, bootstrap_basic
+
+    oembed_providers = boostrap_basic(cache)
+
+    # add a custom provider
+    oembed_providers.register('http://example.com/\S*', Provider('http://example.com/oembed/'))
 
 
 Default settings for requests
@@ -63,45 +184,9 @@ Default arguments need to be specified in the settings:
         'maxheight': 600,
     }
 
-You can also use the factory method to partially apply values to
-generate new filters:
 
-.. code-block:: python
-
-    MICAWBER_TEMPLATE_EXTENSIONS = [
-        ('oembed_no_urlize', {'urlize_all': False}),
-    ]
-
-These can be automatically imported and loaded:
-
-``MICAWBER_TEMPLATE_EXTENSIONS = 'my_app.micawber_extensions'``
-
-.. note::
-
-    the attribute ``micawber_extensions`` must be a list of the form:
-    
-    .. code-block:: python
-    
-        micawber_extensions = [
-            ('oembed_no_urlize', {'urlize_all': False}),
-        ]
-
-
-Template filters
-----------------
-
-Here is some simple usage:
-
-.. code-block:: html
-
-    {% load micawber_tags %}
-    
-    {% block content %}
-      <p>{{ object.body|oembed:"600x600" }}</p>
-    {% endblock %}
-
-
-Trying it out in the python shell:
+Trying it out in the python shell
+---------------------------------
 
 .. code-block:: python
 

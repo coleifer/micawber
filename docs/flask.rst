@@ -38,7 +38,7 @@ The following filters are exposed via the :py:mod:`micawber.contrib.mcflask` mod
 
 .. py:function:: oembed(text, urlize_all=True, html=False, **params)
 
-    Parse the given text, rendering URLs as rick media
+    Parse the given text, rendering URLs as rich media
 
     Usage within a Jinja2 template:
 
