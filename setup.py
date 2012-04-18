@@ -17,8 +17,6 @@ setup(
     package_data = {
         'micawber': [
         ],
-    },
-    package_data = {
         'examples': [
             #'requirements.txt',
             '*/static/*.css',
