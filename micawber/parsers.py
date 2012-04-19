@@ -164,7 +164,7 @@ def _is_standalone(soup_elem):
 def _inside_skip(soup_elem):
     parent = soup_elem.parent
     while parent is not None:
-        if parent.name not in skip_elements:
+        if parent.name in skip_elements:
             return True
         parent = parent.parent
     return False
