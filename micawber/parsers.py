@@ -23,6 +23,8 @@ block_elements = set([
     'ins', 'map', 'object', 'script', '[document]'
 ])
 
+skip_elements = set(['a', 'pre', 'code'])
+
 
 def full_handler(url, response_data, **params):
     if response_data['type'] == 'link':
@@ -119,7 +121,7 @@ def parse_html(html, providers, urlize_all=True, handler=full_handler, block_han
     soup = BeautifulSoup(html)
 
     for url in soup.findAll(text=re.compile(url_re)):
-        if not _inside_a(url):
+        if not _inside_skip(url):
             if _is_standalone(url):
                 url_handler = handler
             else:
@@ -140,7 +142,7 @@ def extract_html(html, providers, **params):
     extracted_urls = {}
 
     for url in soup.findAll(text=re.compile(url_re)):
-        if _inside_a(url):
+        if _inside_skip(url):
             continue
     
         block_all, block_ext = extract(unicode(url), providers, **params)
@@ -159,10 +161,10 @@ def _is_standalone(soup_elem):
         return soup_elem.parent.name in block_elements
     return False
 
-def _inside_a(soup_elem):
+def _inside_skip(soup_elem):
     parent = soup_elem.parent
     while parent is not None:
-        if parent.name == 'a':
+        if parent.name not in skip_elements:
             return True
         parent = parent.parent
     return False
