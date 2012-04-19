@@ -66,6 +66,20 @@ Providers
         :param regex: a regex for matching URLs of a given type
         :param provider: a :py:class:`Provider` instance
 
+    .. py:method:: request(url, **extra_params)
+    
+        Retrieve information about the given url if it matches a regex in
+        the instance's registry.  If no provider matches the URL, a ``ProviderException``
+        is thrown, otherwise the URL and parameters are dispatched to the matching
+        provider's :py:meth:`Provider.request` method.
+
+        If a cache was specified, the resulting metadata will be cached.
+        
+        :param url: URL to retrieve metadata for
+        :param extra_params: additional parameters to pass to the endpoint, for
+            example a maxwidth or an API key.
+        :rtype: a dictionary of JSON data
+
 .. py:function:: bootstrap_basic([cache=None])
 
     Create a :py:class:`ProviderRegistry` and register some basic providers,
