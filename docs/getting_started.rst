@@ -160,3 +160,31 @@ If you would rather extract metadata, there are two functions:
 
 The :ref:`API docs <api>` are extensive, so please refer there for a full list of
 parameters and functions.
+
+
+How the parsers determine what to convert
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+First a couple definitions:
+
+Full representation:
+    A "rich" representation of an embeddable object, for example a flash player
+    or an <img> tag.
+
+Inline representation:
+    A representation of an embeddable object suitable for embedding within a
+    block of text, so as not to disrupt the flow of the text -- for example
+    a clickable <a> tag.
+
+There are two parsers that you will probably use the most:
+
+* :py:func:`~micawber.parsers.parse_text` for text
+
+  * URLs on their own line are converted into full representations
+  * URLs within blocks of text are converted into clickable links
+
+* :py:func:`~micawber.parsers.parse_html` for html
+
+  * URLs that are already within <a> tags are passed over
+  * URLs on their own in block tags are converted into full representations
+  * URLs interspersed with text are converted into clickable links
