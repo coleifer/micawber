@@ -1,5 +1,6 @@
 from django import template
 from django.conf import settings
+from django.template.loader import render_to_string
 from django.utils.importlib import import_module
 from django.utils.safestring import mark_safe
 
@@ -22,6 +23,12 @@ if callable(providers):
 
 register = template.Library()
 
+def django_template_handler(url, response_data, **params):
+    return mark_safe(render_to_string('micawber/%s.html' % response_data['type'], template.Context(dict(
+        params=params,
+        response=response_data,
+        url=url,
+    ))).strip())
 
 def fix_width_height(width_height, params):
     if width_height:
@@ -32,7 +39,7 @@ def fix_width_height(width_height, params):
             params.pop('maxheight', None)
     return params
 
-def extension(filter_name, providers=providers, urlize_all=True, html=False, handler=full_handler, 
+def extension(filter_name, providers=providers, urlize_all=True, html=False, handler=django_template_handler, 
               block_handler=inline_handler, text_fn=parse_text, html_fn=parse_html, **kwargs):
     if html:
         fn = html_fn
