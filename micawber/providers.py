@@ -1,7 +1,9 @@
 import hashlib
 import pickle
 import re
+import socket
 import urllib2
+import sys
 from urllib import urlencode
 try:
     import simplejson as json
@@ -21,13 +23,16 @@ class Provider(object):
         self.base_params.update(kwargs)
 
     def fetch(self, url):
+        socket.setdefaulttimeout(self.socket_timeout)
         req = urllib2.Request(url, headers={'User-Agent': self.user_agent})
         try:
-            resp = urllib2.urlopen(req, timeout=self.socket_timeout)
+            resp = urllib2.urlopen(req)
         except urllib2.URLError:
             return False
+        except socket.timeout:
+            return False
 
-        if resp.getcode() < 200 or resp.getcode() >= 300:
+        if resp.code < 200 or resp.code >= 300:
             return False
 
         content = resp.read()
