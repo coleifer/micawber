@@ -123,6 +123,12 @@ You can use two helper functions to get a populated registry:
 * :py:func:`~micawber.providers.bootstrap_basic`
 * :py:func:`~micawber.providers.bootstrap_embedly`
 
+The bootstrap_embedly function makes a HTTP request to embed.ly's server asking
+for a list of providers it supports, so you may experience some latency when
+using this helper.  For most WSGI applications this will not be an issue, but
+if you'd like to speed it up I suggest fetching the results, storing them in
+the db or a file, and then pulling from there.
+
 More information can be found in the :py:class:`~micawber.providers.ProviderRegistry` API docs.
 
 Parsers
