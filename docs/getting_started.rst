@@ -118,6 +118,11 @@ pre-populated:
 As you can see, the :py:meth:`~micawber.providers.ProviderRegistry.register` method takes
 two parameters, a regular expression for valid URLs and a ``Provider`` instance.
 
+You can use two helper functions to get a populated registry:
+
+* :py:func:`~micawber.providers.bootstrap_basic`
+* :py:func:`~micawber.providers.bootstrap_embedly`
+
 More information can be found in the :py:class:`~micawber.providers.ProviderRegistry` API docs.
 
 Parsers

@@ -99,6 +99,12 @@ Providers
         specifying your API key
     :rtype: a ProviderRegistry with support for embed.ly
 
+    .. code-block:: python
+
+        # if you have an API key, you can specify that here
+        pr = bootstrap_embedly(key='my-embedly-key')
+        pr.request('http://www.youtube.com/watch?v=54XHDUOHuzU')
+
 Parsers
 -------
 
