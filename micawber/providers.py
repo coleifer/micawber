@@ -85,7 +85,7 @@ class ProviderRegistry(object):
         self._registry[regex] = provider
 
     def unregister(self, regex):
-        del(self._registry[index])
+        del(self._registry[regex])
 
     def __iter__(self):
         return iter(self._registry.items())
