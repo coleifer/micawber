@@ -39,11 +39,14 @@ class Provider(object):
         resp.close()
         return content
 
-    def request(self, url, **extra_params):
+    def encode_params(self, url, **extra_params):
         params = dict(self.base_params)
         params.update(extra_params)
         params['url'] = url
-        encoded_params = urlencode(sorted(params.items()))
+        return urlencode(sorted(params.items()))
+
+    def request(self, url, **extra_params):
+        encoded_params = self.encode_params(url, **extra_params)
 
         endpoint_url = self.endpoint
         if '?' in endpoint_url:
@@ -53,12 +56,15 @@ class Provider(object):
 
         response = self.fetch(endpoint_url)
         if response:
-            json_data = json.loads(response)
-            if 'url' not in json_data:
-                json_data['url'] = url
-            return json_data
+            return self.handle_response(response, url)
         else:
             raise ProviderException('Error fetching "%s"' % endpoint_url)
+
+    def handle_response(self, response, url):
+        json_data = json.loads(response)
+        if 'url' not in json_data:
+            json_data['url'] = url
+        return json_data
 
 
 def make_key(*args, **kwargs):
