@@ -1,7 +1,7 @@
 micawber
 ========
 
-.. image:: http://i.imgur.com/QAnaa.jpg
+.. image:: http://media.charlesleifer.com/blog/photos/micawber.jpg
 
 A small library for extracting rich content from urls
 
