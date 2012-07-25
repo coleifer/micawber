@@ -16,13 +16,12 @@ setup(
     packages=find_packages(),
     package_data = {
         'micawber': [
+            'contrib/mcdjango/templates/micawber/*.html',
         ],
         'examples': [
             #'requirements.txt',
             '*/static/*.css',
             '*/templates/*.html',
-        ],
-        'micawber': [
         ],
     },
     classifiers=[
