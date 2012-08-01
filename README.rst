@@ -29,7 +29,7 @@ here is a quick example::
     # returns the following dictionary:
     {
         'author_name': 'pascalbrax', 
-        'author_url': u'http://www.youtube.com/user/pascalbrax'
+        'author_url': u'http://www.youtube.com/user/pascalbrax',
         'height': 344, 
         'html': u'<iframe width="459" height="344" src="http://www.youtube.com/embed/54XHDUOHuzU?fs=1&feature=oembed" frameborder="0" allowfullscreen></iframe>', 
         'provider_name': 'YouTube', 
