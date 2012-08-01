@@ -113,7 +113,7 @@ def bootstrap_basic(cache=None):
     # complements of oembed.com#section7
     pr = ProviderRegistry(cache)
     pr.register('http://\S*?flickr.com/\S*', Provider('http://www.flickr.com/services/oembed/'))
-    pr.register('http://\S*.youtu(\.be|be\.com)/watch\S*', Provider('http://www.youtube.com/oembed'))
+    pr.register('https?://\S*.youtu(\.be|be\.com)/watch\S*', Provider('http://www.youtube.com/oembed'))
     pr.register('http://\S*.viddler.com/\S*', Provider('http://lab.viddler.com/services/oembed/'))
     pr.register('http://qik.com/video/\S*', Provider('http://qik.com/api/oembed.json'))
     pr.register('http://\S*.revision3.com/\S*', Provider('http://revision3.com/api/oembed/'))
