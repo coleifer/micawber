@@ -1,5 +1,9 @@
+import urllib2, unittest
+
 from micawber import *
-from micawber.test_utils import test_pr, test_cache, test_pr_cache, TestProvider, BaseTestCase
+from micawber.test_utils import (
+    test_pr, test_cache, test_pr_cache, TestProvider, BaseTestCase
+)
 
 
 class ProviderTestCase(BaseTestCase):
@@ -38,7 +42,7 @@ class ProviderTestCase(BaseTestCase):
 
         self.assertRaises(ProviderException, test_pr.request, 'http://not-here')
         self.assertRaises(ProviderException, test_pr.request, 'http://link-test3')
-    
+
     def test_caching(self):
         resp = test_pr_cache.request('http://link-test1')
         self.assertCached('http://link-test1', resp)
@@ -65,12 +69,82 @@ class ProviderTestCase(BaseTestCase):
         self.assertFalse(resp == resp_p)
 
 
+def internet_available():
+    """ Test whether there's an internet connection available. """
+    req = urllib2.Request('http://www.google.com/')
+
+    try:
+        urllib2.urlopen(req)
+    except urllib2.URLError:
+        return False
+    except socket.timeout:
+        return False
+
+    return True
+
+@unittest.skipUnless(internet_available(), 'No internet connection available.')
+class OnlineProviderTestCase(BaseTestCase):
+    """ Testcase for getting info from a real provider. """
+
+    def setUp(self):
+        self.providers = bootstrap_basic()
+
+
+    def test_readme(self):
+        """ Test the URL from the readme. """
+
+        result = self.providers.request('http://www.youtube.com/watch?v=54XHDUOHuzU')
+
+        expected_result = {
+            'author_name': 'pascalbrax',
+            'author_url': u'http://www.youtube.com/user/pascalbrax',
+            'height': 344,
+            'html': u'<iframe width="459" height="344" src="http://www.youtube.com/embed/54XHDUOHuzU?fs=1&feature=oembed" frameborder="0" allowfullscreen></iframe>',
+            'provider_name': 'YouTube',
+            'provider_url': 'http://www.youtube.com/',
+            'title': 'Future Crew - Second Reality demo - HD',
+            'type': u'video',
+            'thumbnail_height': 360,
+            'thumbnail_url': u'http://i2.ytimg.com/vi/54XHDUOHuzU/hqdefault.jpg',
+            'thumbnail_width': 480,
+            'url': 'http://www.youtube.com/watch?v=54XHDUOHuzU',
+            'width': 459,
+            'version': '1.0',
+        }
+
+        self.assertEquals(result, expected_result)
+
+    def test_readme_ssl(self):
+        """ Test the URL from the readme, over HTTPS. """
+
+        result = self.providers.request('https://www.youtube.com/watch?v=54XHDUOHuzU')
+
+        expected_result = {
+            'author_name': 'pascalbrax',
+            'author_url': u'http://www.youtube.com/user/pascalbrax',
+            'height': 344,
+            'html': u'<iframe width="459" height="344" src="http://www.youtube.com/embed/54XHDUOHuzU?fs=1&feature=oembed" frameborder="0" allowfullscreen></iframe>',
+            'provider_name': 'YouTube',
+            'provider_url': 'http://www.youtube.com/',
+            'title': 'Future Crew - Second Reality demo - HD',
+            'type': u'video',
+            'thumbnail_height': 360,
+            'thumbnail_url': u'http://i2.ytimg.com/vi/54XHDUOHuzU/hqdefault.jpg',
+            'thumbnail_width': 480,
+            'url': 'https://www.youtube.com/watch?v=54XHDUOHuzU',
+            'width': 459,
+            'version': '1.0',
+        }
+
+        self.assertEquals(result, expected_result)
+
+
 class ParserTestCase(BaseTestCase):
     def test_parse_text_full(self):
         for url, expected in self.full_pairs.items():
             parsed = parse_text_full(url, test_pr)
             self.assertEqual(parsed, expected)
-        
+
         # the parse_text_full will replace even inline content
         for url, expected in self.full_pairs.items():
             parsed = parse_text_full('this is inline: %s' % url, test_pr)
@@ -211,7 +285,7 @@ class ParserTestCase(BaseTestCase):
             if 'url' not in expected:
                 expected['url'] = url
             self.assertEqual(extracted, {url: expected})
-    
+
     def test_outside_of_markup(self):
         frame = '%s<p>testing</p>'
         for url, expected in self.full_pairs.items():
