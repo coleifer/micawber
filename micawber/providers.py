@@ -29,6 +29,8 @@ class Provider(object):
             resp = urllib2.urlopen(req)
         except urllib2.URLError:
             return False
+        except urllib2.HTTPError:
+            return False
         except socket.timeout:
             return False
 
