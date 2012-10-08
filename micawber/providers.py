@@ -10,7 +10,7 @@ try:
 except ImportError:
     import json
 
-from micawber.exceptions import ProviderException
+from micawber.exceptions import ProviderException, ProviderNotFoundException
 
 
 class Provider(object):
@@ -108,7 +108,7 @@ class ProviderRegistry(object):
         provider = self.provider_for_url(url)
         if provider:
             return provider.request(url, **params)
-        raise ProviderException('Provider not found for "%s"' % url)
+        raise ProviderNotFoundException('Provider not found for "%s"' % url)
 
 
 def bootstrap_basic(cache=None):
