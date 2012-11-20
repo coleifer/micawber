@@ -31,7 +31,7 @@ class GoogleMapsProvider(Provider):
     pr = micawber.bootstrap_basic()
     pr.register(GoogleMapsProvider.regex, GoogleMapsProvider(''))
     """
-    regex = r'^http://maps.google.com/maps\?([^\s]+)'
+    regex = r'^https?://maps.google.com/maps\?([^\s]+)'
     
     valid_params = ['q', 'z']
     
