@@ -35,7 +35,7 @@ def fix_width_height(width_height, params):
         if 'x' in width_height:
             params['maxwidth'], params['maxheight'] = map(int, width_height.split('x'))
         else:
-            params['maxwidth'] = int(width_height[0])
+            params['maxwidth'] = int(width_height)
             params.pop('maxheight', None)
     return params
 

@@ -9,10 +9,15 @@ class MicawberDjangoTestCase(TestCase, BaseTestCase):
         s = '{%% load micawber_tags %%}%s' % s
         return Template(s).render(Context(params)).strip()
 
+    def test_fix_wh(self):
+        from micawber.contrib.mcdjango import fix_width_height
+        self.assertEqual(fix_width_height('300x400', {}), {'maxwidth': 300, 'maxheight': 400})
+        self.assertEqual(fix_width_height('300', {}), {'maxwidth': 300})
+
     def test_provider_loading(self):
         from micawber.contrib.mcdjango import providers
         self.assertEqual(providers, test_pr)
-    
+
     def test_oembed_filter_multiline_plain(self):
         for url, expected in self.full_pairs.items():
             expected_inline = self.inline_pairs[url]
@@ -22,7 +27,7 @@ class MicawberDjangoTestCase(TestCase, BaseTestCase):
 
             parsed = self.render('{{ test_str|oembed }}', test_str=test_str)
             self.assertEqual(parsed, frame % (expected_inline, expected, expected_inline))
-    
+
     def test_oembed_filter_multiline_html(self):
         for url, expected in self.full_pairs.items():
             expected_inline = self.inline_pairs[url]
@@ -41,7 +46,7 @@ class MicawberDjangoTestCase(TestCase, BaseTestCase):
 
             parsed = self.render('{{ test_str|oembed_html }}', test_str=test_str)
             self.assertEqual(parsed, frame % (url, expected_inline, expected_inline))
-    
+
     def test_urlize(self):
         u1 = 'http://fappio.com/'
         u2 = 'http://google.com/fap/'
@@ -55,7 +60,7 @@ class MicawberDjangoTestCase(TestCase, BaseTestCase):
 
             parsed = self.render('{{ test_str|oembed }}', test_str=test_str)
             self.assertEqual(parsed, frame % (u1h, u2h, expected, expected_inline))
-    
+
     def test_oembed_filter_extension(self):
         for url, expected in self.full_pairs.items():
             expected_inline = self.inline_pairs[url]
@@ -65,7 +70,7 @@ class MicawberDjangoTestCase(TestCase, BaseTestCase):
 
             parsed = self.render('{{ test_str|oembed_no_urlize }}', test_str=test_str)
             self.assertEqual(parsed, frame % (expected, expected_inline))
-    
+
     def test_extract_filter(self):
         blank = 'http://fapp.io/foo/'
         frame = 'test %s\n%s\n%s\n%s at last'
@@ -78,7 +83,7 @@ class MicawberDjangoTestCase(TestCase, BaseTestCase):
             test_str = frame % (url, blank, url, blank)
             rendered = self.render(t, test_str=test_str)
             self.assertEqual(rendered, url)
-            
+
             test_str = frame_html % (url, blank, url, blank)
             rendered = self.render(t, test_str=test_str)
             self.assertEqual(rendered, url)
