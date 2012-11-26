@@ -122,6 +122,7 @@ def bootstrap_basic(cache=None):
     pr.register('http://\S*.revision3.com/\S*', Provider('http://revision3.com/api/oembed/'))
     pr.register('http://www.hulu.com/watch/\S*', Provider('http://www.hulu.com/api/oembed.json'))
     pr.register('http://vimeo.com/\S*', Provider('http://vimeo.com/api/oembed.json'))
+    pr.register('https://vimeo.com/\S*', Provider('https://vimeo.com/api/oembed.json'))
     pr.register('http://www.polleverywhere.com/(polls|multiple_choice_polls|free_text_polls)/\S*', Provider('http://www.polleverywhere.com/services/oembed/'))
     pr.register('http://www.ifixit.com/Guide/View/\S*', Provider('http://www.ifixit.com/Embed'))
     pr.register('http://\S*.smugmug.com/\S*', Provider('http://api.smugmug.com/services/oembed/'))
