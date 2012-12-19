@@ -118,7 +118,7 @@ def parse_html(html, providers, urlize_all=True, handler=full_handler, block_han
     if not BeautifulSoup:
         raise Exception('Unable to parse HTML, please install BeautifulSoup or use the text parser')
 
-    soup = BeautifulSoup(html)
+    soup = BeautifulSoup(html, convertEntities=BeautifulSoup.HTML_ENTITIES)
 
     for url in soup.findAll(text=re.compile(url_re)):
         if not _inside_skip(url):
@@ -136,7 +136,7 @@ def extract_html(html, providers, **params):
     if not BeautifulSoup:
         raise Exception('Unable to parse HTML, please install BeautifulSoup or use the text parser')
 
-    soup = BeautifulSoup(html)
+    soup = BeautifulSoup(html, convertEntities=BeautifulSoup.HTML_ENTITIES)
     all_urls = set()
     urls = []
     extracted_urls = {}

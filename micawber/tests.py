@@ -217,3 +217,18 @@ class ParserTestCase(BaseTestCase):
         for url, expected in self.full_pairs.items():
             parsed = parse_html(frame % (url), test_pr)
             self.assertEqual(parsed, frame % (expected))
+
+    def test_html_entities(self):
+        frame_html = '<p>test %s</p><p><a href="foo">%s</a></p>'
+
+        for url, expected in self.data_pairs.items():
+            esc_url = url.replace('&', '&amp;')
+            all_urls, extracted = extract_html(frame_html % (esc_url, esc_url), test_pr)
+            self.assertEqual(all_urls, [url])
+
+            if 'url' not in expected:
+                expected['url'] = url
+            self.assertEqual(extracted, {url: expected})
+
+            rendered = parse_html('<p>%s</p>' % esc_url, test_pr)
+            self.assertEqual(rendered, '<p>%s</p>' % self.full_pairs[url])

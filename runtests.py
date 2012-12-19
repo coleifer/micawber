@@ -11,7 +11,7 @@ def run_django_tests():
         import django
     except ImportError:
         print 'Skipping django tests'
-        return failures, errors
+        return
     else:
         print 'Running django integration tests'
 
