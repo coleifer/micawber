@@ -114,20 +114,42 @@ class ProviderRegistry(object):
 def bootstrap_basic(cache=None):
     # complements of oembed.com#section7
     pr = ProviderRegistry(cache)
-    pr.register('http://\S*?flickr.com/\S*', Provider('http://www.flickr.com/services/oembed/'))
-    pr.register('https?://(\S*.)?youtu(\.be/|be\.com/watch)\S*', Provider('http://www.youtube.com/oembed'))
+
+    # i
+    pr.register('http://www.ifixit.com/Guide/View/\S*', Provider('http://www.ifixit.com/Embed'))
     pr.register('http://(.*imgur\.com/.*)', Provider('http://api.imgur.com/oembed')),
-    pr.register('http://\S*.viddler.com/\S*', Provider('http://lab.viddler.com/services/oembed/'))
-    pr.register('http://qik.com/video/\S*', Provider('http://qik.com/api/oembed.json'))
-    pr.register('http://\S*.revision3.com/\S*', Provider('http://revision3.com/api/oembed/'))
+
+    # f
+    pr.register('http://\S*?flickr.com/\S*', Provider('http://www.flickr.com/services/oembed/'))
+
+    # h
     pr.register('http://www.hulu.com/watch/\S*', Provider('http://www.hulu.com/api/oembed.json'))
+
+    # p
+    pr.register('http://www.polleverywhere.com/(polls|multiple_choice_polls|free_text_polls)/\S*', Provider('http://www.polleverywhere.com/services/oembed/'))
+
+    # q
+    pr.register('http://qik.com/video/\S*', Provider('http://qik.com/api/oembed.json'))
+
+    # r
+    pr.register('http://\S*.revision3.com/\S*', Provider('http://revision3.com/api/oembed/'))
+
+    # s
+    pr.register('http://www.slideshare.net/[^\/]+/\S*', Provider('http://www.slideshare.net/api/oembed/2'))
+    pr.register('http://\S*.smugmug.com/\S*', Provider('http://api.smugmug.com/services/oembed/'))
+    pr.register('https://\S*?soundcloud.com/\S*', Provider('http://soundcloud.com/oembed'))
+
+    # v
+    pr.register('http://\S*.viddler.com/\S*', Provider('http://lab.viddler.com/services/oembed/'))
     pr.register('http://vimeo.com/\S*', Provider('http://vimeo.com/api/oembed.json'))
     pr.register('https://vimeo.com/\S*', Provider('https://vimeo.com/api/oembed.json'))
-    pr.register('http://www.polleverywhere.com/(polls|multiple_choice_polls|free_text_polls)/\S*', Provider('http://www.polleverywhere.com/services/oembed/'))
-    pr.register('http://www.ifixit.com/Guide/View/\S*', Provider('http://www.ifixit.com/Embed'))
-    pr.register('http://\S*.smugmug.com/\S*', Provider('http://api.smugmug.com/services/oembed/'))
+
+    # y
+    pr.register('https?://(\S*.)?youtu(\.be/|be\.com/watch)\S*', Provider('http://www.youtube.com/oembed'))
+
+    # w
     pr.register('http://\S+.wordpress.com/\S+', Provider('http://public-api.wordpress.com/oembed/'))
-    pr.register('http://www.slideshare.net/[^\/]+/\S*', Provider('http://www.slideshare.net/api/oembed/2'))
+
     return pr
 
 def bootstrap_embedly(cache=None, **params):
