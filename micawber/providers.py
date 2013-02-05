@@ -114,43 +114,66 @@ class ProviderRegistry(object):
 def bootstrap_basic(cache=None):
     # complements of oembed.com#section7
     pr = ProviderRegistry(cache)
+    
+    # b
+    pr.register('http://blip.tv/\S+', Provider('http://blip.tv/oembed')) 
 
-    # i
-    pr.register('http://www.ifixit.com/Guide/View/\S*', Provider('http://www.ifixit.com/Embed'))
-    pr.register('http://(.*imgur\.com/.*)', Provider('http://api.imgur.com/oembed')),
+    # c
+    pr.register('http://chirb.it/\S+', Provider('http://chirb.it/oembed.json'))
+    pr.register('https://www.circuitlab.com/circuit/\S+', Provider('https://www.circuitlab.com/circuit/oembed'))
+    pr.register('http://www.collegehumor.com/video/\S+', Provider('http://www.collegehumor.com/oembed.json'))
+
+    # d
+    pr.register('https?://(www\.)?dailymotion\.com/\S+', Provider('http://www.dailymotion.com/services/oembed'))
 
     # f
-    pr.register('http://\S*?flickr.com/\S*', Provider('http://www.flickr.com/services/oembed/'))
+    pr.register('http://\S*?flickr.com/\S+', Provider('http://www.flickr.com/services/oembed/'))
+    pr.register('https?://(www\.)?funnyordie\.com/videos/\S+', Provider('http://www.funnyordie.com/oembed'))
 
     # h
-    pr.register('http://www.hulu.com/watch/\S*', Provider('http://www.hulu.com/api/oembed.json'))
+    pr.register('http://www.hulu.com/watch/\S+', Provider('http://www.hulu.com/api/oembed.json'))
+
+    # i
+    pr.register('http://www.ifixit.com/Guide/View/\S+', Provider('http://www.ifixit.com/Embed'))
+    pr.register('http://\S*imgur\.com/\S+)', Provider('http://api.imgur.com/oembed')),
+    pr.register('http://instagr(\.am|am\.com)/p/\S+', Provider('http://api.instagram.com/oembed'))
+
+    # j
+    pr.register('http://www.jest.com/(video|embed)/\S+', Provider('http://www.jest.com/oembed.json'))
 
     # p
-    pr.register('http://www.polleverywhere.com/(polls|multiple_choice_polls|free_text_polls)/\S*', Provider('http://www.polleverywhere.com/services/oembed/'))
+    pr.register('http://i\S*.photobucket.com/albums/\S+', Provider('http://photobucket.com/oembed'))
+    pr.register('http://gi\S*.photobucket.com/groups/\S+', Provider('http://photobucket.com/oembed'))
+    pr.register('http://www.polleverywhere.com/(polls|multiple_choice_polls|free_text_polls)/\S+', Provider('http://www.polleverywhere.com/services/oembed/'))
 
     # q
-    pr.register('http://qik.com/video/\S*', Provider('http://qik.com/api/oembed.json'))
+    pr.register('http://qik.com/video/\S+', Provider('http://qik.com/api/oembed.json'))
 
     # r
-    pr.register('http://\S*.revision3.com/\S*', Provider('http://revision3.com/api/oembed/'))
+    pr.register('http://\S*.revision3.com/\S+', Provider('http://revision3.com/api/oembed/'))
 
     # s
-    pr.register('http://www.slideshare.net/[^\/]+/\S*', Provider('http://www.slideshare.net/api/oembed/2'))
+    pr.register('http://www.slideshare.net/[^\/]+/\S+', Provider('http://www.slideshare.net/api/oembed/2'))
     pr.register('http://\S*.smugmug.com/\S*', Provider('http://api.smugmug.com/services/oembed/'))
-    pr.register('https://\S*?soundcloud.com/\S*', Provider('http://soundcloud.com/oembed'))
+    pr.register('https://\S*?soundcloud.com/\S+', Provider('http://soundcloud.com/oembed'))
+
+    # t
+    pr.register('https?://(www\.)?twitter.com/\S+/status(es)?/\S+', Provider('http://api.twitter.com/1/statuses/oembed.json'))
 
     # v
     pr.register('http://\S*.viddler.com/\S*', Provider('http://lab.viddler.com/services/oembed/'))
-    pr.register('http://vimeo.com/\S*', Provider('http://vimeo.com/api/oembed.json'))
-    pr.register('https://vimeo.com/\S*', Provider('https://vimeo.com/api/oembed.json'))
+    pr.register('http://vimeo.com/\S+', Provider('http://vimeo.com/api/oembed.json'))
+    pr.register('https://vimeo.com/\S+', Provider('https://vimeo.com/api/oembed.json'))
 
     # y
-    pr.register('https?://(\S*.)?youtu(\.be/|be\.com/watch)\S*', Provider('http://www.youtube.com/oembed'))
+    pr.register('https?://(\S*.)?youtu(\.be/|be\.com/watch)\S+', Provider('http://www.youtube.com/oembed'))
 
     # w
     pr.register('http://\S+.wordpress.com/\S+', Provider('http://public-api.wordpress.com/oembed/'))
+    pr.register('https?://wordpress.tv/\S+', Provider('http://wordpress.tv/oembed/'))
 
     return pr
+
 
 def bootstrap_embedly(cache=None, **params):
     endpoint = 'http://api.embed.ly/1/oembed'
