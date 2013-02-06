@@ -125,7 +125,7 @@ def parse_html(html, providers, urlize_all=True, handler=full_handler, block_han
             if _is_standalone(url):
                 url_handler = handler
             else:
-                url_handler = inline_handler
+                url_handler = block_handler
 
             url_unescaped = url.string
             replacement = parse_text_full(url_unescaped, providers, urlize_all, url_handler, **params)
