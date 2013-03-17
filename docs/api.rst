@@ -105,6 +105,23 @@ Providers
         pr = bootstrap_embedly(key='my-embedly-key')
         pr.request('http://www.youtube.com/watch?v=54XHDUOHuzU')
 
+.. py:function:: bootstrap_noembed([cache=None, [**kwargs]])
+
+    Create a :py:class:`ProviderRegistry` and register as many providers as
+    are supported by `noembed.com <http://noembed.com>`_.  Valid services are
+    fetched from http://noembed.com/providers and parsed then registered.
+
+    :param cache: an object that implements simple ``get`` and ``set``
+    :param kwargs: any default keyword arguments to use with providers, useful for
+        passing the ``nowrap`` option to noembed.
+    :rtype: a ProviderRegistry with support for noembed
+
+    .. code-block:: python
+
+        # if you have an API key, you can specify that here
+        pr = bootstrap_noembed(nowrap=1)
+        pr.request('http://www.youtube.com/watch?v=54XHDUOHuzU')
+
 Parsers
 -------
 

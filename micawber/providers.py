@@ -206,3 +206,22 @@ def bootstrap_embedly(cache=None, **params):
         for regex in provider_meta['regex']:
             pr.register(regex, Provider(endpoint, **params))
     return pr
+
+
+def bootstrap_noembed(cache=None, **params):
+    endpoint = 'http://noembed.com/embed'
+    schema_url = 'http://noembed.com/providers'
+
+    pr = ProviderRegistry(cache)
+
+    # fetch the schema
+    resp = urllib2.urlopen(schema_url)
+    contents = resp.read()
+    resp.close()
+
+    json_data = json.loads(contents)
+
+    for provider_meta in json_data:
+        for regex in provider_meta['patterns']:
+            pr.register(regex, Provider(endpoint, **params))
+    return pr
