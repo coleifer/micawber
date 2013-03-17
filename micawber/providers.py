@@ -3,7 +3,6 @@ import pickle
 import re
 import socket
 import urllib2
-import sys
 from urllib import urlencode
 try:
     import simplejson as json
@@ -72,6 +71,7 @@ class Provider(object):
 def make_key(*args, **kwargs):
     return hashlib.md5(pickle.dumps((args, kwargs))).hexdigest()
 
+
 def url_cache(fn):
     def inner(self, url, **params):
         if self.cache:
@@ -83,6 +83,7 @@ def url_cache(fn):
             return data
         return fn(self, url, **params)
     return inner
+
 
 class ProviderRegistry(object):
     def __init__(self, cache=None):
@@ -114,9 +115,9 @@ class ProviderRegistry(object):
 def bootstrap_basic(cache=None):
     # complements of oembed.com#section7
     pr = ProviderRegistry(cache)
-    
+
     # b
-    pr.register('http://blip.tv/\S+', Provider('http://blip.tv/oembed')) 
+    pr.register('http://blip.tv/\S+', Provider('http://blip.tv/oembed'))
 
     # c
     pr.register('http://chirb.it/\S+', Provider('http://chirb.it/oembed.json'))
@@ -128,7 +129,11 @@ def bootstrap_basic(cache=None):
 
     # f
     pr.register('http://\S*?flickr.com/\S+', Provider('http://www.flickr.com/services/oembed/'))
+    pr.register('http://flic\.kr/\S*', Provider('http://www.flickr.com/services/oembed/'))
     pr.register('https?://(www\.)?funnyordie\.com/videos/\S+', Provider('http://www.funnyordie.com/oembed'))
+
+    # g
+    pr.register(r'https?://gist.github.com/\S*', Provider('https://github.com/api/oembed'))
 
     # h
     pr.register('http://www.hulu.com/watch/\S+', Provider('http://www.hulu.com/api/oembed.json'))
@@ -141,10 +146,15 @@ def bootstrap_basic(cache=None):
     # j
     pr.register('http://www.jest.com/(video|embed)/\S+', Provider('http://www.jest.com/oembed.json'))
 
+    # m
+    pr.register('http://www.mobypicture.com/user/\S*?/view/\S*', Provider('http://api.mobypicture.com/oEmbed'))
+    pr.register('http://moby.to/\S*', Provider('http://api.mobypicture.com/oEmbed'))
+
     # p
     pr.register('http://i\S*.photobucket.com/albums/\S+', Provider('http://photobucket.com/oembed'))
     pr.register('http://gi\S*.photobucket.com/groups/\S+', Provider('http://photobucket.com/oembed'))
     pr.register('http://www.polleverywhere.com/(polls|multiple_choice_polls|free_text_polls)/\S+', Provider('http://www.polleverywhere.com/services/oembed/'))
+    pr.register('https?://(.+\.)?polldaddy\.com/\S*', Provider('http://polldaddy.com/oembed/'))
 
     # q
     pr.register('http://qik.com/video/\S+', Provider('http://qik.com/api/oembed.json'))
@@ -154,8 +164,11 @@ def bootstrap_basic(cache=None):
 
     # s
     pr.register('http://www.slideshare.net/[^\/]+/\S+', Provider('http://www.slideshare.net/api/oembed/2'))
+    pr.register('http://slidesha\.re/\S*', Provider('http://www.slideshare.net/api/oembed/2'))
     pr.register('http://\S*.smugmug.com/\S*', Provider('http://api.smugmug.com/services/oembed/'))
     pr.register('https://\S*?soundcloud.com/\S+', Provider('http://soundcloud.com/oembed'))
+    pr.register('https?://speakerdeck\.com/\S*', Provider('https://speakerdeck.com/oembed.json')),
+    pr.register('https?://(www\.)?scribd\.com/\S*', Provider('http://www.scribd.com/services/oembed'))
 
     # t
     pr.register('https?://(www\.)?twitter.com/\S+/status(es)?/\S+', Provider('http://api.twitter.com/1/statuses/oembed.json'))
@@ -167,6 +180,7 @@ def bootstrap_basic(cache=None):
 
     # y
     pr.register('https?://(\S*.)?youtu(\.be/|be\.com/watch)\S+', Provider('http://www.youtube.com/oembed'))
+    pr.register('http://(\S*\.)?yfrog\.com/\S*', Provider('http://www.yfrog.com/api/oembed'))
 
     # w
     pr.register('http://\S+.wordpress.com/\S+', Provider('http://public-api.wordpress.com/oembed/'))
@@ -190,5 +204,24 @@ def bootstrap_embedly(cache=None, **params):
 
     for provider_meta in json_data:
         for regex in provider_meta['regex']:
+            pr.register(regex, Provider(endpoint, **params))
+    return pr
+
+
+def bootstrap_noembed(cache=None, **params):
+    endpoint = 'http://noembed.com/embed'
+    schema_url = 'http://noembed.com/providers'
+
+    pr = ProviderRegistry(cache)
+
+    # fetch the schema
+    resp = urllib2.urlopen(schema_url)
+    contents = resp.read()
+    resp.close()
+
+    json_data = json.loads(contents)
+
+    for provider_meta in json_data:
+        for regex in provider_meta['patterns']:
             pr.register(regex, Provider(endpoint, **params))
     return pr
