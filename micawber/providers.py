@@ -3,7 +3,6 @@ import pickle
 import re
 import socket
 import urllib2
-import sys
 from urllib import urlencode
 try:
     import simplejson as json
@@ -72,6 +71,7 @@ class Provider(object):
 def make_key(*args, **kwargs):
     return hashlib.md5(pickle.dumps((args, kwargs))).hexdigest()
 
+
 def url_cache(fn):
     def inner(self, url, **params):
         if self.cache:
@@ -83,6 +83,7 @@ def url_cache(fn):
             return data
         return fn(self, url, **params)
     return inner
+
 
 class ProviderRegistry(object):
     def __init__(self, cache=None):
@@ -114,9 +115,9 @@ class ProviderRegistry(object):
 def bootstrap_basic(cache=None):
     # complements of oembed.com#section7
     pr = ProviderRegistry(cache)
-    
+
     # b
-    pr.register('http://blip.tv/\S+', Provider('http://blip.tv/oembed')) 
+    pr.register('http://blip.tv/\S+', Provider('http://blip.tv/oembed'))
 
     # c
     pr.register('http://chirb.it/\S+', Provider('http://chirb.it/oembed.json'))
