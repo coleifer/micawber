@@ -7,7 +7,7 @@ f.close()
 
 setup(
     name='micawber',
-    version="0.2.5",
+    version="0.2.6",
     description='a small library for extracting rich content from urls',
     long_description=readme,
     author='Charles Leifer',
