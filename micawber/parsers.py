@@ -129,7 +129,7 @@ def parse_html(html, providers, urlize_all=True, handler=full_handler, block_han
 
             url_unescaped = url.string
             replacement = parse_text_full(url_unescaped, providers, urlize_all, url_handler, **params)
-            url.replaceWith(BeautifulSoup(replacement))
+            url.replaceWith(replacement)
 
     return unicode(soup)
 
