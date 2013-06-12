@@ -2,7 +2,7 @@ import hashlib
 import pickle
 import re
 import socket
-from .compat import urlencode, Request, urlopen, URLError, HTTPError
+from .compat import urlencode, Request, urlopen, URLError, HTTPError, get_charset
 try:
     import simplejson as json
 except ImportError:
@@ -35,7 +35,10 @@ class Provider(object):
         if resp.code < 200 or resp.code >= 300:
             return False
 
-        content = resp.read()
+        # by RFC, default HTTP charset is ISO-8859-1
+        charset = get_charset(resp) or 'iso-8859-1'
+
+        content = resp.read().decode(charset)
         resp.close()
         return content
 
