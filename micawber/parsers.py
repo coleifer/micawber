@@ -1,4 +1,5 @@
 import re
+from .compat import text_type
 try:
     import simplejson as json
 except ImportError:
@@ -136,7 +137,7 @@ def parse_html(html, providers, urlize_all=True, handler=full_handler, block_han
             replacement = parse_text_full(url_unescaped, providers, urlize_all, url_handler, **params)
             url.replaceWith(BeautifulSoup(replacement))
 
-    return unicode(soup)
+    return text_type(soup)
 
 def extract_html(html, providers, **params):
     if not BeautifulSoup:
@@ -151,7 +152,7 @@ def extract_html(html, providers, **params):
         if _inside_skip(url):
             continue
     
-        block_all, block_ext = extract(unicode(url), providers, **params)
+        block_all, block_ext = extract(text_type(url), providers, **params)
         for extracted_url in block_all:
             if extracted_url in all_urls:
                 continue
