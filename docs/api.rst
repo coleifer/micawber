@@ -172,7 +172,7 @@ Functions for parsing text and HTML
     worth noting is that URLs that are already enclosed within a <a> tag are skipped
     over.
     
-    .. note:: requires BeautifulSoup
+    .. note:: requires BeautifulSoup or beautifulsoup4
     
     :param html: a string of HTML to parse
     :param providers: a :py:class:`ProviderRegistry` instance
