@@ -2,8 +2,7 @@ import hashlib
 import pickle
 import re
 import socket
-import urllib2
-from urllib import urlencode
+from .compat import urlencode, Request, urlopen, URLError, HTTPError
 try:
     import simplejson as json
 except ImportError:
@@ -23,12 +22,12 @@ class Provider(object):
 
     def fetch(self, url):
         socket.setdefaulttimeout(self.socket_timeout)
-        req = urllib2.Request(url, headers={'User-Agent': self.user_agent})
+        req = Request(url, headers={'User-Agent': self.user_agent})
         try:
-            resp = urllib2.urlopen(req)
-        except urllib2.URLError:
+            resp = urlopen(req)
+        except URLError:
             return False
-        except urllib2.HTTPError:
+        except HTTPError:
             return False
         except socket.timeout:
             return False
@@ -196,7 +195,7 @@ def bootstrap_embedly(cache=None, **params):
     pr = ProviderRegistry(cache)
 
     # fetch the schema
-    resp = urllib2.urlopen(schema_url)
+    resp = urlopen(schema_url)
     contents = resp.read()
     resp.close()
 
@@ -215,7 +214,7 @@ def bootstrap_noembed(cache=None, **params):
     pr = ProviderRegistry(cache)
 
     # fetch the schema
-    resp = urllib2.urlopen(schema_url)
+    resp = urlopen(schema_url)
     contents = resp.read()
     resp.close()
 
