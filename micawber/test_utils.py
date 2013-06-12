@@ -5,6 +5,7 @@ except ImportError:
     import json
 
 from micawber import *
+from micawber.parsers import BeautifulSoup, bs_kwargs
 from micawber.providers import make_key
 
 
@@ -75,3 +76,9 @@ class BaseTestCase(unittest.TestCase):
         key = make_key(url, params)
         self.assertTrue(key in test_cache._cache)
         self.assertEqual(test_cache._cache[key], data)
+
+
+    def assertHTMLEqual(self, first, second, msg=None):
+        first = BeautifulSoup(first, **bs_kwargs)
+        second = BeautifulSoup(second, **bs_kwargs)
+        self.assertEqual(first, second, msg)
