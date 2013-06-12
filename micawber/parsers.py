@@ -87,7 +87,7 @@ def parse_text_full(text, providers, urlize_all=True, handler=full_handler, **pa
 
         # iterate through the rest of the matches offsetting their indices
         # based on the difference between replacement/original
-        for j in xrange(indx + 1, len(matches)):
+        for j in range(indx + 1, len(matches)):
             matches[j][0] += difference
             matches[j][1] += difference
 
