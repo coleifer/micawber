@@ -36,7 +36,7 @@ class MicawberDjangoTestCase(TestCase, BaseTestCase):
             test_str = frame % (url, url, url, url)
 
             parsed = self.render('{{ test_str|oembed_html }}', test_str=test_str)
-            self.assertEqual(parsed, frame % (expected, expected_inline, expected, expected_inline))
+            self.assertHTMLEqual(parsed, frame % (expected, expected_inline, expected, expected_inline))
 
         for url, expected in self.full_pairs.items():
             expected_inline = self.inline_pairs[url]
@@ -45,7 +45,7 @@ class MicawberDjangoTestCase(TestCase, BaseTestCase):
             test_str = frame % (url, url, url)
 
             parsed = self.render('{{ test_str|oembed_html }}', test_str=test_str)
-            self.assertEqual(parsed, frame % (url, expected_inline, expected_inline))
+            self.assertHTMLEqual(parsed, frame % (url, expected_inline, expected_inline))
 
     def test_urlize(self):
         u1 = 'http://fappio.com/'
