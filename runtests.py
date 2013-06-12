@@ -10,10 +10,10 @@ def run_django_tests():
     try:
         import django
     except ImportError:
-        print 'Skipping django tests'
+        print('Skipping django tests')
         return
     else:
-        print 'Running django integration tests'
+        print('Running django integration tests')
 
     providers = 'micawber.contrib.mcdjango.mcdjango_tests.tests.test_pr'
     extensions = (
@@ -52,7 +52,7 @@ def run_django_tests():
 
 
 def runtests(*test_args):
-    print "Running micawber tests"
+    print("Running micawber tests")
     errors = failures = False
     suite = unittest.TestLoader().loadTestsFromModule(tests)
     result = unittest.TextTestRunner(verbosity=2).run(suite)
@@ -61,7 +61,7 @@ def runtests(*test_args):
     if result.errors:
         errors = True
     if not (errors or failures):
-        print "All micawber tests passed"
+        print("All micawber tests passed")
     
     dj_failures = run_django_tests()
     
