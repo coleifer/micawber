@@ -6,11 +6,11 @@ except ImportError:
     import json
 try:
     from BeautifulSoup import BeautifulSoup
-    parse_kwargs = {'convertEntities': BeautifulSoup.HTML_ENTITIES}
+    bs_kwargs = {'convertEntities': BeautifulSoup.HTML_ENTITIES}
 except ImportError:
     try:
         from bs4 import BeautifulSoup
-        parse_kwargs = {} # BS4 converts entities by default
+        bs_kwargs = {} # BS4 converts entities by default
     except ImportError:
         BeautifulSoup = None
 
@@ -124,7 +124,7 @@ def parse_html(html, providers, urlize_all=True, handler=full_handler, block_han
     if not BeautifulSoup:
         raise Exception('Unable to parse HTML, please install BeautifulSoup or use the text parser')
 
-    soup = BeautifulSoup(html, **parse_kwargs)
+    soup = BeautifulSoup(html, **bs_kwargs)
 
     for url in soup.findAll(text=re.compile(url_re)):
         if not _inside_skip(url):
@@ -143,7 +143,7 @@ def extract_html(html, providers, **params):
     if not BeautifulSoup:
         raise Exception('Unable to parse HTML, please install BeautifulSoup or use the text parser')
 
-    soup = BeautifulSoup(html, **parse_kwargs)
+    soup = BeautifulSoup(html, **bs_kwargs)
     all_urls = set()
     urls = []
     extracted_urls = {}
