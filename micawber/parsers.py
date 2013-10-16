@@ -54,7 +54,7 @@ def extract(text, providers, **params):
     for url in re.findall(url_re, text):
         if url in all_urls:
             continue
-        
+
         all_urls.add(url)
         urls.append(url)
         try:
@@ -151,12 +151,12 @@ def extract_html(html, providers, **params):
     for url in soup.findAll(text=re.compile(url_re)):
         if _inside_skip(url):
             continue
-    
+
         block_all, block_ext = extract(text_type(url), providers, **params)
         for extracted_url in block_all:
             if extracted_url in all_urls:
                 continue
-            
+
             extracted_urls.update(block_ext)
             urls.append(extracted_url)
             all_urls.add(extracted_url)
