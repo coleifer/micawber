@@ -227,3 +227,20 @@ def bootstrap_noembed(cache=None, **params):
         for regex in provider_meta['patterns']:
             pr.register(regex, Provider(endpoint, **params))
     return pr
+
+
+def bootstrap_oembedio(cache=None, **params):
+    endpoint = 'http://oembed.io/api'
+    schema_url = 'http://oembed.io/providers'
+
+    pr = ProviderRegistry(cache)
+
+    # fetch the schema
+    resp = urlopen(schema_url)
+    contents = resp.read()
+    resp.close()
+
+    json_data = json.loads(contents)
+    for provider_meta in json_data:
+        pr.register(provider_meta['s'], Provider(endpoint, **params))
+    return pr
