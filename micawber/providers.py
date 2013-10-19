@@ -38,7 +38,8 @@ class Provider(object):
         # by RFC, default HTTP charset is ISO-8859-1
         charset = get_charset(resp) or 'iso-8859-1'
 
-        content = resp.read().decode(charset)
+        content = '\n'.join(resp.readlines())
+        content = content.decode(charset)
         resp.close()
         return content
 
@@ -199,7 +200,7 @@ def bootstrap_embedly(cache=None, **params):
 
     # fetch the schema
     resp = urlopen(schema_url)
-    contents = resp.read()
+    contents = '\n'.join(resp.readlines())
     resp.close()
 
     json_data = json.loads(contents)
@@ -218,7 +219,7 @@ def bootstrap_noembed(cache=None, **params):
 
     # fetch the schema
     resp = urlopen(schema_url)
-    contents = resp.read()
+    contents = '\n'.join(resp.readlines())
     resp.close()
 
     json_data = json.loads(contents)
