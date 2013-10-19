@@ -24,23 +24,14 @@ class Provider(object):
         socket.setdefaulttimeout(self.socket_timeout)
         req = Request(url, headers={'User-Agent': self.user_agent})
         try:
-            resp = urlopen(req)
+            resp = fetch(req)
         except URLError:
             return False
         except HTTPError:
             return False
         except socket.timeout:
             return False
-
-        if resp.code < 200 or resp.code >= 300:
-            return False
-
-        # by RFC, default HTTP charset is ISO-8859-1
-        charset = get_charset(resp) or 'iso-8859-1'
-
-        content = resp.read().decode(charset)
-        resp.close()
-        return content
+        return resp
 
     def encode_params(self, url, **extra_params):
         params = dict(self.base_params)
@@ -85,6 +76,19 @@ def url_cache(fn):
             return data
         return fn(self, url, **params)
     return inner
+
+
+def fetch(request):
+    resp = urlopen(request)
+    if resp.code < 200 or resp.code >= 300:
+        return False
+
+    # by RFC, default HTTP charset is ISO-8859-1
+    charset = get_charset(resp) or 'iso-8859-1'
+
+    content = resp.read().decode(charset)
+    resp.close()
+    return content
 
 
 class ProviderRegistry(object):
@@ -198,10 +202,7 @@ def bootstrap_embedly(cache=None, **params):
     pr = ProviderRegistry(cache)
 
     # fetch the schema
-    resp = urlopen(schema_url)
-    contents = resp.read()
-    resp.close()
-
+    contents = fetch(schema_url)
     json_data = json.loads(contents)
 
     for provider_meta in json_data:
@@ -217,10 +218,7 @@ def bootstrap_noembed(cache=None, **params):
     pr = ProviderRegistry(cache)
 
     # fetch the schema
-    resp = urlopen(schema_url)
-    contents = resp.read()
-    resp.close()
-
+    contents = fetch(schema_url)
     json_data = json.loads(contents)
 
     for provider_meta in json_data:
@@ -236,11 +234,9 @@ def bootstrap_oembedio(cache=None, **params):
     pr = ProviderRegistry(cache)
 
     # fetch the schema
-    resp = urlopen(schema_url)
-    contents = resp.read()
-    resp.close()
-
+    contents = fetch(schema_url)
     json_data = json.loads(contents)
+
     for provider_meta in json_data:
         pr.register(provider_meta['s'], Provider(endpoint, **params))
     return pr
