@@ -58,6 +58,8 @@ class Provider(object):
         json_data = json.loads(response)
         if 'url' not in json_data:
             json_data['url'] = url
+        if 'title' not in json_data:
+            json_data['title'] = json_data['url']
         return json_data
 
 

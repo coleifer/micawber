@@ -18,7 +18,7 @@ class TestProvider(Provider):
         # photo
         'photo?format=json&url=http%3A%2F%2Fphoto-test1': {'title': 'ptest1', 'url': 'test1.jpg', 'type': 'photo'},
         'photo?format=json&url=http%3A%2F%2Fphoto-test2': {'title': 'ptest2', 'url': 'test2.jpg', 'type': 'photo'},
-        
+
         # video
         'video?format=json&url=http%3A%2F%2Fvideo-test1': {'title': 'vtest1', 'html': '<test1>video</test1>', 'type': 'video'},
         'video?format=json&url=http%3A%2F%2Fvideo-test2': {'title': 'vtest2', 'html': '<test2>video</test2>', 'type': 'video'},
@@ -29,6 +29,9 @@ class TestProvider(Provider):
 
         # with param
         'link?format=json&url=http%3A%2F%2Flink-test1&width=100': {'title': 'test1', 'type': 'link', 'width': 99},
+
+        # no title
+        'photo?format=json&url=http%3A%2F%2Fphoto-notitle': {'url': 'notitle.jpg', 'type': 'photo'},
     }
 
     def fetch(self, url):
@@ -56,6 +59,7 @@ class BaseTestCase(unittest.TestCase):
             'http://photo-test2': '<a href="test2.jpg" title="ptest2"><img alt="ptest2" src="test2.jpg" /></a>',
             'http://video-test1': '<test1>video</test1>',
             'http://rich-test2': '<test2>rich</test2>',
+            'http://photo-notitle': '<a href="notitle.jpg" title="notitle.jpg"><img alt="notitle.jpg" src="notitle.jpg" /></a>',
         }
 
         self.inline_pairs = {
@@ -63,6 +67,8 @@ class BaseTestCase(unittest.TestCase):
             'http://photo-test2': '<a href="test2.jpg" title="ptest2">ptest2</a>',
             'http://video-test1': '<a href="http://video-test1" title="vtest1">vtest1</a>',
             'http://rich-test2': '<a href="http://rich-test2" title="rtest2">rtest2</a>',
+            'http://rich-test2': '<a href="http://rich-test2" title="rtest2">rtest2</a>',
+            'http://photo-notitle': '<a href="notitle.jpg" title="notitle.jpg">notitle.jpg</a>',
         }
 
         self.data_pairs = {
@@ -70,6 +76,7 @@ class BaseTestCase(unittest.TestCase):
             'http://photo-test2': {'title': 'ptest2', 'url': 'test2.jpg', 'type': 'photo'},
             'http://video-test1': {'title': 'vtest1', 'html': '<test1>video</test1>', 'type': 'video'},
             'http://rich-test2': {'title': 'rtest2', 'html': '<test2>rich</test2>', 'type': 'rich'},
+            'http://photo-notitle': {'url': 'notitle.jpg', 'type': 'photo'},
         }
 
     def assertCached(self, url, data, **params):

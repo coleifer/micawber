@@ -38,7 +38,7 @@ class ProviderTestCase(BaseTestCase):
 
         self.assertRaises(ProviderException, test_pr.request, 'http://not-here')
         self.assertRaises(ProviderException, test_pr.request, 'http://link-test3')
-    
+
     def test_caching(self):
         resp = test_pr_cache.request('http://link-test1')
         self.assertCached('http://link-test1', resp)
@@ -70,7 +70,7 @@ class ParserTestCase(BaseTestCase):
         for url, expected in self.full_pairs.items():
             parsed = parse_text_full(url, test_pr)
             self.assertHTMLEqual(parsed, expected)
-        
+
         # the parse_text_full will replace even inline content
         for url, expected in self.full_pairs.items():
             parsed = parse_text_full('this is inline: %s' % url, test_pr)
@@ -203,6 +203,8 @@ class ParserTestCase(BaseTestCase):
 
             if 'url' not in expected:
                 expected['url'] = url
+            if 'title' not in expected:
+                expected['title'] = expected['url']
             self.assertEqual(extracted, {url: expected})
 
             all_urls, extracted = extract_html(frame_html % (url, url, blank, blank), test_pr)
@@ -211,7 +213,7 @@ class ParserTestCase(BaseTestCase):
             if 'url' not in expected:
                 expected['url'] = url
             self.assertEqual(extracted, {url: expected})
-    
+
     def test_outside_of_markup(self):
         frame = '%s<p>testing</p>'
         for url, expected in self.full_pairs.items():
@@ -228,6 +230,8 @@ class ParserTestCase(BaseTestCase):
 
             if 'url' not in expected:
                 expected['url'] = url
+            if 'title' not in expected:
+                expected['title'] = expected['url']
             self.assertEqual(extracted, {url: expected})
 
             rendered = parse_html('<p>%s</p>' % esc_url, test_pr)
