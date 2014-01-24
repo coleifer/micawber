@@ -33,6 +33,7 @@ skip_elements = set(['a', 'pre', 'code'])
 
 
 def full_handler(url, response_data, **params):
+    response_data.setdefault('title', response_data.get('url', ''))
     if response_data['type'] == 'link':
         return '<a href="%(url)s" title="%(title)s">%(title)s</a>' % response_data
     elif response_data['type'] == 'photo':
@@ -41,6 +42,7 @@ def full_handler(url, response_data, **params):
         return response_data['html']
 
 def inline_handler(url, response_data, **params):
+    response_data.setdefault('title', response_data.get('url', ''))
     return '<a href="%(url)s" title="%(title)s">%(title)s</a>' % response_data
 
 def urlize(url):
