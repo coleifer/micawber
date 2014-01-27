@@ -179,7 +179,7 @@ def bootstrap_basic(cache=None):
     pr.register('https?://(www\.)?scribd\.com/\S*', Provider('http://www.scribd.com/services/oembed'))
 
     # t
-    pr.register('https?://(www\.)?twitter.com/\S+/status(es)?/\S+', Provider('http://api.twitter.com/1/statuses/oembed.json'))
+    pr.register('https?://(www\.)?twitter.com/\S+/status(es)?/\S+', Provider('https://api.twitter.com/1/statuses/oembed.json'))
 
     # v
     pr.register('http://\S*.viddler.com/\S*', Provider('http://lab.viddler.com/services/oembed/'))
