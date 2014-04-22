@@ -187,7 +187,8 @@ def bootstrap_basic(cache=None):
     pr.register('https://vimeo.com/\S+', Provider('https://vimeo.com/api/oembed.json'))
 
     # y
-    pr.register('https?://(\S*.)?youtu(\.be/|be\.com/watch)\S+', Provider('http://www.youtube.com/oembed'))
+    pr.register('http://(\S*.)?youtu(\.be/|be\.com/watch)\S+', Provider('http://www.youtube.com/oembed'))
+    pr.register('https://(\S*.)?youtu(\.be/|be\.com/watch)\S+', Provider('http://www.youtube.com/oembed?scheme=https&'))
     pr.register('http://(\S*\.)?yfrog\.com/\S*', Provider('http://www.yfrog.com/api/oembed'))
 
     # w
