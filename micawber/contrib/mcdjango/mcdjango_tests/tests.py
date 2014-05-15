@@ -1,13 +1,43 @@
-from django.template import Template, Context
+from django.template import Context
+from django.template import Template
 from django.test import TestCase
 
-from micawber.test_utils import test_pr, test_cache, test_pr_cache, TestProvider, BaseTestCase
+from micawber.parsers import parse_text
+from micawber.test_utils import BaseTestCase
+from micawber.test_utils import test_cache
+from micawber.test_utils import test_pr
+from micawber.test_utils import test_pr_cache
+from micawber.test_utils import TestProvider
 
 
 class MicawberDjangoTestCase(TestCase, BaseTestCase):
     def render(self, s, **params):
         s = '{%% load micawber_tags %%}%s' % s
         return Template(s).render(Context(params)).strip()
+
+    def test_oembed_alt(self):
+        from micawber.contrib.mcdjango import extension
+
+        def custom_handler(url, response_data):
+            return url
+
+        oembed_alt = extension(
+            'oembed_alt',
+            urlize_all=False,
+            block_handler=custom_handler)
+
+        text = '\n'.join((
+            'this is the first line',
+            'http://photo-test2',
+            'this is the third line http://photo-test2',
+            'http://photo-test2 this is the fourth line'))
+        rendered = self.render('{{ text|oembed_alt }}', text=text)
+        self.assertEqual(rendered.splitlines(), [
+            'this is the first line',
+            self.full_pairs['http://photo-test2'],
+            'this is the third line http://photo-test2',
+            'http://photo-test2 this is the fourth line',
+        ])
 
     def test_fix_wh(self):
         from micawber.contrib.mcdjango import fix_width_height
