@@ -2,13 +2,22 @@ import hashlib
 import pickle
 import re
 import socket
-from .compat import urlencode, Request, urlopen, URLError, HTTPError, get_charset
+from .compat import get_charset
+from .compat import HTTPError
+from .compat import Request
+from .compat import urlencode
+from .compat import URLError
+from .compat import urlopen
 try:
     import simplejson as json
+    InvalidJson = json.JSONDecodeError
 except ImportError:
     import json
+    InvalidJson = ValueError
 
-from micawber.exceptions import ProviderException, ProviderNotFoundException
+from micawber.exceptions import InvalidResponseException
+from micawber.exceptions import ProviderException
+from micawber.exceptions import ProviderNotFoundException
 
 
 class Provider(object):
@@ -55,11 +64,16 @@ class Provider(object):
             raise ProviderException('Error fetching "%s"' % endpoint_url)
 
     def handle_response(self, response, url):
-        json_data = json.loads(response)
+        try:
+            json_data = json.loads(response)
+        except InvalidJson as exc:
+            raise InvalidResponseException(exc.message)
+
         if 'url' not in json_data:
             json_data['url'] = url
         if 'title' not in json_data:
             json_data['title'] = json_data['url']
+
         return json_data
 
 

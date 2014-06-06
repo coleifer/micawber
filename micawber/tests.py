@@ -64,6 +64,14 @@ class ProviderTestCase(BaseTestCase):
 
         self.assertFalse(resp == resp_p)
 
+    def test_invalid_json(self):
+        pr = ProviderRegistry()
+        class BadProvider(Provider):
+            def fetch(self, url):
+                return 'bad'
+        pr.register('http://bad', BadProvider('link'))
+        self.assertRaises(InvalidResponseException, pr.request, 'http://bad')
+
 
 class ParserTestCase(BaseTestCase):
     def test_parse_text_full(self):

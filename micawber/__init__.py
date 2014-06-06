@@ -1,6 +1,7 @@
 from micawber.cache import Cache
 from micawber.cache import PickleCache
 from micawber.exceptions import ProviderException
+from micawber.exceptions import InvalidResponseException
 from micawber.parsers import extract
 from micawber.parsers import extract_html
 from micawber.parsers import parse_text
