@@ -8,7 +8,7 @@ try:
 except ImportError:
     import json
 
-from micawber.exceptions import ProviderException, ProviderNotFoundException
+from micawber.exceptions import ProviderException, ProviderNotFoundException, ProviderBadResponseException
 
 
 class Provider(object):
@@ -55,7 +55,12 @@ class Provider(object):
             raise ProviderException('Error fetching "%s"' % endpoint_url)
 
     def handle_response(self, response, url):
-        json_data = json.loads(response)
+        try:
+            ## sometimes a provider goes down
+            ## or sometimes they are asses and will return "This video can not be embedded" as plaintext
+            json_data = json.loads(response)
+        except:
+            raise ProviderBadResponseException(response)
         if 'url' not in json_data:
             json_data['url'] = url
         if 'title' not in json_data:
