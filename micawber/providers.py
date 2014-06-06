@@ -8,7 +8,7 @@ try:
 except ImportError:
     import json
 
-from micawber.exceptions import ProviderException, ProviderNotFoundException
+from micawber.exceptions import ProviderException, ProviderNotFoundException, ProviderBadResponseException
 
 
 class Provider(object):
@@ -60,7 +60,7 @@ class Provider(object):
             ## or sometimes they are asses and will return "This video can not be embedded" as plaintext
             json_data = json.loads(response)
         except:
-            json_data = { 'micawber-error' : True, 'micawber-response' : response }
+            raise ProviderBadResponseException(response)
         if 'url' not in json_data:
             json_data['url'] = url
         if 'title' not in json_data:

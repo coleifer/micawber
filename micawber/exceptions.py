@@ -3,3 +3,6 @@ class ProviderException(Exception):
 
 class ProviderNotFoundException(ProviderException):
     pass
+
+class ProviderBadResponseException(ProviderException):
+    pass
