@@ -150,8 +150,8 @@ def bootstrap_basic(cache=None):
     pr.register('https?://(www\.)?dailymotion\.com/\S+', Provider('http://www.dailymotion.com/services/oembed'))
 
     # f
-    pr.register('http://\S*?flickr.com/\S+', Provider('http://www.flickr.com/services/oembed/'))
-    pr.register('http://flic\.kr/\S*', Provider('http://www.flickr.com/services/oembed/'))
+    pr.register('https?://\S*?flickr.com/\S+', Provider('http://www.flickr.com/services/oembed/'))
+    pr.register('https?://flic\.kr/\S*', Provider('http://www.flickr.com/services/oembed/'))
     pr.register('https?://(www\.)?funnyordie\.com/videos/\S+', Provider('http://www.funnyordie.com/oembed'))
 
     # g
