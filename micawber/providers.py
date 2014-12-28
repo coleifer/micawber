@@ -255,5 +255,8 @@ def bootstrap_oembedio(cache=None, **params):
     json_data = json.loads(contents)
 
     for provider_meta in json_data:
-        pr.register(provider_meta['s'], Provider(endpoint, **params))
+        regex = provider_meta['s']
+        if not regex.startswith('http'):
+            regex = 'https?://(?:www\.)?' + regex
+        pr.register(regex, Provider(endpoint, **params))
     return pr
