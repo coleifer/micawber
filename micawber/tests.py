@@ -33,6 +33,8 @@ class ProviderTestCase(BaseTestCase):
         pr.register('1(\d+)', provider1)
         pr.register('1\d+', provider2)
         self.assertEqual(pr.provider_for_url('11'), provider2)
+        pr.unregister('1\d+')
+        self.assertEqual(pr.provider_for_url('11'), provider1)
 
     def test_provider_matching(self):
         provider = test_pr.provider_for_url('http://link-test1')
