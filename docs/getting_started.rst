@@ -30,9 +30,9 @@ template filters, ``oembed`` and ``extract_oembed``:
     from flask import Flask
     from micawber.providers import bootstrap_basic
     from micawber.contrib.mcflask import add_oembed_filters
-    
+
     app = Flask(__name__)
-    
+
     oembed_providers = bootstrap_basic()
     add_oembed_filters(app, oembed_providers)
 
@@ -69,10 +69,10 @@ Example:
 .. code-block:: python
 
     from micawber.providers import Provider
-    
+
     youtube = Provider('http://www.youtube.com/oembed')
     youtube.request('http://www.youtube.com/watch?v=nda_OSWeyn8')
-    
+
 The above code returns a dictionary containing metadata about the requested
 video, including the markup for an embeddable player::
 
@@ -108,8 +108,8 @@ pre-populated:
 
 .. code-block:: python
 
-    def bootstrap_basic(cache=None):
-        pr = ProviderRegistry(cache)
+    def bootstrap_basic(cache=None, registry=None, **params):
+        pr = registry or ProviderRegistry(cache)
         pr.register('http://\S*?flickr.com/\S*', Provider('http://www.flickr.com/services/oembed/'))
         pr.register('http://\S*.youtu(\.be|be\.com)/watch\S*', Provider('http://www.youtube.com/oembed'))
         pr.register('http://www.hulu.com/watch/\S*', Provider('http://www.hulu.com/api/oembed.json'))
@@ -118,14 +118,16 @@ pre-populated:
 As you can see, the :py:meth:`~micawber.providers.ProviderRegistry.register` method takes
 two parameters, a regular expression for valid URLs and a ``Provider`` instance.
 
-You can use two helper functions to get a populated registry:
+You can use helper functions to get a populated registry:
 
 * :py:func:`~micawber.providers.bootstrap_basic`
 * :py:func:`~micawber.providers.bootstrap_embedly`
+* :py:func:`~micawber.providers.bootstrap_noembed`
+* :py:func:`~micawber.providers.bootstrap_oembedio`
 
-The bootstrap_embedly function makes a HTTP request to embed.ly's server asking
-for a list of providers it supports, so you may experience some latency when
-using this helper.  For most WSGI applications this will not be an issue, but
+The ``bootstrap_embedly``, ``bootstrap_noembed`` and ``bootstrap_oembedio`` functions make a HTTP request to the API server asking
+for a list of supported providers, so you may experience some latency when
+using these helpers.  For most WSGI applications this will not be an issue, but
 if you'd like to speed it up I suggest fetching the results, storing them in
 the db or a file, and then pulling from there.
 
@@ -145,9 +147,9 @@ A quick example:
 .. code-block:: python
 
     import micawber
-    
+
     providers = micawber.bootstrap_basic()
-    
+
     micawber.parse_text('this is a test:\nhttp://www.youtube.com/watch?v=54XHDUOHuzU', providers)
 
 This will result in the following output::
@@ -160,7 +162,7 @@ You can also parse HTML using the :py:func:`~micawber.parsers.parse_html` functi
 .. code-block:: python
 
     micawber.parse_html('<p>http://www.youtube.com/watch?v=54XHDUOHuzU</p>', providers)
-    
+
     # yields the following output:
     <p><iframe width="459" height="344" src="http://www.youtube.com/embed/54XHDUOHuzU?fs=1&amp;feature=oembed" frameborder="0" allowfullscreen="allowfullscreen"></iframe></p>
 

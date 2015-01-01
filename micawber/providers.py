@@ -134,9 +134,9 @@ class ProviderRegistry(object):
         raise ProviderNotFoundException('Provider not found for "%s"' % url)
 
 
-def bootstrap_basic(cache=None):
+def bootstrap_basic(cache=None, registry=None):
     # complements of oembed.com#section7
-    pr = ProviderRegistry(cache)
+    pr = registry or ProviderRegistry(cache)
 
     # b
     pr.register('http://blip.tv/\S+', Provider('http://blip.tv/oembed'))
@@ -212,11 +212,11 @@ def bootstrap_basic(cache=None):
     return pr
 
 
-def bootstrap_embedly(cache=None, **params):
+def bootstrap_embedly(cache=None, registry=None, **params):
     endpoint = 'http://api.embed.ly/1/oembed'
     schema_url = 'http://api.embed.ly/1/services/python'
 
-    pr = ProviderRegistry(cache)
+    pr = registry or ProviderRegistry(cache)
 
     # fetch the schema
     contents = fetch(schema_url)
@@ -228,11 +228,11 @@ def bootstrap_embedly(cache=None, **params):
     return pr
 
 
-def bootstrap_noembed(cache=None, **params):
+def bootstrap_noembed(cache=None, registry=None, **params):
     endpoint = 'http://noembed.com/embed'
     schema_url = 'http://noembed.com/providers'
 
-    pr = ProviderRegistry(cache)
+    pr = registry or ProviderRegistry(cache)
 
     # fetch the schema
     contents = fetch(schema_url)
@@ -244,11 +244,11 @@ def bootstrap_noembed(cache=None, **params):
     return pr
 
 
-def bootstrap_oembedio(cache=None, **params):
+def bootstrap_oembedio(cache=None, registry=None, **params):
     endpoint = 'http://oembed.io/api'
     schema_url = 'http://oembed.io/providers'
 
-    pr = ProviderRegistry(cache)
+    pr = registry or ProviderRegistry(cache)
 
     # fetch the schema
     contents = fetch(schema_url)
