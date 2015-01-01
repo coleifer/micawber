@@ -3,6 +3,37 @@ from micawber.test_utils import test_pr, test_cache, test_pr_cache, TestProvider
 
 
 class ProviderTestCase(BaseTestCase):
+    def test_register_unregister(self):
+        pr = ProviderRegistry()
+        provider1 = TestProvider('link')
+        provider2 = TestProvider('link')
+        pr.register('1', provider1)
+        pr.register('2', provider1)
+        pr.register('3', provider2)
+        pr.unregister('2')
+        self.assertEqual(len(pr._registry), 2)
+
+        # Multiple calls to remove() are OK.
+        self.assertRaises(KeyError, pr.unregister, '2')
+
+        self.assertEqual(pr.provider_for_url('1'), provider1)
+        self.assertEqual(pr.provider_for_url('2'), None)
+        self.assertEqual(pr.provider_for_url('3'), provider2)
+
+        pr.unregister('1')
+        pr.unregister('3')
+        self.assertEqual(len(pr._registry), 0)
+        for test_regex in ['1', '2', '3']:
+            self.assertEqual(pr.provider_for_url(test_regex), None)
+
+    def test_multiple_matches(self):
+        pr = ProviderRegistry()
+        provider1 = TestProvider('link')
+        provider2 = TestProvider('link')
+        pr.register('1(\d+)', provider1)
+        pr.register('1\d+', provider2)
+        self.assertEqual(pr.provider_for_url('11'), provider2)
+
     def test_provider_matching(self):
         provider = test_pr.provider_for_url('http://link-test1')
         self.assertFalse(provider is None)

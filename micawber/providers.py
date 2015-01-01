@@ -4,6 +4,7 @@ import re
 import socket
 from .compat import get_charset
 from .compat import HTTPError
+from .compat import OrderedDict
 from .compat import Request
 from .compat import urlencode
 from .compat import URLError
@@ -109,17 +110,17 @@ def fetch(request):
 
 class ProviderRegistry(object):
     def __init__(self, cache=None):
-        self._registry = {}
+        self._registry = OrderedDict()
         self.cache = cache
 
     def register(self, regex, provider):
         self._registry[regex] = provider
 
     def unregister(self, regex):
-        del(self._registry[regex])
+        del self._registry[regex]
 
     def __iter__(self):
-        return iter(self._registry.items())
+        return iter(reversed(self._registry.items()))
 
     def provider_for_url(self, url):
         for regex, provider in self:
