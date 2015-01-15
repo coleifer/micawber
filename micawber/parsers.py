@@ -7,10 +7,11 @@ except ImportError:
 try:
     from BeautifulSoup import BeautifulSoup
     bs_kwargs = {'convertEntities': BeautifulSoup.HTML_ENTITIES}
+    replace_kwargs = {}
 except ImportError:
     try:
         from bs4 import BeautifulSoup
-        bs_kwargs = {'features': 'html.parser'}
+        bs_kwargs = replace_kwargs = {'features': 'html.parser'}
     except ImportError:
         BeautifulSoup = None
 
@@ -135,7 +136,7 @@ def parse_html(html, providers, urlize_all=True, handler=full_handler, block_han
 
             url_unescaped = url.string
             replacement = parse_text_full(url_unescaped, providers, urlize_all, url_handler, **params)
-            url.replaceWith(BeautifulSoup(replacement))
+            url.replaceWith(BeautifulSoup(replacement, **replace_kwargs))
 
     return text_type(soup)
 
