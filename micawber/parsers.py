@@ -10,7 +10,7 @@ try:
 except ImportError:
     try:
         from bs4 import BeautifulSoup
-        bs_kwargs = {} # BS4 converts entities by default
+        bs_kwargs = {'features': 'html.parser'}
     except ImportError:
         BeautifulSoup = None
 
