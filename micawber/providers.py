@@ -12,7 +12,7 @@ from .compat import urlopen
 try:
     import simplejson as json
     InvalidJson = json.JSONDecodeError
-except ImportError:
+except (ImportError, AttributeError) as e:
     import json
     InvalidJson = ValueError
 
