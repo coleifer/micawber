@@ -11,7 +11,10 @@ from .compat import URLError
 from .compat import urlopen
 try:
     import simplejson as json
-    InvalidJson = json.JSONDecodeError
+    try:
+        InvalidJson = json.JSONDecodeError
+    except AttributeError:
+        InvalidJson = ValueError
 except ImportError:
     import json
     InvalidJson = ValueError
