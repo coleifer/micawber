@@ -2,6 +2,7 @@ import hashlib
 import pickle
 import re
 import socket
+import ssl
 from .compat import get_charset
 from .compat import HTTPError
 from .compat import OrderedDict
@@ -43,6 +44,8 @@ class Provider(object):
         except HTTPError:
             return False
         except socket.timeout:
+            return False
+        except ssl.SSLError:
             return False
         return resp
 
