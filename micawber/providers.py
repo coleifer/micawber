@@ -74,7 +74,11 @@ class Provider(object):
         try:
             json_data = json.loads(response)
         except InvalidJson as exc:
-            raise InvalidResponseException(exc.message)
+            try:
+                msg = exc.message
+            except AttributeError:
+                msg = exc.args[0]
+            raise InvalidResponseException(msg)
 
         if 'url' not in json_data:
             json_data['url'] = url
@@ -126,7 +130,7 @@ class ProviderRegistry(object):
         del self._registry[regex]
 
     def __iter__(self):
-        return iter(reversed(self._registry.items()))
+        return iter(reversed(list(self._registry.items())))
 
     def provider_for_url(self, url):
         for regex, provider in self:
