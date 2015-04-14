@@ -1,7 +1,8 @@
+from importlib import import_module
+
 from django import template
 from django.conf import settings
 from django.template.loader import render_to_string
-from django.utils.importlib import import_module
 from django.utils.safestring import mark_safe
 
 from micawber.compat import string_types
@@ -40,7 +41,7 @@ def fix_width_height(width_height, params):
             params.pop('maxheight', None)
     return params
 
-def extension(filter_name, providers=providers, urlize_all=True, html=False, handler=django_template_handler, 
+def extension(filter_name, providers=providers, urlize_all=True, html=False, handler=django_template_handler,
               block_handler=inline_handler, text_fn=parse_text, html_fn=parse_html, **kwargs):
     if html:
         fn = html_fn
