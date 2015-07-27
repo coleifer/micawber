@@ -1,5 +1,4 @@
-micawber
-========
+.. image:: http://media.charlesleifer.com/blog/photos/micawber-logo.png
 
 .. image:: http://media.charlesleifer.com/blog/photos/micawber.jpg
 
