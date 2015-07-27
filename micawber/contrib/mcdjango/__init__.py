@@ -26,7 +26,6 @@ if callable(providers):
 register = template.Library()
 
 def django_template_handler(url, response_data, **params):
-    #import ipdb; ipdb.set_trace()
     return mark_safe(
         render_to_string([
             'micawber/%s.html' % response_data['provider_name'].lower(),
