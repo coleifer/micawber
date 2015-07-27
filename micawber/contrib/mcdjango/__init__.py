@@ -2,7 +2,7 @@ from importlib import import_module
 
 from django import template
 from django.conf import settings
-from django.template.loader import render_to_string
+from django.template.loader import render_to_string, select_template
 from django.utils.safestring import mark_safe
 
 from micawber.compat import string_types
@@ -26,11 +26,17 @@ if callable(providers):
 register = template.Library()
 
 def django_template_handler(url, response_data, **params):
-    return mark_safe(render_to_string('micawber/%s.html' % response_data['type'], template.Context(dict(
-        params=params,
-        response=response_data,
-        url=url,
-    ))).strip())
+    #import ipdb; ipdb.set_trace()
+    return mark_safe(
+        render_to_string([
+            'micawber/%s.html' % response_data['provider_name'].lower(),
+            'micawber/%s.html' % response_data['type'],
+        ],
+        template.Context(dict(
+            params=params,
+            response=response_data,
+            url=url,
+        ))).strip())
 
 def fix_width_height(width_height, params):
     if width_height:
