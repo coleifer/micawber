@@ -8,6 +8,7 @@ from django.utils.safestring import mark_safe
 from micawber.compat import string_types
 from micawber.parsers import full_handler, inline_handler, parse_text, \
     parse_html, extract, extract_html
+import collections
 
 
 def _load_from_module(path):
@@ -19,7 +20,7 @@ def _load_from_module(path):
 PROVIDERS = getattr(settings, 'MICAWBER_PROVIDERS', 'micawber.contrib.mcdjango.providers.bootstrap_basic')
 
 providers = _load_from_module(PROVIDERS)
-if callable(providers):
+if isinstance(providers, collections.Callable):
     providers = providers()
 
 
@@ -35,7 +36,7 @@ def django_template_handler(url, response_data, **params):
 def fix_width_height(width_height, params):
     if width_height:
         if 'x' in width_height:
-            params['maxwidth'], params['maxheight'] = map(int, width_height.split('x'))
+            params['maxwidth'], params['maxheight'] = list(map(int, width_height.split('x')))
         else:
             params['maxwidth'] = int(width_height)
             params.pop('maxheight', None)
