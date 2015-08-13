@@ -1,0 +1,11 @@
+language: python
+python:
+  - "3.4"
+  - "3.3"
+  - "3.2"
+  - "2.7"
+  - "2.6"
+install:
+  - pip install -q Django==1.6.11 BeautifulSoup4
+script:
+  - env PYTHONPATH=`pwd` python setup.py test
