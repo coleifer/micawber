@@ -1,3 +1,4 @@
+from collections import Callable
 from importlib import import_module
 
 from django import template
@@ -19,7 +20,7 @@ def _load_from_module(path):
 PROVIDERS = getattr(settings, 'MICAWBER_PROVIDERS', 'micawber.contrib.mcdjango.providers.bootstrap_basic')
 
 providers = _load_from_module(PROVIDERS)
-if callable(providers):
+if isinstance(providers, Callable):
     providers = providers()
 
 
@@ -35,7 +36,7 @@ def django_template_handler(url, response_data, **params):
 def fix_width_height(width_height, params):
     if width_height:
         if 'x' in width_height:
-            params['maxwidth'], params['maxheight'] = map(int, width_height.split('x'))
+            params['maxwidth'], params['maxheight'] = [int(n) for n in  width_height.split('x')]
         else:
             params['maxwidth'] = int(width_height)
             params.pop('maxheight', None)
