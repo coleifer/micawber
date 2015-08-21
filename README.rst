@@ -2,7 +2,7 @@
 
 .. image:: http://media.charlesleifer.com/blog/photos/micawber.jpg
 
-A small library for extracting rich content from urls. [Live demo](http://micawberdemo.appspot.com/).
+A small library for extracting rich content from urls. `Live demo <http://micawberdemo.appspot.com/>`_.
 
 
 what does it do?
