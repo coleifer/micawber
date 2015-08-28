@@ -155,6 +155,7 @@ def bootstrap_basic(cache=None, registry=None):
     # a
     pr.register('https://alpha.app.net/\S+/post/\S+', Provider('https://alpha-api.app.net/oembed'))
     pr.register('https://photos.app.net/\S+/\S+', Provider('https://alpha-api.app.net/oembed'))
+    pr.register('http://live.amcharts.com/\S+', Provider('http://live.amcharts.com/oembed'))
     pr.register('http://animoto.com/play/\S+', Provider('https://alpha-api.app.net/oembed'))
     pr.register('http://animoto.com/play/\S+', Provider('http://animoto.com/oembeds/create'))
     pr.register('http://audiosnaps.com/k/\S+', Provider('http://audiosnaps.com/service/oembed'))
