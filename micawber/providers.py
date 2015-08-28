@@ -217,6 +217,9 @@ def bootstrap_basic(cache=None, registry=None):
     # k
     pr.register('http://www.kickstarter.com/projects/\S+', Provider('http://www.kickstarter.com/services/oembed'))
 
+    # l
+    pr.register('http://learningapps.org/\S+', Provider('http://learningapps.org/oembed.php'))
+
     # m
     pr.register('http://meetu(p\.com|\.ps)/\S+', Provider('https://api.meetup.com/oembed'))
     pr.register('http://www.mixcloud.com/[^\/]+/\S+', Provider('http://www.mixcloud.com/oembed/'))
