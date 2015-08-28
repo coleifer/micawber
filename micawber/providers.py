@@ -242,6 +242,7 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register('http://www.screenr.com/[^\/]+/', Provider('http://www.screenr.com/api/oembed.json'))
     pr.register('http://www.scribd.com/doc/\S+', Provider('http://www.scribd.com/services/oembed/'))
     pr.register('http://shoudio.(com|io)/\S+', Provider('http://shoudio.com/api/oembed'))
+    pr.register('https?://sketchfab.com/(models|\S+folders)/\S+', Provider('http://sketchfab.com/oembed'))
     pr.register('http://www.slideshare.net/[^\/]+/\S+', Provider('http://www.slideshare.net/api/oembed/2'))
     pr.register('http://slidesha\.re/\S*', Provider('http://www.slideshare.net/api/oembed/2'))
     pr.register('http://(\S+\.)?smugmug.com/\S*', Provider('http://api.smugmug.com/services/oembed/'))
