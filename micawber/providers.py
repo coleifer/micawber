@@ -209,6 +209,7 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register('http://\S*.revision3.com/\S+', Provider('http://revision3.com/api/oembed/'))
 
     # s
+    pr.register('http://videos.sapo.pt/\S+', Provider('http://videos.sapo.pt/oembed'))
     pr.register('http://www.screenr.com/[^\/]+/', Provider('http://www.screenr.com/api/oembed.json'))
     pr.register('http://www.scribd.com/doc/\S+', Provider('http://www.scribd.com/services/oembed/'))
     pr.register('http://www.slideshare.net/[^\/]+/\S+', Provider('http://www.slideshare.net/api/oembed/2'))
