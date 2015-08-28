@@ -224,6 +224,7 @@ def bootstrap_basic(cache=None, registry=None):
     # o
     pr.register('http://official.fm/(tracks|playlists)/\S+', Provider('http://official.fm/services/oembed.json'))
     pr.register('http://on.aol.com/video/\S+', Provider('http://on.aol.com/api'))
+    pr.register('https://www.ora.tv/\S+', Provider('https://www.ora.tv/oembed/\S+?format=json'))
 
     # p
     pr.register('http://i\S*.photobucket.com/albums/\S+', Provider('http://photobucket.com/oembed'))
