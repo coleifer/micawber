@@ -185,6 +185,9 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register('http://www.mobypicture.com/user/\S*?/view/\S*', Provider('http://api.mobypicture.com/oEmbed'))
     pr.register('http://moby.to/\S*', Provider('http://api.mobypicture.com/oEmbed'))
 
+    # n
+    pr.register('http://(\S+\.)?nfb.ca/film/\S+', Provider('http://www.nfb.ca/remote/services/oembed/'))
+
     # p
     pr.register('http://i\S*.photobucket.com/albums/\S+', Provider('http://photobucket.com/oembed'))
     pr.register('http://gi\S*.photobucket.com/groups/\S+', Provider('http://photobucket.com/oembed'))
