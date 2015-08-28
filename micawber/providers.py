@@ -165,6 +165,7 @@ def bootstrap_basic(cache=None, registry=None):
 
     # c
     pr.register('https://cacoo.com/diagrams/\S+', Provider('http://cacoo.com/oembed.json'))
+    pr.register('http://public.chartblocks.com/c/\S+', Provider('http://embed.chartblocks.com/1.0/oembed'))
     pr.register('http://chirb.it/\S+', Provider('http://chirb.it/oembed.json'))
     pr.register('https://www.circuitlab.com/circuit/\S+', Provider('https://www.circuitlab.com/circuit/oembed'))
     pr.register('http://clyp.it/\S+', Provider('http://api.clyp.it/oembed/'))
