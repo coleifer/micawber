@@ -171,6 +171,7 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register('http://coub.com/(view|embed)/\S+', Provider('http://coub.com/api/oembed.json'))
 
     # d
+    pr.register('http://www.dailymile.com/people/\S+/entries/\S+', Provider('http://api.dailymile.com/oembed?format=json'))
     pr.register('https?://(www\.)?dailymotion\.com/video/\S+', Provider('http://www.dailymotion.com/services/oembed'))
     pr.register('http://(\S+\.)?deviantart.com/\S+', Provider('http://backend.deviantart.com/oembed'))
     pr.register('http://www.dipity.com/\S+/\S+', Provider('http://www.dipity.com/oembed/timeline/'))
