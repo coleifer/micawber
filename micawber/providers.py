@@ -208,8 +208,7 @@ def bootstrap_basic(cache=None, registry=None):
 
     # v
     pr.register('http://(\S*\.)?viddler.com/v/\S*', Provider('http://www.viddler.com/oembed/'))
-    pr.register('http://vimeo.com/\S+', Provider('http://vimeo.com/api/oembed.json'))
-    pr.register('https://vimeo.com/\S+', Provider('https://vimeo.com/api/oembed.json'))
+    pr.register('https?://vimeo.com/\S+', Provider('http://vimeo.com/api/oembed.json'))
 
     # y
     pr.register('http://(\S*.)?youtu(\.be/|be\.com/watch)\S+', Provider('http://www.youtube.com/oembed'))
