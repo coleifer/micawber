@@ -224,6 +224,7 @@ def bootstrap_basic(cache=None, registry=None):
 
     # v
     pr.register('http://(\S*\.)?viddler.com/v/\S*', Provider('http://www.viddler.com/oembed/'))
+    pr.register('http://www.videojug.com/(film|interview)/\S+', Provider('http://www.videojug.com/oembed.json'))
     pr.register('https?://vimeo.com/\S+', Provider('http://vimeo.com/api/oembed.json'))
 
     # y
