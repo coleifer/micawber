@@ -219,7 +219,7 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register('http://(\S*\.)?yfrog\.com/\S*', Provider('http://www.yfrog.com/api/oembed'))
 
     # w
-    pr.register('http://\S+.wordpress.com/\S+', Provider('http://public-api.wordpress.com/oembed/'))
+    pr.register('http://(\S+\.)?wordpress.com/\S+', Provider('http://public-api.wordpress.com/oembed/'))
     pr.register('https?://wordpress.tv/\S+', Provider('http://wordpress.tv/oembed/'))
 
     return pr
