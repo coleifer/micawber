@@ -166,7 +166,7 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register('http://www.collegehumor.com/video/\S+', Provider('http://www.collegehumor.com/oembed.json'))
 
     # d
-    pr.register('https?://(www\.)?dailymotion\.com/\S+', Provider('http://www.dailymotion.com/services/oembed'))
+    pr.register('https?://(www\.)?dailymotion\.com/video/\S+', Provider('http://www.dailymotion.com/services/oembed'))
     pr.register('http://(\S+\.)?deviantart.com/\S+', Provider('http://backend.deviantart.com/oembed'))
     pr.register('http://www.dipity.com/\S+/\S+', Provider('http://www.dipity.com/oembed/timeline/'))
     pr.register('http://dotsub.com/view/\S+', Provider('http://dotsub.com/services/oembed'))
