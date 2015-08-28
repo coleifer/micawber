@@ -203,6 +203,7 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register('http://qik.com/video/\S+', Provider('http://qik.com/api/oembed.json'))
 
     # r
+    pr.register('http://(\S+\.)?rdio.com/(artist|people)/\S+', Provider('http://www.rdio.com/api/oembed/'))
     pr.register('http://\S*.revision3.com/\S+', Provider('http://revision3.com/api/oembed/'))
 
     # s
