@@ -194,6 +194,9 @@ def bootstrap_basic(cache=None, registry=None):
     # n
     pr.register('http://(\S+\.)?nfb.ca/film/\S+', Provider('http://www.nfb.ca/remote/services/oembed/'))
 
+    # o
+    pr.register('http://official.fm/(tracks|playlists)/\S+', Provider('http://official.fm/services/oembed.json'))
+
     # p
     pr.register('http://i\S*.photobucket.com/albums/\S+', Provider('http://photobucket.com/oembed'))
     pr.register('http://gi\S*.photobucket.com/groups/\S+', Provider('http://photobucket.com/oembed'))
