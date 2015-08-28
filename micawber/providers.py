@@ -162,7 +162,7 @@ def bootstrap_basic(cache=None, registry=None):
 
     # f
     pr.register('https?://(\S*\.)?flickr.com/\S+', Provider('https://www.flickr.com/services/oembed/'))
-    pr.register('https?://flic\.kr/\S*', Provider('https://www.flickr.com/services/oembed/'))
+    pr.register('https?://flic\.kr/p/\S*', Provider('https://www.flickr.com/services/oembed/'))
     pr.register('https?://(www\.)?funnyordie\.com/videos/\S+', Provider('http://www.funnyordie.com/oembed'))
 
     # g
