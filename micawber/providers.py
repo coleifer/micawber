@@ -219,6 +219,7 @@ def bootstrap_basic(cache=None, registry=None):
 
     # q
     pr.register('http://qik.com/video/\S+', Provider('http://qik.com/api/oembed.json'))
+    pr.register('http://www.quiz.biz/quizz-\S+.html', Provider('http://www.quiz.biz/api/oembed'))
 
     # r
     pr.register('http://(\S+\.)?rdio.com/(artist|people)/\S+', Provider('http://www.rdio.com/api/oembed/'))
