@@ -178,6 +178,9 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register('http://www.dipity.com/\S+/\S+', Provider('http://www.dipity.com/oembed/timeline/'))
     pr.register('http://dotsub.com/view/\S+', Provider('http://dotsub.com/services/oembed'))
 
+    # e
+    pr.register('http://edocr.com/docs/\S+', Provider('http://edocr.com/api/oembed'))
+
     # f
     pr.register('https?://(\S*\.)?flickr.com/\S+', Provider('https://www.flickr.com/services/oembed/'))
     pr.register('https?://flic\.kr/p/\S*', Provider('https://www.flickr.com/services/oembed/'))
