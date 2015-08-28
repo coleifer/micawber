@@ -164,7 +164,8 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register('https://www.circuitlab.com/circuit/\S+', Provider('https://www.circuitlab.com/circuit/oembed'))
     pr.register('http://clyp.it/\S+', Provider('http://api.clyp.it/oembed/'))
     pr.register('http://www.collegehumor.com/video/\S+', Provider('http://www.collegehumor.com/oembed.json'))
-    pr.register('http://crowdranking.com/\S+/\S+', Provider('http://crowdranking.com/api/oembed.json'))
+    pr.register('http://www.collegehumor.com/video/\S+', Provider('http://www.collegehumor.com/oembed.json'))
+    pr.register('http://coub.com/(view|embed)/\S+', Provider('http://coub.com/api/oembed.json'))
 
     # d
     pr.register('https?://(www\.)?dailymotion\.com/video/\S+', Provider('http://www.dailymotion.com/services/oembed'))
