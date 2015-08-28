@@ -200,7 +200,7 @@ def bootstrap_basic(cache=None, registry=None):
     # s
     pr.register('http://www.slideshare.net/[^\/]+/\S+', Provider('http://www.slideshare.net/api/oembed/2'))
     pr.register('http://slidesha\.re/\S*', Provider('http://www.slideshare.net/api/oembed/2'))
-    pr.register('http://\S*.smugmug.com/\S*', Provider('http://api.smugmug.com/services/oembed/'))
+    pr.register('http://(\S+\.)?smugmug.com/\S*', Provider('http://api.smugmug.com/services/oembed/'))
     pr.register('https://\S*?soundcloud.com/\S+', Provider('http://soundcloud.com/oembed'))
     pr.register('https?://speakerdeck\.com/\S*', Provider('https://speakerdeck.com/oembed.json')),
     pr.register('https?://(www\.)?scribd\.com/\S*', Provider('http://www.scribd.com/services/oembed'))
