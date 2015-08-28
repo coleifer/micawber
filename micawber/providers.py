@@ -178,6 +178,12 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register('https?://(www\.)?funnyordie\.com/videos/\S+', Provider('http://www.funnyordie.com/oembed.json'))
 
     # g
+    pr.register('http://(\S+\.)?geograph.(org.uk|co.uk|ie)/\S+', Provider('http://api.geograph.org.uk/api/oembed'))
+    pr.register('http://(\S+\.)?wikimedia.org/\S+_geograph.org.uk_\S+', Provider('http://api.geograph.org.uk/api/oembed'))
+    pr.register('http://geo(-en\.)?hlipp.de/\S+', Provider('http://geo.hlipp.de/restapi.php/api/oembed'))
+    pr.register('http://germany.geograph.org/\S+', Provider('http://geo.hlipp.de/restapi.php/api/oembed'))
+    pr.register('http://(\S+\.)?geograph.org.(gg|je)/\S+', Provider('http://www.geograph.org.gg/api/oembed'))
+    pr.register('http://(channel-islands|(\S+\.)?channel).geographs?.org/\S+', Provider('http://www.geograph.org.gg/api/oembed'))
     pr.register(r'https?://gist.github.com/\S*', Provider('https://github.com/api/oembed'))
 
     # h
