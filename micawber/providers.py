@@ -189,8 +189,8 @@ def bootstrap_basic(cache=None, registry=None):
 
     # m
     pr.register('http://www.mixcloud.com/[^\/]+/\S+', Provider('http://www.mixcloud.com/oembed/'))
-    pr.register('http://www.mobypicture.com/user/\S*?/view/\S*', Provider('http://api.mobypicture.com/oEmbed'))
-    pr.register('http://moby.to/\S*', Provider('http://api.mobypicture.com/oEmbed'))
+    pr.register('http://www.mobypicture.com/user/\S+/view/\S+', Provider('http://api.mobypicture.com/oEmbed'))
+    pr.register('http://moby.to/\S+', Provider('http://api.mobypicture.com/oEmbed'))
 
     # n
     pr.register('http://(\S+\.)?nfb.ca/film/\S+', Provider('http://www.nfb.ca/remote/services/oembed/'))
