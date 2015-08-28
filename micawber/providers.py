@@ -195,7 +195,7 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register('http://(channel-islands|(\S+\.)?channel).geographs?.org/\S+', Provider('http://www.geograph.org.gg/api/oembed'))
     pr.register('http://gty.im/\S+', Provider('http://embed.gettyimages.com/oembed'))
     pr.register(r'https?://gist.github.com/\S*', Provider('https://github.com/api/oembed'))
-    pr.register('https://gmep.org/media/\S+', Provider('https://gmep.org/oembed.'))
+    pr.register('https://gmep.org/media/\S+', Provider('https://gmep.org/oembed.json'))
 
     # h
     pr.register('http://huffduffer.com/[^\/]+/\S+', Provider('http://huffduffer.com/oembed'))
