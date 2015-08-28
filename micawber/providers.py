@@ -189,6 +189,7 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register('http://gi\S*.photobucket.com/groups/\S+', Provider('http://photobucket.com/oembed'))
     pr.register('http://www.polleverywhere.com/(polls|multiple_choice_polls|free_text_polls)/\S+', Provider('http://www.polleverywhere.com/services/oembed/'))
     pr.register('https?://(.+\.)?polldaddy\.com/\S*', Provider('http://polldaddy.com/oembed/'))
+    pr.register('https://portfolium\.com/entry/\S*', Provider('https://api.portfolium.com/oembed'))
 
     # q
     pr.register('http://qik.com/video/\S+', Provider('http://qik.com/api/oembed.json'))
