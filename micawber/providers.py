@@ -238,6 +238,7 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register('http://www.quizz.biz/quizz-\S+.html', Provider('http://www.quizz.biz/api/oembed'))
 
     # r
+    pr.register('https://rapidengage.com/s/\S+', Provider('https://rapidengage.com/api/oembed'))
     pr.register('http://(\S+\.)?rdio.com/(artist|people)/\S+', Provider('http://www.rdio.com/api/oembed/'))
     pr.register('http://\S*.revision3.com/\S+', Provider('http://revision3.com/api/oembed/'))
     pr.register('http://roomshare.jp/(en/)?post/\S+', Provider('http://roomshare.jp/en/oembed.json'))
