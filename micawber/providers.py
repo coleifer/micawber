@@ -257,6 +257,7 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register('http://videos.sapo.pt/\S+', Provider('http://videos.sapo.pt/oembed'))
     pr.register('http://www.screenr.com/[^\/]+/', Provider('http://www.screenr.com/api/oembed.json'))
     pr.register('http://www.scribd.com/doc/\S+', Provider('http://www.scribd.com/services/oembed/'))
+    pr.register('https://www.shortnote.jp/view/notes/\S+', Provider('https://www.shortnote.jp/oembed/'))
     pr.register('http://shoudio.(com|io)/\S+', Provider('http://shoudio.com/api/oembed'))
     pr.register('https?://sketchfab.com/(models|\S+folders)/\S+', Provider('http://sketchfab.com/oembed'))
     pr.register('http://www.slideshare.net/[^\/]+/\S+', Provider('http://www.slideshare.net/api/oembed/2'))
