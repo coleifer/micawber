@@ -185,7 +185,7 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register('http://embedarticles.com/\S+', Provider('http://embedarticles.com/oembed/'))
 
     # f
-    pr.register('https?://(\S*\.)?flickr.com/\S+', Provider('https://www.flickr.com/services/oembed/'))
+    pr.register('https?://(\S+\.)?flickr.com/\S+', Provider('https://www.flickr.com/services/oembed/'))
     pr.register('https?://flic\.kr/p/\S*', Provider('https://www.flickr.com/services/oembed/'))
     pr.register('https?://(www\.)?funnyordie\.com/videos/\S+', Provider('http://www.funnyordie.com/oembed.json'))
 
@@ -197,11 +197,11 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register('http://(\S+\.)?geograph.org.(gg|je)/\S+', Provider('http://www.geograph.org.gg/api/oembed'))
     pr.register('http://(channel-islands|(\S+\.)?channel).geographs?.org/\S+', Provider('http://www.geograph.org.gg/api/oembed'))
     pr.register('http://gty.im/\S+', Provider('http://embed.gettyimages.com/oembed'))
-    pr.register(r'https?://gist.github.com/\S*', Provider('https://github.com/api/oembed'))
+    pr.register('https?://gist.github.com/\S+', Provider('https://github.com/api/oembed'))
     pr.register('https://gmep.org/media/\S+', Provider('https://gmep.org/oembed.json'))
 
     # h
-    pr.register('http://huffduffer.com/[^\/]+/\S+', Provider('http://huffduffer.com/oembed'))
+    pr.register('http://huffduffer.com/\S+/\S+', Provider('http://huffduffer.com/oembed'))
     pr.register('http://www.hulu.com/watch/\S+', Provider('http://www.hulu.com/api/oembed.json'))
 
     # i
@@ -223,7 +223,7 @@ def bootstrap_basic(cache=None, registry=None):
 
     # m
     pr.register('http://meetu(p\.com|\.ps)/\S+', Provider('https://api.meetup.com/oembed'))
-    pr.register('http://www.mixcloud.com/[^\/]+/\S+', Provider('http://www.mixcloud.com/oembed/'))
+    pr.register('http://www.mixcloud.com/\S+/\S+', Provider('http://www.mixcloud.com/oembed/'))
     pr.register('http://www.mobypicture.com/user/\S+/view/\S+', Provider('http://api.mobypicture.com/oEmbed'))
     pr.register('http://moby.to/\S+', Provider('http://api.mobypicture.com/oEmbed'))
 
@@ -252,17 +252,17 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register('http://(\S+\.)?rdio.com/(artist|people)/\S+', Provider('http://www.rdio.com/api/oembed/'))
     pr.register('http://rwire.com/\S+', Provider('http://publisher.releasewire.com/oembed/'))
     pr.register('https://www.reverbnation.com/\S+', Provider('https://www.reverbnation.com/oembed'))
-    pr.register('http://\S*.revision3.com/\S+', Provider('http://revision3.com/api/oembed/'))
+    pr.register('http://(\S+\.)?revision3.com/\S+', Provider('http://revision3.com/api/oembed/'))
     pr.register('http://roomshare.jp/(en/)?post/\S+', Provider('http://roomshare.jp/en/oembed.json'))
 
     # s
     pr.register('http://videos.sapo.pt/\S+', Provider('http://videos.sapo.pt/oembed'))
-    pr.register('http://www.screenr.com/[^\/]+/', Provider('http://www.screenr.com/api/oembed.json'))
+    pr.register('http://www.screenr.com/\S+/', Provider('http://www.screenr.com/api/oembed.json'))
     pr.register('http://www.scribd.com/doc/\S+', Provider('http://www.scribd.com/services/oembed/'))
     pr.register('https://www.shortnote.jp/view/notes/\S+', Provider('https://www.shortnote.jp/oembed/'))
     pr.register('http://shoudio.(com|io)/\S+', Provider('http://shoudio.com/api/oembed'))
     pr.register('https?://sketchfab.com/(models|\S+folders)/\S+', Provider('http://sketchfab.com/oembed'))
-    pr.register('http://www.slideshare.net/[^\/]+/\S+', Provider('http://www.slideshare.net/api/oembed/2'))
+    pr.register('http://www.slideshare.net/\S+/\S+', Provider('http://www.slideshare.net/api/oembed/2'))
     pr.register('http://slidesha\.re/\S*', Provider('http://www.slideshare.net/api/oembed/2'))
     pr.register('http://(\S+\.)?smugmug.com/\S*', Provider('http://api.smugmug.com/services/oembed/'))
     pr.register('http://soundcloud.com/\S+', Provider('https://soundcloud.com/oembed'))
@@ -279,14 +279,14 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register('http://(\S+\.)?ustream.(tv|com)/\S+', Provider('http://www.ustream.tv/oembed'))
 
     # v
-    pr.register('http://(\S*\.)?viddler.com/v/\S*', Provider('http://www.viddler.com/oembed/'))
+    pr.register('http://(\S+\.)?viddler.com/v/\S+', Provider('http://www.viddler.com/oembed/'))
     pr.register('http://videofork.com/oembed/\d+', Provider('http://videofork.com/oembed'))
     pr.register('http://www.videojug.com/(film|interview)/\S+', Provider('http://www.videojug.com/oembed.json'))
     pr.register('https?://vimeo.com/\S+', Provider('http://vimeo.com/api/oembed.json'))
 
     # y
-    pr.register('http://(\S*.)?youtu(\.be/|be\.com/watch)\S+', Provider('http://www.youtube.com/oembed'))
-    pr.register('https://(\S*.)?youtu(\.be/|be\.com/watch)\S+', Provider('http://www.youtube.com/oembed?scheme=https&'))
+    pr.register('http://(\S+.)?youtu(\.be/|be\.com/watch)\S+', Provider('http://www.youtube.com/oembed'))
+    pr.register('https://(\S+.)?youtu(\.be/|be\.com/watch)\S+', Provider('http://www.youtube.com/oembed?scheme=https&'))
     pr.register('http://(\S+\.)?yfrog\.(com|us)/\S+', Provider('http://www.yfrog.com/api/oembed'))
 
     # w
