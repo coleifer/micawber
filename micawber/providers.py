@@ -157,6 +157,7 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register('https://photos.app.net/\S+/\S+', Provider('https://alpha-api.app.net/oembed'))
     pr.register('http://animoto.com/play/\S+', Provider('https://alpha-api.app.net/oembed'))
     pr.register('http://animoto.com/play/\S+', Provider('http://animoto.com/oembeds/create'))
+    pr.register('http://audiosnaps.com/k/\S+', Provider('http://audiosnaps.com/service/oembed'))
 
     # b
     pr.register('http://(\S+\.)?blip.tv/\S+', Provider('http://blip.tv/oembed'))
