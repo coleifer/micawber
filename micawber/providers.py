@@ -203,6 +203,9 @@ def bootstrap_basic(cache=None, registry=None):
     # j
     pr.register('http://www.jest.com/(video|embed)/\S+', Provider('http://www.jest.com/oembed.json'))
 
+    # k
+    pr.register('http://www.kickstarter.com/projects/\S+', Provider('http://www.kickstarter.com/services/oembed'))
+
     # m
     pr.register('http://www.mixcloud.com/[^\/]+/\S+', Provider('http://www.mixcloud.com/oembed/'))
     pr.register('http://www.mobypicture.com/user/\S+/view/\S+', Provider('http://api.mobypicture.com/oEmbed'))
