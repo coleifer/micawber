@@ -149,6 +149,9 @@ def bootstrap_basic(cache=None, registry=None):
     # complements of oembed.com#section7
     pr = registry or ProviderRegistry(cache)
 
+    # a
+    pr.register('http://animoto.com/play/\S+', Provider('http://animoto.com/oembeds/create'))
+
     # b
     pr.register('http://blip.tv/\S+', Provider('http://blip.tv/oembed'))
 
