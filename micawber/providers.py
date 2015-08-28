@@ -175,6 +175,7 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register(r'https?://gist.github.com/\S*', Provider('https://github.com/api/oembed'))
 
     # h
+    pr.register('http://huffduffer.com/[^\/]+/\S+', Provider('http://huffduffer.com/oembed'))
     pr.register('http://www.hulu.com/watch/\S+', Provider('http://www.hulu.com/api/oembed.json'))
 
     # i
