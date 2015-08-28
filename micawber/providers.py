@@ -207,6 +207,7 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register('http://ifttt.com/recipes/\S+', Provider('http://www.ifttt.com/oembed/'))
     pr.register('http://\S*imgur\.com/\S+', Provider('http://api.imgur.com/oembed')),
     pr.register('https?://instagr(\.am|am\.com)/p/\S+', Provider('http://api.instagram.com/oembed'))
+    pr.register('https://isnare.com/\S+', Provider('https://isnare.com/oembed/'))
 
     # j
     pr.register('http://www.jest.com/(video|embed)/\S+', Provider('http://www.jest.com/oembed.json'))
