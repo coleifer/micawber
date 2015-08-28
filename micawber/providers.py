@@ -182,6 +182,7 @@ def bootstrap_basic(cache=None, registry=None):
 
     # e
     pr.register('http://edocr.com/docs/\S+', Provider('http://edocr.com/api/oembed'))
+    pr.register('http://embedarticles.com/\S+', Provider('http://embedarticles.com/oembed/'))
 
     # f
     pr.register('https?://(\S*\.)?flickr.com/\S+', Provider('https://www.flickr.com/services/oembed/'))
