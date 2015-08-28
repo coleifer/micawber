@@ -169,7 +169,7 @@ def bootstrap_basic(cache=None, registry=None):
     # f
     pr.register('https?://(\S*\.)?flickr.com/\S+', Provider('https://www.flickr.com/services/oembed/'))
     pr.register('https?://flic\.kr/p/\S*', Provider('https://www.flickr.com/services/oembed/'))
-    pr.register('https?://(www\.)?funnyordie\.com/videos/\S+', Provider('http://www.funnyordie.com/oembed'))
+    pr.register('https?://(www\.)?funnyordie\.com/videos/\S+', Provider('http://www.funnyordie.com/oembed.json'))
 
     # g
     pr.register(r'https?://gist.github.com/\S*', Provider('https://github.com/api/oembed'))
@@ -209,6 +209,7 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register('http://\S*.revision3.com/\S+', Provider('http://revision3.com/api/oembed/'))
 
     # s
+    pr.register('http://www.screenr.com/[^\/]+/', Provider('http://www.screenr.com/api/oembed.json'))
     pr.register('http://www.scribd.com/doc/\S+', Provider('http://www.scribd.com/services/oembed/'))
     pr.register('http://www.slideshare.net/[^\/]+/\S+', Provider('http://www.slideshare.net/api/oembed/2'))
     pr.register('http://slidesha\.re/\S*', Provider('http://www.slideshare.net/api/oembed/2'))
