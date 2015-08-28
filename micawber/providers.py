@@ -207,7 +207,7 @@ def bootstrap_basic(cache=None, registry=None):
     # i
     pr.register('http://www.ifixit.com/Guide/View/\S+', Provider('http://www.ifixit.com/Embed'))
     pr.register('http://ifttt.com/recipes/\S+', Provider('http://www.ifttt.com/oembed/'))
-    pr.register('http://\S*imgur\.com/\S+', Provider('http://api.imgur.com/oembed')),
+    pr.register('http://\S*imgur\.com/\S+', Provider('http://api.imgur.com/oembed'))
     pr.register('https://infogr\.am/\S+', Provider('https://infogr\.am/oembed'))
     pr.register('https?://instagr(\.am|am\.com)/p/\S+', Provider('http://api.instagram.com/oembed'))
     pr.register('https://isnare.com/\S+', Provider('https://isnare.com/oembed/'))
@@ -266,7 +266,7 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register('http://slidesha\.re/\S*', Provider('http://www.slideshare.net/api/oembed/2'))
     pr.register('http://(\S+\.)?smugmug.com/\S*', Provider('http://api.smugmug.com/services/oembed/'))
     pr.register('http://soundcloud.com/\S+', Provider('https://soundcloud.com/oembed'))
-    pr.register('https?://speakerdeck\.com/\S+/\S+', Provider('https://speakerdeck.com/oembed.json')),
+    pr.register('https?://speakerdeck\.com/\S+/\S+', Provider('https://speakerdeck.com/oembed.json'))
     pr.register('https?://(www\.)?scribd\.com/\S*', Provider('http://www.scribd.com/services/oembed'))
 
     # t
