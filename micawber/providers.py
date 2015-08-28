@@ -251,6 +251,9 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register('http://ted.com/talks/\S+', Provider('http://ted.com/talks/oembed.json'))
     pr.register('https?://(www\.)?twitter.com/\S+/status(es)?/\S+', Provider('https://api.twitter.com/1/statuses/oembed.json'))
 
+    # u
+    pr.register('http://(\S+\.)?ustream.(tv|com)/\S+', Provider('http://www.ustream.tv/oembed'))
+
     # v
     pr.register('http://(\S*\.)?viddler.com/v/\S*', Provider('http://www.viddler.com/oembed/'))
     pr.register('http://www.videojug.com/(film|interview)/\S+', Provider('http://www.videojug.com/oembed.json'))
