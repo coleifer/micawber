@@ -173,6 +173,7 @@ def bootstrap_basic(cache=None, registry=None):
 
     # i
     pr.register('http://www.ifixit.com/Guide/View/\S+', Provider('http://www.ifixit.com/Embed'))
+    pr.register('http://ifttt.com/recipes/\S+', Provider('http://www.ifttt.com/oembed/'))
     pr.register('http://\S*imgur\.com/\S+', Provider('http://api.imgur.com/oembed')),
     pr.register('https?://instagr(\.am|am\.com)/p/\S+', Provider('http://api.instagram.com/oembed'))
 
