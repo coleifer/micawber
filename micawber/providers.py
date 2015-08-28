@@ -158,6 +158,7 @@ def bootstrap_basic(cache=None, registry=None):
     # c
     pr.register('http://chirb.it/\S+', Provider('http://chirb.it/oembed.json'))
     pr.register('https://www.circuitlab.com/circuit/\S+', Provider('https://www.circuitlab.com/circuit/oembed'))
+    pr.register('http://clyp.it/\S+', Provider('http://api.clyp.it/oembed/'))
     pr.register('http://www.collegehumor.com/video/\S+', Provider('http://www.collegehumor.com/oembed.json'))
 
     # d
