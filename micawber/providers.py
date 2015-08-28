@@ -159,6 +159,7 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register('http://blip.tv/\S+', Provider('http://blip.tv/oembed'))
 
     # c
+    pr.register('https://cacoo.com/diagrams/\S+', Provider('http://cacoo.com/oembed.json'))
     pr.register('http://chirb.it/\S+', Provider('http://chirb.it/oembed.json'))
     pr.register('https://www.circuitlab.com/circuit/\S+', Provider('https://www.circuitlab.com/circuit/oembed'))
     pr.register('http://clyp.it/\S+', Provider('http://api.clyp.it/oembed/'))
