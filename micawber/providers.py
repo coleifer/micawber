@@ -159,7 +159,7 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register('http://animoto.com/play/\S+', Provider('http://animoto.com/oembeds/create'))
 
     # b
-    pr.register('http://blip.tv/\S+', Provider('http://blip.tv/oembed'))
+    pr.register('http://(\S+\.)?blip.tv/\S+', Provider('http://blip.tv/oembed'))
 
     # c
     pr.register('https://cacoo.com/diagrams/\S+', Provider('http://cacoo.com/oembed.json'))
