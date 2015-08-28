@@ -153,6 +153,9 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register('http://www.23hq.com/\S+/photo/\S+', Provider('http://www.23hq.com/23/oembed'))
 
     # a
+    pr.register('https://alpha.app.net/\S+/post/\S+', Provider('https://alpha-api.app.net/oembed'))
+    pr.register('https://photos.app.net/\S+/\S+', Provider('https://alpha-api.app.net/oembed'))
+    pr.register('http://animoto.com/play/\S+', Provider('https://alpha-api.app.net/oembed'))
     pr.register('http://animoto.com/play/\S+', Provider('http://animoto.com/oembeds/create'))
 
     # b
