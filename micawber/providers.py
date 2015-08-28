@@ -149,6 +149,9 @@ def bootstrap_basic(cache=None, registry=None):
     # complements of oembed.com#section7
     pr = registry or ProviderRegistry(cache)
 
+    # #
+    pr.register('http://www.23hq.com/\S+/photo/\S+', Provider('http://www.23hq.com/23/oembed'))
+
     # a
     pr.register('http://animoto.com/play/\S+', Provider('http://animoto.com/oembeds/create'))
 
