@@ -159,6 +159,7 @@ def bootstrap_basic(cache=None, registry=None):
 
     # d
     pr.register('https?://(www\.)?dailymotion\.com/\S+', Provider('http://www.dailymotion.com/services/oembed'))
+    pr.register('http://(\S+\.)?deviantart.com/\S+', Provider('http://backend.deviantart.com/oembed'))
 
     # f
     pr.register('https?://(\S*\.)?flickr.com/\S+', Provider('https://www.flickr.com/services/oembed/'))
