@@ -265,6 +265,7 @@ def bootstrap_basic(cache=None, registry=None):
 
     # t
     pr.register('http://ted.com/talks/\S+', Provider('http://ted.com/talks/oembed.json'))
+    pr.register('https://theysaidso.com/image/\S+', Provider('https://theysaidso.com/extensions/oembed/'))
     pr.register('https?://(www\.)?twitter.com/\S+/status(es)?/\S+', Provider('https://api.twitter.com/1/statuses/oembed.json'))
 
     # u
