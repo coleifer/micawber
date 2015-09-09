@@ -27,16 +27,19 @@ if isinstance(providers, Callable):
 register = template.Library()
 
 def django_template_handler(url, response_data, **params):
+    names = (
+        response_data.get('provider_name'),
+        response_data['type'],
+    )
+    template_names = ['micawber/%s.html' % name for name in names if name]
     return mark_safe(
-        render_to_string([
-            'micawber/%s.html' % response_data['provider_name'].lower(),
-            'micawber/%s.html' % response_data['type'],
-        ],
-        template.Context(dict(
-            params=params,
-            response=response_data,
-            url=url,
-        ))).strip())
+        render_to_string(
+            template_names,
+            template.Context({
+                'params': params,
+                'response': response_data,
+                'url': url,
+            })).strip())
 
 def fix_width_height(width_height, params):
     if width_height:
