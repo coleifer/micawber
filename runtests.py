@@ -44,11 +44,17 @@ def run_django_tests():
         settings.MICAWBER_PROVIDERS = providers
         settings.MICAWBER_TEMPLATE_EXTENSIONS = extensions
 
-    from django.test.simple import DjangoTestSuiteRunner
+    try:
+        from django import setup
+    except ImportError:
+        pass
+    else:
+        setup()
+
+    from django.test.runner import DiscoverRunner
     parent = os.path.dirname(os.path.abspath(__file__))
     sys.path.insert(0, parent)
-    return DjangoTestSuiteRunner(
-        verbosity=1, interactive=True).run_tests(['mcdjango_tests'])
+    return DiscoverRunner().run_tests(['micawber/contrib/mcdjango'])
 
 
 def runtests(*test_args):
