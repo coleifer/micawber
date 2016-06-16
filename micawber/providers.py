@@ -26,19 +26,17 @@ from micawber.exceptions import ProviderNotFoundException
 
 
 class Provider(object):
-    socket_timeout = 3.0
-    user_agent = 'python-micawber'
-
-    def __init__(self, endpoint, **kwargs):
+    def __init__(self, endpoint, timeout=3.0, user_agent=None, **kwargs):
         self.endpoint = endpoint
+        self.socket_timeout = timeout
+        self.user_agent = user_agent or 'python-micawber'
         self.base_params = {'format': 'json'}
         self.base_params.update(kwargs)
 
     def fetch(self, url):
-        socket.setdefaulttimeout(self.socket_timeout)
         req = Request(url, headers={'User-Agent': self.user_agent})
         try:
-            resp = fetch(req)
+            resp = fetch(req, self.timeout)
         except URLError:
             return False
         except HTTPError:
@@ -105,8 +103,11 @@ def url_cache(fn):
     return inner
 
 
-def fetch(request):
-    resp = urlopen(request)
+def fetch(request, timeout=None):
+    urlopen_params = {}
+    if timeout:
+        urlopen_params['timeout'] = timeout
+    resp = urlopen(request, **urlopen_params)
     if resp.code < 200 or resp.code >= 300:
         return False
 
