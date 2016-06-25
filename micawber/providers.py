@@ -36,7 +36,7 @@ class Provider(object):
     def fetch(self, url):
         req = Request(url, headers={'User-Agent': self.user_agent})
         try:
-            resp = fetch(req, self.timeout)
+            resp = fetch(req, self.socket_timeout)
         except URLError:
             return False
         except HTTPError:
