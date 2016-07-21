@@ -30,7 +30,7 @@ block_elements = set([
     'ins', 'map', 'object', 'script', '[document]'
 ])
 
-skip_elements = set(['a', 'pre', 'code'])
+skip_elements = set(['a', 'pre', 'code', 'input', 'textarea', 'select'])
 
 
 def full_handler(url, response_data, **params):
