@@ -37,6 +37,14 @@ def run_django_tests():
                 'micawber.contrib.mcdjango',
                 'micawber.contrib.mcdjango.mcdjango_tests',
             ],
+            TEMPLATES=[
+                {
+                    'BACKEND': 'django.template.backends.django.DjangoTemplates',
+                    'DIRS': [],
+                    'APP_DIRS': True,
+                    'OPTIONS': {}
+                },
+            ],
             MICAWBER_PROVIDERS=providers,
             MICAWBER_TEMPLATE_EXTENSIONS=extensions,
         )
@@ -68,12 +76,12 @@ def runtests(*test_args):
         errors = True
     if not (errors or failures):
         print("All micawber tests passed")
-    
+
     dj_failures = run_django_tests()
-    
+
     if failures or errors or dj_failures:
         sys.exit(1)
-    
+
     sys.exit(0)
 
 if __name__ == '__main__':
