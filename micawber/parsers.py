@@ -20,7 +20,7 @@ from micawber.exceptions import ProviderException
 
 url_pattern = '(https?://[-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@#/%=~_|])'
 url_re = re.compile(url_pattern)
-standalone_url_re = re.compile('^\s*' + url_pattern + '\s*$')
+standalone_url_re = re.compile('^\s*[^\[]?' + url_pattern + '(?:(?!\]\())?\s*$')
 
 block_elements = set([
     'address', 'blockquote', 'center', 'dir', 'div', 'dl', 'fieldset', 'form',
@@ -30,7 +30,7 @@ block_elements = set([
     'ins', 'map', 'object', 'script', '[document]'
 ])
 
-skip_elements = set(['a', 'pre', 'code', 'input', 'textarea', 'select'])
+skip_elements = set(['a', 'pre', 'code'])
 
 
 def full_handler(url, response_data, **params):
