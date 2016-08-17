@@ -121,11 +121,15 @@ def parse_text(text, providers, urlize_all=True, handler=full_handler, block_han
 
     return '\n'.join(parsed)
 
-def parse_html(html, providers, urlize_all=True, handler=full_handler, block_handler=inline_handler, **params):
-    if not BeautifulSoup:
-        raise Exception('Unable to parse HTML, please install BeautifulSoup or use the text parser')
+def parse_html(html, providers, urlize_all=True, handler=full_handler,
+               block_handler=inline_handler, soup_class=BeautifulSoup,
+               **params):
 
-    soup = BeautifulSoup(html, **bs_kwargs)
+    if not soup_class:
+        raise Exception('Unable to parse HTML, please install BeautifulSoup '
+                        'or use the text parser')
+
+    soup = soup_class(html, **bs_kwargs)
 
     for url in soup.findAll(text=re.compile(url_re)):
         if not _inside_skip(url):
