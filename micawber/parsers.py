@@ -127,7 +127,7 @@ def parse_html(html, providers, urlize_all=True, handler=full_handler,
 
     if not soup_class:
         raise Exception('Unable to parse HTML, please install BeautifulSoup '
-                        'or use the text parser')
+                        'or beautifulsoup4, or use the text parser')
 
     soup = soup_class(html, **bs_kwargs)
 
