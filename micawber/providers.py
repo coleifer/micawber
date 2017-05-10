@@ -197,8 +197,8 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register('http://\S*.revision3.com/\S+', Provider('http://revision3.com/api/oembed/'))
 
     # s
-    pr.register('http://www.slideshare.net/[^\/]+/\S+', Provider('http://www.slideshare.net/api/oembed/2'))
-    pr.register('http://slidesha\.re/\S*', Provider('http://www.slideshare.net/api/oembed/2'))
+    pr.register('https?://www.slideshare.net/[^\/]+/\S+', Provider('http://www.slideshare.net/api/oembed/2'))
+    pr.register('https?://slidesha\.re/\S*', Provider('http://www.slideshare.net/api/oembed/2'))
     pr.register('http://\S*.smugmug.com/\S*', Provider('http://api.smugmug.com/services/oembed/'))
     pr.register('https://\S*?soundcloud.com/\S+', Provider('http://soundcloud.com/oembed'))
     pr.register('https?://speakerdeck\.com/\S*', Provider('https://speakerdeck.com/oembed.json')),
