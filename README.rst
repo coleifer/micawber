@@ -1,3 +1,15 @@
+.. image:: https://img.shields.io/pypi/v/micawber.svg
+    :target: https://pypi.python.org/pypi/micawber
+
+.. image:: https://img.shields.io/pypi/l/micawber.svg
+    :target: https://pypi.python.org/pypi/micawber
+
+.. image:: https://img.shields.io/pypi/wheel/micawber.svg
+    :target: https://pypi.python.org/pypi/micawber
+
+.. image:: https://img.shields.io/pypi/pyversions/micawber.svg
+    :target: https://pypi.python.org/pypi/micawber
+
 .. image:: http://media.charlesleifer.com/blog/photos/micawber-logo.png
 
 .. image:: http://media.charlesleifer.com/blog/photos/micawber.jpg

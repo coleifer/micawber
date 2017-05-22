@@ -24,6 +24,7 @@ setup(
             '*/templates/*.html',
         ],
     },
+    license='mit',
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
