@@ -3,9 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. image:: http://media.charlesleifer.com/blog/photos/micawber-logo.png
-
-.. image:: http://media.charlesleifer.com/blog/photos/micawber.jpg
+.. image:: http://media.charlesleifer.com/blog/photos/micawber-logo-0.png
 
 A small library for extracting rich content from urls.  `Live demo <http://micawberdemo.appspot.com/>`_.
 
