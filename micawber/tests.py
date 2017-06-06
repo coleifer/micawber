@@ -106,6 +106,57 @@ class ProviderTestCase(BaseTestCase):
         self.assertRaises(InvalidResponseException, pr.request, 'http://bad')
 
 
+class ProviderDomainsTestCase(BaseTestCase):
+    def test_register_unregister(self):
+        pr = ProviderRegistry()
+        provider1 = TestProvider('link')
+        provider2 = TestProvider('link')
+        pr.register('1', provider1, domains=['1'])
+        pr.register('2', provider1, domains=['2'])
+        pr.register('3', provider2, domains=['3'])
+        pr.unregister('2', domains=['2'])
+        self.assertEqual(len(pr._registry), 2)
+        self.assertEqual(len(pr._domains_registry), 2)
+
+        # Multiple calls to remove() are OK.
+        self.assertRaises(KeyError, pr.unregister, '2', domains=['2'])
+
+        self.assertEqual(pr.provider_for_url('1'), provider1)
+        self.assertEqual(pr.provider_for_url('2'), None)
+        self.assertEqual(pr.provider_for_url('3'), provider2)
+
+        # with domain args
+        self.assertEqual(pr.provider_for_url('1', domain='1'), provider1)
+        self.assertEqual(pr.provider_for_url('2', domain='2'), None)
+        self.assertEqual(pr.provider_for_url('3', domain='3'), provider2)
+
+        pr.unregister('1', domains=['1'])
+        pr.unregister('3', domains=['3'])
+        self.assertEqual(len(pr._registry), 0)
+        self.assertEqual(len(pr._domains_registry), 0)
+        for test_regex in ['1', '2', '3']:
+            self.assertEqual(pr.provider_for_url(test_regex, domain=test_regex), None)
+
+    def test_multiple_matches(self):
+        """this works differently than the non-domains way"""
+        pr = ProviderRegistry()
+        provider1 = TestProvider('link')
+        provider2 = TestProvider('link')
+        pr.register('1(\d+)', provider1, domains='1')
+        pr.register('1\d+', provider2, domains='1')
+        self.assertEqual(pr.provider_for_url('11', domain='1'), provider1)
+        pr.unregister('1(\d+)', domains='1')
+        self.assertEqual(pr.provider_for_url('11', domain='1'), provider2)
+
+    def test_invalid_json(self):
+        pr = ProviderRegistry()
+        class BadProvider(Provider):
+            def fetch(self, url):
+                return 'bad'
+        pr.register('http://bad', BadProvider('link'), domains='bad')
+        self.assertRaises(InvalidResponseException, pr.request, 'http://bad')
+
+
 class ParserTestCase(BaseTestCase):
     def test_parse_text_full(self):
         for url, expected in self.full_pairs.items():
