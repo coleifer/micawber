@@ -166,6 +166,20 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register('https?://flic\.kr/\S*', Provider('https://www.flickr.com/services/oembed/'))
     pr.register('https?://(www\.)?funnyordie\.com/videos/\S+', Provider('http://www.funnyordie.com/oembed'))
 
+    # f - facebook posts
+    pr.register('https://www.facebook.com/[^\/]+/(posts|activity)/[^\/]+', Provider('https://www.facebook.com/plugins/post/oembed.json/'))
+    pr.register('https://www.facebook.com/[^\/]+/photos/[^\/]+/[^\/]+/\S+', Provider('https://www.facebook.com/plugins/post/oembed.json/'))
+    pr.register('https://www.facebook.com/photo.php\?fbid=\S+', Provider('https://www.facebook.com/plugins/post/oembed.json/'))
+    pr.register('https://www.facebook.com/photos/\S+', Provider('https://www.facebook.com/plugins/post/oembed.json/'))
+    pr.register('https://www.facebook.com/permalink.php\?story_fbid=\S+', Provider('https://www.facebook.com/plugins/post/oembed.json/'))
+    pr.register('https://www.facebook.com/media/set\?set=\S+', Provider('https://www.facebook.com/plugins/post/oembed.json/'))
+    pr.register('https://www.facebook.com/questions/\S+', Provider('https://www.facebook.com/plugins/post/oembed.json/'))
+    pr.register('https://www.facebook.com/notes/[^\/]+/[^\/]+/[^\/]+', Provider('https://www.facebook.com/plugins/post/oembed.json/'))
+
+    # f - facebook videos
+    pr.register('https://www.facebook.com/[^\/]+/videos/[^\/]+/', Provider('https://www.facebook.com/plugins/video/oembed.json/'))
+    pr.register('https://www.facebook.com/video.php?(id|v)=\S+', Provider('https://www.facebook.com/plugins/video/oembed.json/'))
+
     # g
     pr.register(r'https?://gist.github.com/\S*', Provider('https://github.com/api/oembed'))
 
