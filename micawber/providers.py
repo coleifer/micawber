@@ -3,6 +3,7 @@ import pickle
 import re
 import socket
 import ssl
+from urlparse import urlparse
 from .compat import get_charset
 from .compat import HTTPError
 from .compat import OrderedDict
@@ -146,7 +147,7 @@ class ProviderRegistry(object):
         raise ProviderNotFoundException('Provider not found for "%s"' % url)
 
 
-def bootstrap_basic(cache=None, registry=None):
+def bootstrap_basic(cache=None, registry=None, tumblr_domain=None):
     # complements of oembed.com#section7
     pr = registry or ProviderRegistry(cache)
 
@@ -206,6 +207,11 @@ def bootstrap_basic(cache=None, registry=None):
 
     # t
     pr.register('https?://(www\.)?twitter.com/\S+/status(es)?/\S+', Provider('https://api.twitter.com/1/statuses/oembed.json'))
+
+    if tumblr_domain:
+        tumblr_domain = urlparse(tumblr_domain)
+        tumblr_domain = tumblr_domain.netloc
+        pr.register('http://%s/\S*' % tumblr_domain, Provider('https://www.tumblr.com/oembed/1.0'))
 
     # v
     pr.register('http://\S*.viddler.com/\S*', Provider('http://lab.viddler.com/services/oembed/'))
