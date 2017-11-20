@@ -92,7 +92,7 @@ def make_key(*args, **kwargs):
 
 def url_cache(fn):
     def inner(self, url, **params):
-        if self.cache:
+        if self.cache is not None:
             key = make_key(url, params)
             data = self.cache.get(key)
             if not data:
