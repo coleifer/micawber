@@ -150,9 +150,6 @@ def bootstrap_basic(cache=None, registry=None):
     # complements of oembed.com#section7
     pr = registry or ProviderRegistry(cache)
 
-    # b
-    pr.register('http://blip.tv/\S+', Provider('http://blip.tv/oembed'))
-
     # c
     pr.register('http://chirb.it/\S+', Provider('http://chirb.it/oembed.json'))
     pr.register('https://www.circuitlab.com/circuit/\S+', Provider('https://www.circuitlab.com/circuit/oembed'))
@@ -174,7 +171,7 @@ def bootstrap_basic(cache=None, registry=None):
 
     # i
     pr.register('http://www.ifixit.com/Guide/View/\S+', Provider('http://www.ifixit.com/Embed'))
-    pr.register('http://\S*imgur\.com/\S+', Provider('http://api.imgur.com/oembed')),
+    pr.register('https?://\S*imgur\.com/\S+', Provider('https://api.imgur.com/oembed')),
     pr.register('https?://(www\.)?instagr(\.am|am\.com)/p/\S+', Provider('http://api.instagram.com/oembed'))
 
     # j
