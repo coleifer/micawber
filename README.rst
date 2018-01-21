@@ -14,7 +14,9 @@ content.
 examples
 --------
 
-here is a quick example::
+here is a quick example:
+
+.. code-block:: python
 
     import micawber
 
