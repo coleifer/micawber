@@ -5,6 +5,6 @@ python:
   - 3.4
   - 2.7
 install:
-  - pip install -q django BeautifulSoup4
+  - pip install django bs4
 script:
   - env PYTHONPATH=`pwd` python setup.py test
