@@ -18,11 +18,6 @@ setup(
         'micawber': [
             'contrib/mcdjango/templates/micawber/*.html',
         ],
-        'examples': [
-            #'requirements.txt',
-            '*/static/*.css',
-            '*/templates/*.html',
-        ],
     },
     classifiers=[
         'Development Status :: 4 - Beta',
