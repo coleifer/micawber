@@ -7,13 +7,13 @@ f.close()
 
 setup(
     name='micawber',
-    version='0.3.6',
+    version='0.3.7',
     description='a small library for extracting rich content from urls',
     long_description=readme,
     author='Charles Leifer',
     author_email='coleifer@gmail.com',
     url='http://github.com/coleifer/micawber/',
-    packages=find_packages(),
+    packages=['micawber'],
     package_data = {
         'micawber': [
             'contrib/mcdjango/templates/micawber/*.html',
