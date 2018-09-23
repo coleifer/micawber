@@ -13,7 +13,7 @@ setup(
     author='Charles Leifer',
     author_email='coleifer@gmail.com',
     url='http://github.com/coleifer/micawber/',
-    packages=['micawber'],
+    packages=[p for p in find_packages() if not p.startswith('examples')],
     package_data = {
         'micawber': [
             'contrib/mcdjango/templates/micawber/*.html',
