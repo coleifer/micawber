@@ -152,7 +152,7 @@ def bootstrap_basic(cache=None, registry=None):
 
     # c
     pr.register('http://chirb.it/\S+', Provider('http://chirb.it/oembed.json'))
-    pr.register('https://www.circuitlab.com/circuit/\S+', Provider('https://www.circuitlab.com/circuit/oembed'))
+    pr.register('https?://www.circuitlab.com/circuit/\S+', Provider('https://www.circuitlab.com/circuit/oembed'))
     pr.register('http://www.collegehumor.com/video/\S+', Provider('http://www.collegehumor.com/oembed.json'))
 
     # d
@@ -170,12 +170,8 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register('http://www.hulu.com/watch/\S+', Provider('http://www.hulu.com/api/oembed.json'))
 
     # i
-    pr.register('http://www.ifixit.com/Guide/View/\S+', Provider('http://www.ifixit.com/Embed'))
     pr.register('https?://\S*imgur\.com/\S+', Provider('https://api.imgur.com/oembed')),
     pr.register('https?://(www\.)?instagr(\.am|am\.com)/p/\S+', Provider('http://api.instagram.com/oembed'))
-
-    # j
-    pr.register('http://www.jest.com/(video|embed)/\S+', Provider('http://www.jest.com/oembed.json'))
 
     # m
     pr.register('http://www.mobypicture.com/user/\S*?/view/\S*', Provider('http://api.mobypicture.com/oEmbed'))
@@ -186,12 +182,6 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register('http://gi\S*.photobucket.com/groups/\S+', Provider('http://photobucket.com/oembed'))
     pr.register('http://www.polleverywhere.com/(polls|multiple_choice_polls|free_text_polls)/\S+', Provider('http://www.polleverywhere.com/services/oembed/'))
     pr.register('https?://(.+\.)?polldaddy\.com/\S*', Provider('http://polldaddy.com/oembed/'))
-
-    # q
-    pr.register('http://qik.com/video/\S+', Provider('http://qik.com/api/oembed.json'))
-
-    # r
-    pr.register('http://\S*.revision3.com/\S+', Provider('http://revision3.com/api/oembed/'))
 
     # s
     pr.register('https?://www.slideshare.net/[^\/]+/\S+', Provider('http://www.slideshare.net/api/oembed/2'))
