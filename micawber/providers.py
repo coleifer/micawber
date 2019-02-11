@@ -266,7 +266,7 @@ def bootstrap_oembed(cache=None, registry=None, **params):
                 # Transform the raw pattern into a reasonable regex. Match one
                 # or more of any character that is not a slash, whitespace, or
                 # a parameter used for separating querystring/url params.
-                pattern = scheme.replace('*', '[^\/\s\?&]+?')
+                pattern = scheme.replace('*', r'[^\/\s\?&]+?')
                 pr.register(pattern, provider)
 
     # Currently oembed.com does not provide patterns for YouTube, so we'll add
