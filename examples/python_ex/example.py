@@ -1,13 +1,13 @@
 import pprint
-from micawber import bootstrap_embedly, ProviderException
+from micawber import bootstrap_oembed, ProviderException
 try:
     read_input = raw_input
 except NameError:
     read_input = input
 
 def main():
-    print('Please wait, loading providers from embed.ly')
-    providers = bootstrap_embedly()
+    print('Please wait, loading providers from oembed.com')
+    providers = bootstrap_oembed()
 
     while 1:
         url = read_input('Enter a url (or q to quit): ')

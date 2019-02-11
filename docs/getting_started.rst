@@ -8,7 +8,7 @@ If you want the dead simple get-me-up-and-running, try the following:
 .. code-block:: python
 
     >>> import micawber
-    >>> providers = micawber.bootstrap_embedly() # may take a second
+    >>> providers = micawber.bootstrap_basic() # may take a second
     >>> print micawber.parse_text('this is a test:\nhttp://www.youtube.com/watch?v=54XHDUOHuzU', providers)
     this is a test:
     <iframe width="640" height="360" src="http://www.youtube.com/embed/54XHDUOHuzU?fs=1&feature=oembed" frameborder="0" allowfullscreen></iframe>
@@ -121,15 +121,16 @@ two parameters, a regular expression for valid URLs and a ``Provider`` instance.
 You can use helper functions to get a populated registry:
 
 * :py:func:`~micawber.providers.bootstrap_basic`
+* :py:func:`~micawber.providers.bootstrap_oembed` - uses oembed.com's official providers list.
 * :py:func:`~micawber.providers.bootstrap_embedly`
 * :py:func:`~micawber.providers.bootstrap_noembed`
-* :py:func:`~micawber.providers.bootstrap_oembedio`
 
-The ``bootstrap_embedly``, ``bootstrap_noembed`` and ``bootstrap_oembedio`` functions make a HTTP request to the API server asking
-for a list of supported providers, so you may experience some latency when
-using these helpers.  For most WSGI applications this will not be an issue, but
-if you'd like to speed it up I suggest fetching the results, storing them in
-the db or a file, and then pulling from there.
+The ``bootstrap_oembed``, ``bootstrap_embedly``, and ``bootstrap_noembed``
+functions make a HTTP request to the API server asking for a list of supported
+providers, so you may experience some latency when using these helpers. For
+most WSGI applications this will not be an issue, but if you'd like to speed it
+up I suggest fetching the results, storing them in the db or a file, and then
+pulling from there.
 
 More information can be found in the :py:class:`~micawber.providers.ProviderRegistry` API docs.
 
