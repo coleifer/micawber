@@ -238,3 +238,42 @@ def bootstrap_noembed(cache=None, registry=None, **params):
         for regex in provider_meta['patterns']:
             pr.register(regex, Provider(endpoint, **params))
     return pr
+
+
+def bootstrap_oembed(cache=None, registry=None, **params):
+    schema_url = 'https://oembed.com/providers.json'
+    pr = registry or ProviderRegistry(cache)
+
+    # Fetch schema.
+    contents = fetch(schema_url)
+    json_data = json.loads(contents)
+
+    for item in json_data:
+        for endpoint in item['endpoints']:
+            # Possibly this provider only supports discovery via <link> tags,
+            # which is not supported by micawber.
+            if 'schemes' not in endpoint:
+                continue
+
+            # Consists of one or more schemes, a destination URL and optionally
+            # a format, e.g. "json".
+            url = endpoint['url']
+            if '{format}' in url:
+                url = url.replace('{format}', 'json')
+
+            provider = Provider(url, **params)
+            for scheme in endpoint['schemes']:
+                # Transform the raw pattern into a reasonable regex. Match one
+                # or more of any character that is not a slash, whitespace, or
+                # a parameter used for separating querystring/url params.
+                pattern = scheme.replace('*', '[^\/\s\?&]+?')
+                pr.register(pattern, provider)
+
+    # Currently oembed.com does not provide patterns for YouTube, so we'll add
+    # these ourselves.
+    pr.register(r'http://(\S*\.)?youtu(\.be/|be\.com/watch)\S+',
+                Provider('http://www.youtube.com/oembed'))
+    pr.register(r'https://(\S*\.)?youtu(\.be/|be\.com/watch)\S+',
+                Provider('http://www.youtube.com/oembed?scheme=https&'))
+
+    return pr

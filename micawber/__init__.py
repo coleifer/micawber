@@ -12,3 +12,4 @@ from micawber.providers import ProviderRegistry
 from micawber.providers import bootstrap_basic
 from micawber.providers import bootstrap_embedly
 from micawber.providers import bootstrap_noembed
+from micawber.providers import bootstrap_oembed
