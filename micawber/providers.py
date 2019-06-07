@@ -1,4 +1,5 @@
 import hashlib
+import logging
 import pickle
 import re
 import socket
@@ -23,6 +24,9 @@ except ImportError:
 from micawber.exceptions import InvalidResponseException
 from micawber.exceptions import ProviderException
 from micawber.exceptions import ProviderNotFoundException
+
+
+logger = logging.getLogger(__name__)
 
 
 class Provider(object):
@@ -263,10 +267,21 @@ def bootstrap_oembed(cache=None, registry=None, **params):
 
             provider = Provider(url, **params)
             for scheme in endpoint['schemes']:
+                # If a question-mark is being used, it is for the query-string
+                # and should be treated as a literal.
+                scheme = scheme.replace('?', '\?')
+
                 # Transform the raw pattern into a reasonable regex. Match one
                 # or more of any character that is not a slash, whitespace, or
                 # a parameter used for separating querystring/url params.
                 pattern = scheme.replace('*', r'[^\/\s\?&]+?')
+                try:
+                    re.compile(pattern)
+                except re.error:
+                    logger.exception('oembed.com provider %s regex could not '
+                                     'be compiled: %s', url, pattern)
+                    continue
+
                 pr.register(pattern, provider)
 
     # Currently oembed.com does not provide patterns for YouTube, so we'll add
