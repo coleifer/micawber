@@ -36,14 +36,14 @@ Each filter accepts one argument and one optional argument, due to django's temp
 filters being wack.
 
 Piping a string through the ``oembed`` filter (or ``oembed_html``) will convert
-URLs to things like youtube videos into flash players.  A couple things to
+URLs to things like youtube videos into video players.  A couple things to
 understand about the parsers:
 
 * the plaintext parser (``oembed``) will convert URLs *on their own line* into
-  full images/flash-players/etc.  URLs that are interspersed within text will
+  full images/video-players/etc.  URLs that are interspersed within text will
   simply be converted into clickable links so as not to disrupt the flow of text.
 * the HTML parser (``oembed_html``) will convert URLs that *are not already links*
-  into full images/flash-players/etc.  URLs within block elements along with other
+  into full images/video-players/etc. URLs within block elements along with other
   text will be converted into clickable links as this would likely disrupt the flow
   of text or produce invalid HTML.
 
@@ -161,7 +161,7 @@ Some examples of keyword arguments to override are:
 The magic happens in :py:func:`micawber.contrib.mcdjango.extension` -- check
 out the `source code <https://github.com/coleifer/micawber/blob/master/micawber/contrib/mcdjango/__init__.py>`_ for more details.
 
-.. note:: 
+.. note::
     The ``MICAWBER_EXTENSIONS`` setting can also be a string path to
     a module and an attribute containing a similar data structure.
 

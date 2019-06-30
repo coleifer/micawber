@@ -9,7 +9,7 @@ If you want the dead simple get-me-up-and-running, try the following:
 
     >>> import micawber
     >>> providers = micawber.bootstrap_basic() # may take a second
-    >>> print micawber.parse_text('this is a test:\nhttp://www.youtube.com/watch?v=54XHDUOHuzU', providers)
+    >>> print providers.parse_text('this is a test:\nhttp://www.youtube.com/watch?v=54XHDUOHuzU')
     this is a test:
     <iframe width="640" height="360" src="http://www.youtube.com/embed/54XHDUOHuzU?fs=1&feature=oembed" frameborder="0" allowfullscreen></iframe>
 
@@ -19,7 +19,7 @@ in your templates:
 .. code-block:: html
 
     {% load micawber_tags %}
-    {# show a flash player for the youtube video #}
+    {# show a video player for the youtube video #}
     {{ "http://www.youtube.com/watch?v=mQEWI1cn7HY"|oembed }}
 
 Using flask?  Use the ``add_oembed_filters`` function to register two jinja
@@ -38,7 +38,7 @@ template filters, ``oembed`` and ``extract_oembed``:
 
 .. code-block:: html
 
-    {# show a flash player for the youtube video #}
+    {# show a video player for the youtube video #}
     {{ "http://www.youtube.com/watch?v=mQEWI1cn7HY"|oembed() }}
 
 Overview
@@ -49,12 +49,14 @@ which is designed for converting URLs into rich, embeddable content.  Many popul
 support this, including youtube and flickr.  There is also a 3rd-party service called
 `embedly <http://embed.ly>`_ that can convert many types of links into rich content.
 
-micawber was designed to make it easy to integrate with these APIs.  There are three
-main concepts to grok when using micawber:
+micawber was designed to make it easy to integrate with these APIs.  There are
+two concepts to understand when using micawber:
 
-* :py:class:`~micawber.providers.Provider` objects
-* :py:class:`~micawber.providers.ProviderRegistry` objects
-* :py:mod:`~micawber.parsers` module and its functions
+* :py:class:`~micawber.providers.Provider` objects - which describe how to
+  match a URL (based on a regex) to an OEmbed endpoint.
+* :py:class:`~micawber.providers.ProviderRegistry` objects - which encapsulate
+  a collection or providers and expose methods for parsing text and HTML to
+  convert links into media objects.
 
 
 Providers
@@ -134,14 +136,17 @@ pulling from there.
 
 More information can be found in the :py:class:`~micawber.providers.ProviderRegistry` API docs.
 
-Parsers
--------
+Parsing Links
+^^^^^^^^^^^^^
 
-The :py:mod:`micawber.parsers` module contains several handy functions for parsing
-blocks of text or HTML and either:
+Replace URLs with rich media:
 
-* replacing links with rich markup
-* extracting links and returning metadata dictionaries
+* :py:meth:`~micawber.providers.ProviderRegistry.parse_text`, which converts
+  URLs on their own line into a rich media object. Links embedded within blocks
+  of text are converted into clickable links.
+* :py:meth:`~micawber.providers.ProviderRegistry.parse_html`, which converts
+  URLs within HTML into rich media objects or clickable links, depending on the
+  context in which the URL is found.
 
 A quick example:
 
@@ -151,54 +156,28 @@ A quick example:
 
     providers = micawber.bootstrap_basic()
 
-    micawber.parse_text('this is a test:\nhttp://www.youtube.com/watch?v=54XHDUOHuzU', providers)
+    providers.parse_text('this is a test:\nhttp://www.youtube.com/watch?v=54XHDUOHuzU')
 
 This will result in the following output::
 
     this is a test:
     <iframe width="459" height="344" src="http://www.youtube.com/embed/54XHDUOHuzU?fs=1&feature=oembed" frameborder="0" allowfullscreen></iframe>
 
-You can also parse HTML using the :py:func:`~micawber.parsers.parse_html` function:
+You can also parse HTML using the :py:meth:`~micawber.providers.ProviderRegistry.parse_html` method:
 
 .. code-block:: python
 
-    micawber.parse_html('<p>http://www.youtube.com/watch?v=54XHDUOHuzU</p>', providers)
+    providers.parse_html('<p>http://www.youtube.com/watch?v=54XHDUOHuzU</p>')
 
     # yields the following output:
     <p><iframe width="459" height="344" src="http://www.youtube.com/embed/54XHDUOHuzU?fs=1&amp;feature=oembed" frameborder="0" allowfullscreen="allowfullscreen"></iframe></p>
 
 If you would rather extract metadata, there are two functions:
 
-* :py:func:`~micawber.parsers.extract` (handles text)
-* :py:func:`~micawber.parsers.extract_html` (handles html)
+* :py:meth:`~micawber.providers.ProviderRegistry.extract`, which finds all URLs
+  within a block of text and returns a dictionary of metadata for each.
+* :py:meth:`~micawber.providers.ProviderRegistry.extract_html`, which finds
+  URLs within HTML and returns a dictionary of metadata for each.
 
-The :ref:`API docs <api>` are extensive, so please refer there for a full list of
-parameters and functions.
-
-
-How the parsers determine what to convert
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-First a couple definitions:
-
-Full representation:
-    A "rich" representation of an embeddable object, for example a flash player
-    or an <img> tag.
-
-Inline representation:
-    A representation of an embeddable object suitable for embedding within a
-    block of text, so as not to disrupt the flow of the text -- for example
-    a clickable <a> tag.
-
-There are two parsers that you will probably use the most:
-
-* :py:func:`~micawber.parsers.parse_text` for text
-
-  * URLs on their own line are converted into full representations
-  * URLs within blocks of text are converted into clickable links
-
-* :py:func:`~micawber.parsers.parse_html` for html
-
-  * URLs that are already within <a> tags are passed over
-  * URLs on their own in block tags are converted into full representations
-  * URLs interspersed with text are converted into clickable links
+The :ref:`API docs <api>` are extensive, so please refer there for a full list
+of parameters and functions.

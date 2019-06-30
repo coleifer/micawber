@@ -44,8 +44,11 @@ def full_handler(url, response_data, **params):
 def inline_handler(url, response_data, **params):
     return '<a href="%(url)s" title="%(title)s">%(title)s</a>' % response_data
 
-def urlize(url):
-    return '<a href="%s">%s</a>' % (url, url)
+def urlize(url, **params):
+    params.setdefault('href', url)
+    param_html = ' '.join('%s="%s"' % (key, value)
+                          for key, value in sorted(params.items()))
+    return '<a %s>%s</a>' % (param_html, url)
 
 def extract(text, providers, **params):
     all_urls = set()
@@ -65,15 +68,17 @@ def extract(text, providers, **params):
 
     return urls, extracted_urls
 
-def parse_text_full(text, providers, urlize_all=True, handler=full_handler, **params):
+def parse_text_full(text, providers, urlize_all=True, handler=full_handler,
+                    urlize_params=None, **params):
     all_urls, extracted_urls = extract(text, providers, **params)
     replacements = {}
+    urlize_params = urlize_params or {}
 
     for url in all_urls:
         if url in extracted_urls:
             replacements[url] = handler(url, extracted_urls[url], **params)
         elif urlize_all:
-            replacements[url] = urlize(url)
+            replacements[url] = urlize(url, **urlize_params)
 
     # go through the text recording URLs that can be replaced
     # taking note of their start & end indexes
@@ -100,9 +105,11 @@ def parse_text_full(text, providers, urlize_all=True, handler=full_handler, **pa
 
     return text
 
-def parse_text(text, providers, urlize_all=True, handler=full_handler, block_handler=inline_handler, **params):
+def parse_text(text, providers, urlize_all=True, handler=full_handler,
+               block_handler=inline_handler, urlize_params=None, **params):
     lines = text.splitlines()
     parsed = []
+    urlize_params = urlize_params or {}
 
     for line in lines:
         if standalone_url_re.match(line):
@@ -111,11 +118,12 @@ def parse_text(text, providers, urlize_all=True, handler=full_handler, block_han
                 response = providers.request(url, **params)
             except ProviderException:
                 if urlize_all:
-                    line = urlize(url)
+                    line = urlize(url, **urlize_params)
             else:
                 line = handler(url, response, **params)
         else:
-            line = parse_text_full(line, providers, urlize_all, block_handler, **params)
+            line = parse_text_full(line, providers, urlize_all, block_handler,
+                                   urlize_params=urlize_params, **params)
 
         parsed.append(line)
 
@@ -123,7 +131,7 @@ def parse_text(text, providers, urlize_all=True, handler=full_handler, block_han
 
 def parse_html(html, providers, urlize_all=True, handler=full_handler,
                block_handler=inline_handler, soup_class=BeautifulSoup,
-               **params):
+               urlize_params=None, **params):
 
     if not soup_class:
         raise Exception('Unable to parse HTML, please install BeautifulSoup '
@@ -139,14 +147,21 @@ def parse_html(html, providers, urlize_all=True, handler=full_handler,
                 url_handler = block_handler
 
             url_unescaped = url.string
-            replacement = parse_text_full(url_unescaped, providers, urlize_all, url_handler, **params)
+            replacement = parse_text_full(
+                url_unescaped,
+                providers,
+                urlize_all,
+                url_handler,
+                urlize_params=urlize_params,
+                **params)
             url.replaceWith(BeautifulSoup(replacement, **replace_kwargs))
 
     return text_type(soup)
 
 def extract_html(html, providers, **params):
     if not BeautifulSoup:
-        raise Exception('Unable to parse HTML, please install BeautifulSoup or use the text parser')
+        raise Exception('Unable to parse HTML, please install BeautifulSoup '
+                        'or use the text parser')
 
     soup = BeautifulSoup(html, **bs_kwargs)
     all_urls = set()

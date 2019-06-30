@@ -24,6 +24,11 @@ except ImportError:
 from micawber.exceptions import InvalidResponseException
 from micawber.exceptions import ProviderException
 from micawber.exceptions import ProviderNotFoundException
+from micawber.parsers import extract
+from micawber.parsers import extract_html
+from micawber.parsers import parse_html
+from micawber.parsers import parse_text
+from micawber.parsers import parse_text_full
 
 
 logger = logging.getLogger(__name__)
@@ -148,6 +153,21 @@ class ProviderRegistry(object):
         if provider:
             return provider.request(url, **params)
         raise ProviderNotFoundException('Provider not found for "%s"' % url)
+
+    def parse_text(self, text, **kwargs):
+        return parse_text(text, self, **kwargs)
+
+    def parse_text_full(self, text, **kwargs):
+        return parse_text_full(text, self, **kwargs)
+
+    def parse_html(self, html, **kwargs):
+        return parse_html(html, self, **kwargs)
+
+    def extract(self, text, **kwargs):
+        return extract(text, self, **kwargs)
+
+    def extract_html(self, html, **kwargs):
+        return extract_html(html, self, **kwargs)
 
 
 def bootstrap_basic(cache=None, registry=None):

@@ -43,13 +43,13 @@ here is a quick example:
         'version': '1.0',
     }
 
-    micawber.parse_text('this is a test:\nhttp://www.youtube.com/watch?v=54XHDUOHuzU', providers)
+    providers.parse_text('this is a test:\nhttp://www.youtube.com/watch?v=54XHDUOHuzU')
 
     # returns the following string:
     this is a test:
     <iframe width="459" height="344" src="http://www.youtube.com/embed/54XHDUOHuzU?fs=1&feature=oembed" frameborder="0" allowfullscreen></iframe>
 
-    micawber.parse_html('<p>http://www.youtube.com/watch?v=54XHDUOHuzU</p>', providers)
+    providers.parse_html('<p>http://www.youtube.com/watch?v=54XHDUOHuzU</p>')
 
     # returns the following html:
     <p><iframe width="459" height="344" src="http://www.youtube.com/embed/54XHDUOHuzU?fs=1&amp;feature=oembed" frameborder="0" allowfullscreen="allowfullscreen"></iframe></p>

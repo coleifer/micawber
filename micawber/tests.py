@@ -109,44 +109,44 @@ class ProviderTestCase(BaseTestCase):
 class ParserTestCase(BaseTestCase):
     def test_parse_text_full(self):
         for url, expected in self.full_pairs.items():
-            parsed = parse_text_full(url, test_pr)
+            parsed = test_pr.parse_text_full(url)
             self.assertHTMLEqual(parsed, expected)
 
         # the parse_text_full will replace even inline content
         for url, expected in self.full_pairs.items():
-            parsed = parse_text_full('this is inline: %s' % url, test_pr)
+            parsed = test_pr.parse_text_full('this is inline: %s' % url)
             self.assertHTMLEqual(parsed, 'this is inline: %s' % expected)
 
         for url, expected in self.full_pairs.items():
-            parsed = parse_html('<p>%s</p>' % url, test_pr)
+            parsed = test_pr.parse_html('<p>%s</p>' % url)
             self.assertHTMLEqual(parsed, '<p>%s</p>' % expected)
 
     def test_parse_text(self):
         for url, expected in self.inline_pairs.items():
-            parsed = parse_text('this is inline: %s' % url, test_pr)
+            parsed = test_pr.parse_text('this is inline: %s' % url)
             self.assertHTMLEqual(parsed, 'this is inline: %s' % expected)
 
         # if the link comes on its own line it gets included in full
         for url, expected in self.full_pairs.items():
-            parsed = parse_text(url, test_pr)
+            parsed = test_pr.parse_text(url)
             self.assertHTMLEqual(parsed, expected)
 
         # links inside block tags will render as inline
         frame = '<p>Testing %s</p>'
         for url, expected in self.inline_pairs.items():
-            parsed = parse_html(frame % (url), test_pr)
+            parsed = test_pr.parse_html(frame % (url))
             self.assertHTMLEqual(parsed, frame % (expected))
 
         # links inside <a> tags won't change at all
         frame = '<p><a href="%s">%s</a></p>'
         for url, expected in self.inline_pairs.items():
-            parsed = parse_html(frame % (url, url), test_pr)
+            parsed = test_pr.parse_html(frame % (url, url))
             self.assertHTMLEqual(parsed, frame % (url, url))
 
         # links within tags within a tags are fine too
         frame = '<p><a href="%s"><span>%s</span></a></p>'
         for url, expected in self.inline_pairs.items():
-            parsed = parse_html(frame % (url, url), test_pr)
+            parsed = test_pr.parse_html(frame % (url, url))
             self.assertHTMLEqual(parsed, frame % (url, url))
 
     def test_multiline(self):
@@ -156,7 +156,7 @@ class ParserTestCase(BaseTestCase):
 
             test_str = frame % (url, url, url)
 
-            parsed = parse_text(test_str, test_pr)
+            parsed = test_pr.parse_text(test_str)
             self.assertHTMLEqual(parsed, frame % (expected_inline, expected, expected_inline))
 
         for url, expected in self.full_pairs.items():
@@ -165,7 +165,7 @@ class ParserTestCase(BaseTestCase):
 
             test_str = frame % (url, url, url)
 
-            parsed = parse_text(test_str, test_pr)
+            parsed = test_pr.parse_text(test_str)
             self.assertHTMLEqual(parsed, frame % (expected, expected_inline, expected))
 
         # test mixing multiline with p tags
@@ -175,7 +175,7 @@ class ParserTestCase(BaseTestCase):
 
             test_str = frame % (url, url, url, url)
 
-            parsed = parse_html(test_str, test_pr)
+            parsed = test_pr.parse_html(test_str)
             self.assertHTMLEqual(parsed, frame % (expected, expected_inline, expected, expected_inline))
 
         for url, expected in self.full_pairs.items():
@@ -184,7 +184,7 @@ class ParserTestCase(BaseTestCase):
 
             test_str = frame % (url, url, url)
 
-            parsed = parse_html(test_str, test_pr)
+            parsed = test_pr.parse_html(test_str)
             self.assertHTMLEqual(parsed, frame % (url, expected_inline, expected_inline))
 
     def test_multiline_full(self):
@@ -193,7 +193,7 @@ class ParserTestCase(BaseTestCase):
 
             test_str = frame % (url, url, url)
 
-            parsed = parse_text_full(test_str, test_pr)
+            parsed = test_pr.parse_text_full(test_str)
             self.assertHTMLEqual(parsed, frame % (expected, expected, expected))
 
     def test_urlize(self):
@@ -205,33 +205,48 @@ class ParserTestCase(BaseTestCase):
 
             test_str = frame % (url, blank, url, blank)
 
-            parsed = parse_text(test_str, test_pr)
+            parsed = test_pr.parse_text(test_str)
             self.assertHTMLEqual(parsed, frame % (expected_inline, blank_e, expected, blank_e))
 
-            parsed = parse_text(test_str, test_pr, urlize_all=False)
+            parsed = test_pr.parse_text(test_str, urlize_all=False)
             self.assertHTMLEqual(parsed, frame % (expected_inline, blank, expected, blank))
 
-            parsed = parse_text_full(test_str, test_pr)
+            parsed = test_pr.parse_text_full(test_str)
             self.assertHTMLEqual(parsed, frame % (expected, blank_e, expected, blank_e))
 
-            parsed = parse_text_full(test_str, test_pr, urlize_all=False)
+            parsed = test_pr.parse_text_full(test_str, urlize_all=False)
             self.assertHTMLEqual(parsed, frame % (expected, blank, expected, blank))
 
-            parsed = parse_html(test_str, test_pr)
+            parsed = test_pr.parse_html(test_str)
             self.assertHTMLEqual(parsed, frame % (expected_inline, blank_e, expected_inline, blank_e))
 
-            parsed = parse_html(test_str, test_pr, urlize_all=False)
+            parsed = test_pr.parse_html(test_str, urlize_all=False)
             self.assertHTMLEqual(parsed, frame % (expected_inline, blank, expected_inline, blank))
 
             frame = '<p>test %s</p>\n<a href="foo">%s</a>\n<a href="foo2">%s</a>\n<p>and finally %s</p>'
 
             test_str = frame % (url, blank, url, blank)
 
-            parsed = parse_html(test_str, test_pr)
+            parsed = test_pr.parse_html(test_str)
             self.assertHTMLEqual(parsed, frame % (expected_inline, blank, url, blank_e))
 
-            parsed = parse_html(test_str, test_pr, urlize_all=False)
+            parsed = test_pr.parse_html(test_str, urlize_all=False)
             self.assertHTMLEqual(parsed, frame % (expected_inline, blank, url, blank))
+
+    def test_urlize_params(self):
+        text = 'test http://foo.com/'
+        urlize_params = {'target': '_blank', 'rel': 'nofollow'}
+        exp = ('test <a href="http://foo.com/" rel="nofollow" target="_blank">'
+               'http://foo.com/</a>')
+
+        result = test_pr.parse_text(text, urlize_params=urlize_params)
+        self.assertEqual(result, exp)
+
+        result = test_pr.parse_text_full(text, urlize_params=urlize_params)
+        self.assertEqual(result, exp)
+
+        result = test_pr.parse_html(text, urlize_params=urlize_params)
+        self.assertEqual(result, exp)
 
     def test_extract(self):
         blank = 'http://fapp.io/foo/'
@@ -239,7 +254,8 @@ class ParserTestCase(BaseTestCase):
         frame_html = '<p>test %s</p><p><a href="foo">%s</a> %s</p><p>%s</p>'
 
         for url, expected in self.data_pairs.items():
-            all_urls, extracted = extract(frame % (url, blank, url, blank), test_pr)
+            text = frame % (url, blank, url, blank)
+            all_urls, extracted = test_pr.extract(text)
             self.assertEqual(all_urls, [url, blank])
 
             if 'url' not in expected:
@@ -248,7 +264,8 @@ class ParserTestCase(BaseTestCase):
                 expected['title'] = expected['url']
             self.assertEqual(extracted, {url: expected})
 
-            all_urls, extracted = extract_html(frame_html % (url, url, blank, blank), test_pr)
+            html = frame_html % (url, url, blank, blank)
+            all_urls, extracted = test_pr.extract_html(html)
             self.assertEqual(all_urls, [url, blank])
 
             if 'url' not in expected:
@@ -258,7 +275,7 @@ class ParserTestCase(BaseTestCase):
     def test_outside_of_markup(self):
         frame = '%s<p>testing</p>'
         for url, expected in self.full_pairs.items():
-            parsed = parse_html(frame % (url), test_pr)
+            parsed = test_pr.parse_html(frame % (url))
             self.assertHTMLEqual(parsed, frame % (expected))
 
     def test_html_entities(self):
@@ -266,7 +283,8 @@ class ParserTestCase(BaseTestCase):
 
         for url, expected in self.data_pairs.items():
             esc_url = url.replace('&', '&amp;')
-            all_urls, extracted = extract_html(frame_html % (esc_url, esc_url), test_pr)
+            html = frame_html % (esc_url, esc_url)
+            all_urls, extracted = test_pr.extract_html(html)
             self.assertEqual(all_urls, [url])
 
             if 'url' not in expected:
@@ -275,5 +293,5 @@ class ParserTestCase(BaseTestCase):
                 expected['title'] = expected['url']
             self.assertEqual(extracted, {url: expected})
 
-            rendered = parse_html('<p>%s</p>' % esc_url, test_pr)
+            rendered = test_pr.parse_html('<p>%s</p>' % esc_url)
             self.assertHTMLEqual(rendered, '<p>%s</p>' % self.full_pairs[url])

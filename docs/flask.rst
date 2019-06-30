@@ -15,9 +15,9 @@ You can add them to your jinja environment by using the helper function:
     from flask import Flask
     from micawber.providers import bootstrap_basic
     from micawber.contrib.mcflask import add_oembed_filters
-    
+
     app = Flask(__name__)
-    
+
     oembed_providers = bootstrap_basic()
     add_oembed_filters(app, oembed_providers)
 
@@ -59,7 +59,7 @@ The following filters are exposed via the :py:mod:`micawber.contrib.mcflask` mod
     * a list of all URLs found within the text (if HTML, all URLs that aren't already links)
     * a dictionary of URL to metadata provided by the API endpoint
 
-    .. note:: 
+    .. note::
         Not all URLs listed will have matching entries in the dictionary, since there
         may not be a provider for them.
 

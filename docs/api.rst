@@ -39,13 +39,16 @@ Providers
 
 .. py:class:: ProviderRegistry([cache=None])
 
-    A registry for encapsulating a group of :py:class:`Provider` instances.
-    It has optional caching support.
+    A registry for encapsulating a group of :py:class:`Provider` instances,
+    with optional caching support.
 
     Handles matching regular expressions to providers.  URLs are sent to the
     registry via its :py:meth:`~ProviderRegistry.request` method, it checks to
-    see if it has a provider that matches the URL, and if so, requests the metadata
-    from the provider instance.
+    see if it has a provider that matches the URL, and if so, requests the
+    metadata from the provider instance.
+
+    Exposes methods for parsing various types of text (including HTML), and
+    either rendering oembed media inline or extracting embeddable links.
 
     :param cache: the cache simply needs to implement two methods, ``.get(key)`` and ``.set(key, value)``.
 
@@ -68,10 +71,11 @@ Providers
 
     .. py:method:: request(url, **extra_params)
 
-        Retrieve information about the given url if it matches a regex in
-        the instance's registry.  If no provider matches the URL, a ``ProviderException``
-        is thrown, otherwise the URL and parameters are dispatched to the matching
-        provider's :py:meth:`Provider.request` method.
+        Retrieve information about the given url if it matches a regex in the
+        instance's registry.  If no provider matches the URL, a
+        ``ProviderException`` is thrown, otherwise the URL and parameters are
+        dispatched to the matching provider's :py:meth:`Provider.request`
+        method.
 
         If a cache was specified, the resulting metadata will be cached.
 
@@ -79,6 +83,97 @@ Providers
         :param extra_params: additional parameters to pass to the endpoint, for
             example a maxwidth or an API key.
         :rtype: a dictionary of JSON data
+
+    .. py:method:: parse_text_full(text[, urlize_all=True[, handler=full_handler[, urlize_params=None[, **params]]]])
+
+        Parse a block of text, converting *all* links by passing them to the
+        given handler.  Links contained within a block of text (i.e. not on
+        their own line) will be handled as well.
+
+        Example input and output::
+
+            IN: 'this is a pic http://example.com/some-pic/'
+            OUT: 'this is a pic <a href="http://example.com/some-pic/"><img src="http://example.com/media/some-pic.jpg" /></a>'
+
+        :param str text: a string to parse
+        :param bool urlize_all: convert unmatched urls into links
+        :param handler: function to use to convert metadata back into a string representation
+        :param dict urlize_params: keyword arguments to be used to construct a link
+            when a provider is not found and urlize is enabled.
+        :param params: any additional parameters to use when requesting metadata, i.e.
+            a maxwidth or maxheight.
+
+    .. py:method:: parse_text(text[, urlize_all=True[, handler=full_handler[, block_handler=inline_handler[, urlize_params=None[, **params]]]]])
+
+        Very similar to :py:meth:`~ProviderRegistry.parse_text_full` except
+        URLs *on their own line* are rendered using the given ``handler``,
+        whereas URLs within blocks of text are passed to the ``block_handler``.
+        The default behavior renders full content for URLs on their own line
+        (e.g. a video player), whereas URLs within text are rendered simply as
+        links so as not to disrupt the flow of text.
+
+        * URLs on their own line are converted into full representations
+        * URLs within blocks of text are converted into clickable links
+
+        :param str text: a string to parse
+        :param bool urlize_all: convert unmatched urls into links
+        :param handler: function to use to convert links found on their own line
+        :param block_handler: function to use to convert links found within blocks of text
+        :param dict urlize_params: keyword arguments to be used to construct a link
+            when a provider is not found and urlize is enabled.
+        :param params: any additional parameters to use when requesting metadata, i.e.
+            a maxwidth or maxheight.
+
+    .. py:method:: parse_html(html[, urlize_all=True[, handler=full_handler[, block_handler=inline_handler[, urlize_params=None[, **params]]]]])
+
+        Parse HTML intelligently, rendering items on their own within block
+        elements as full content (e.g. a video player), whereas URLs within
+        text are passed to the ``block_handler`` which by default will render a
+        simple link. URLs that are already enclosed within a ``<a>`` tag are
+        **skipped over**.
+
+        * URLs that are already within <a> tags are passed over
+        * URLs on their own in block tags are converted into full representations
+        * URLs interspersed with text are converted into clickable links
+
+        .. note:: requires BeautifulSoup or beautifulsoup4
+
+        :param str html: a string of HTML to parse
+        :param bool urlize_all: convert unmatched urls into links
+        :param handler: function to use to convert links found on their own within a block element
+        :param block_handler: function to use to convert links found within blocks of text
+        :param dict urlize_params: keyword arguments to be used to construct a link
+            when a provider is not found and urlize is enabled.
+        :param params: any additional parameters to use when requesting metadata, i.e.
+            a maxwidth or maxheight.
+
+    .. py:method:: extract(text, **params)
+
+        Extract all URLs from a block of text, and additionally get any
+        metadata for URLs we have providers for.
+
+        :param str text: a string to parse
+        :param params: any additional parameters to use when requesting
+            metadata, i.e. a maxwidth or maxheight.
+        :rtype: returns a 2-tuple containing a list of all URLs and a dict
+            keyed by URL containing any metadata.  If a provider was not found
+            for a URL it is not listed in the dictionary.
+
+    .. py:method:: extract_html(html, **params)
+
+        Extract all URLs from an HTML string, and additionally get any metadata
+        for URLs we have providers for. :py:meth:`~ProviderRegistry.extract`
+        but for HTML.
+
+        .. note:: URLs within <a> tags will not be included.
+
+        :param str html: a string to parse
+        :param params: any additional parameters to use when requesting
+            metadata, i.e. a maxwidth or maxheight.
+        :rtype: returns a 2-tuple containing a list of all URLs and a dict
+            keyed by URL containing any metadata.  If a provider was not found
+            for a URL it is not listed in the dictionary.
+
 
 .. py:function:: bootstrap_basic([cache=None[, registry=None]])
 
@@ -88,6 +183,7 @@ Providers
     :param cache: an object that implements simple ``get`` and ``set``
     :param registry: a ``ProviderRegistry`` instance, which will be updated with the list of supported providers. If not specified, an empty ``ProviderRegistry`` will be used.
     :rtype: a ``ProviderRegistry`` with a handful of providers registered
+
 
 .. py:function:: bootstrap_oembed([cache=None[, registry=None[, **kwargs]])
 
@@ -101,6 +197,7 @@ Providers
     :param registry: a ``ProviderRegistry`` instance, which will be updated with the list of supported providers. If not specified, an empty ``ProviderRegistry`` will be used.
     :param kwargs: any default keyword arguments to use with providers
     :rtype: a ProviderRegistry with support for noembed
+
 
 .. py:function:: bootstrap_embedly([cache=None[, registry=None[, **kwargs]])
 
@@ -123,6 +220,7 @@ Providers
         pr = bootstrap_embedly(key='my-embedly-key')
         pr.request('http://www.youtube.com/watch?v=54XHDUOHuzU')
 
+
 .. py:function:: bootstrap_noembed([cache=None[, registry=None[, **kwargs]])
 
     Create a :py:class:`ProviderRegistry` and register as many providers as
@@ -143,99 +241,6 @@ Providers
         # if you have an API key, you can specify that here
         pr = bootstrap_noembed(nowrap=1)
         pr.request('http://www.youtube.com/watch?v=54XHDUOHuzU')
-
-
-Parsers
--------
-
-.. py:module:: micawber.parsers
-
-Functions for parsing text and HTML
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. py:function:: parse_text_full(text, providers[, urlize_all=True[, handler=full_handler[, **params]]])
-
-    Parse a block of text, converting *all* links by passing them to the given handler.
-    Links contained within a block of text (i.e. not on their own line) will be handled
-    as well.
-
-    Example input and output::
-
-        IN: 'this is a pic http://example.com/some-pic/'
-        OUT: 'this is a pic <a href="http://example.com/some-pic/"><img src="http://example.com/media/some-pic.jpg" /></a>'
-
-    :param text: a string to parse
-    :param providers: a :py:class:`ProviderRegistry` instance
-    :param urlize_all: whether to convert all urls irrespective of whether a provider exists
-    :param handler: function to use to convert metadata back into a string representation
-    :param params: any additional parameters to use when requesting metadata, i.e.
-        a maxwidth or maxheight.
-
-.. py:function:: parse_text(text, providers[, urlize_all=True[, handler=full_handler[, block_handler=inline_handler[, **params]]]])
-
-    Very similar to the above :py:func:`parse_text_full` except URLs *on their own line*
-    are rendered using the given ``handler``, whereas URLs within blocks of text are
-    passed to the ``block_handler``.  The default behavior renders full content for
-    URLs on their own line (e.g. a flash player), whereas URLs within text are rendered
-    simply as links so as not to disrupt the flow of text.
-
-    :param text: a string to parse
-    :param providers: a :py:class:`ProviderRegistry` instance
-    :param urlize_all: whether to convert all urls irrespective of whether a provider exists
-    :param handler: function to use to convert links found on their own line
-    :param block_handler: function to use to convert links found within blocks of text
-    :param params: any additional parameters to use when requesting metadata, i.e.
-        a maxwidth or maxheight.
-
-.. py:function:: parse_html(html, providers[, urlize_all=True[, handler=full_handler[, block_handler=inline_handler[, **params]]]])
-
-    Parse HTML intelligently, rendering items on their own within block elements
-    as full content (e.g. a flash player), whereas URLs within text are passed
-    to the ``block_handler`` which by default will render a simple link.  Also
-    worth noting is that URLs that are already enclosed within a <a> tag are skipped
-    over.
-
-    .. note:: requires BeautifulSoup or beautifulsoup4
-
-    :param html: a string of HTML to parse
-    :param providers: a :py:class:`ProviderRegistry` instance
-    :param urlize_all: whether to convert all urls irrespective of whether a provider exists
-    :param handler: function to use to convert links found on their own within a block element
-    :param block_handler: function to use to convert links found within blocks of text
-    :param params: any additional parameters to use when requesting metadata, i.e.
-        a maxwidth or maxheight.
-
-
-Functions for extracting rich content from text and HTML
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. py:function:: extract(text, providers, **params)
-
-    Extract all URLs from a block of text, and additionally get any metadata for
-    URLs we have providers for.
-
-    :param text: a string to parse
-    :param providers: a :py:class:`ProviderRegistry` instance
-    :param params: any additional parameters to use when requesting metadata, i.e.
-        a maxwidth or maxheight.
-    :rtype: returns a 2-tuple containing a list of all URLs and a dictionary keyed
-        by URL containing any metadata.  If a provider was not found for a URL
-        it is not listed in the dictionary.
-
-.. py:function:: extract_html(html, providers, **params)
-
-    Extract all URLs from an HTML string, and additionally get any metadata for
-    URLs we have providers for.  Same as :py:func:`extract` but for HTML.
-
-    .. note:: URLs within <a> tags will not be included.
-
-    :param html: a string to parse
-    :param providers: a :py:class:`ProviderRegistry` instance
-    :param params: any additional parameters to use when requesting metadata, i.e.
-        a maxwidth or maxheight.
-    :rtype: returns a 2-tuple containing a list of all URLs and a dictionary keyed
-        by URL containing any metadata.  If a provider was not found for a URL
-        it is not listed in the dictionary.
 
 
 Cache
