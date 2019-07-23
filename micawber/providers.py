@@ -215,7 +215,7 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register(r'https?://(?:www\.)?scribd\.com/\S*', Provider('http://www.scribd.com/services/oembed'))
 
     # t
-    pr.register(r'https?://(www\.)?twitter\.com/\S+/status(es)?/\S+', Provider('https://api.twitter.com/1/statuses/oembed.json'))
+    pr.register(r'https?://(www\.)?twitter\.com/\S+/status(es)?/\S+', Provider('https://publish.twitter.com/oembed'))
 
     # v
     pr.register(r'http://vimeo\.com/\S+', Provider('http://vimeo.com/api/oembed.json'))
