@@ -139,14 +139,17 @@ def parse_html(html, providers, urlize_all=True, handler=full_handler,
 
     soup = soup_class(html, **bs_kwargs)
 
-    for url in soup.findAll(text=re.compile(url_re)):
+    for url in soup.findAll(text=url_re):
         if not _inside_skip(url):
             if _is_standalone(url):
                 url_handler = handler
             else:
                 url_handler = block_handler
 
-            url_unescaped = url.string
+            url_unescaped = (url.string
+                             .replace('<', '&lt;')
+                             .replace('>', '&gt;'))
+
             replacement = parse_text_full(
                 url_unescaped,
                 providers,
@@ -168,7 +171,7 @@ def extract_html(html, providers, **params):
     urls = []
     extracted_urls = {}
 
-    for url in soup.findAll(text=re.compile(url_re)):
+    for url in soup.findAll(text=url_re):
         if _inside_skip(url):
             continue
 

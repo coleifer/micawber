@@ -1,3 +1,6 @@
+import sys
+import unittest
+
 from micawber import *
 from micawber.test_utils import test_pr, test_cache, test_pr_cache, TestProvider, BaseTestCase
 
@@ -295,3 +298,30 @@ class ParserTestCase(BaseTestCase):
 
             rendered = test_pr.parse_html('<p>%s</p>' % esc_url)
             self.assertHTMLEqual(rendered, '<p>%s</p>' % self.full_pairs[url])
+
+
+class TestHTMLEntities(BaseTestCase):
+    def test_parse_html_entities(self):
+        e = '&lt;script&gt;&lt;/script&gt;'
+        p = '<p>Test %s</p>' % e
+        self.assertEqual(test_pr.parse_html(p), p)
+
+        a = '<p>http://google.com %s</p>' % e
+        self.assertEqual(test_pr.parse_html(a),
+                         '<p><a href="http://google.com">http://google.com</a>'
+                         ' %s</p>' % e)
+
+        h = ('<p><a href="http://foo.com">http://foo.com</a> http://bar.com '
+             '<span>http://baz.com &lt;script&gt; '
+             '<b>http://nug.com <i>X &lt;foo&gt;</i></b></span></p>')
+        parsed = test_pr.parse_html(h)
+        self.assertEqual(test_pr.parse_html(h), (
+            '<p><a href="http://foo.com">http://foo.com</a> '
+            '<a href="http://bar.com">http://bar.com</a> '
+            '<span><a href="http://baz.com">http://baz.com</a> &lt;script&gt; '
+            '<b><a href="http://nug.com">http://nug.com</a> '
+            '<i>X &lt;foo&gt;</i></b></span></p>'))
+
+
+if __name__ == '__main__':
+    unittest.main(argv=sys.argv)
