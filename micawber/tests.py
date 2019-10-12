@@ -314,13 +314,22 @@ class TestHTMLEntities(BaseTestCase):
         h = ('<p><a href="http://foo.com">http://foo.com</a> http://bar.com '
              '<span>http://baz.com &lt;script&gt; '
              '<b>http://nug.com <i>X &lt;foo&gt;</i></b></span></p>')
-        parsed = test_pr.parse_html(h)
         self.assertEqual(test_pr.parse_html(h), (
             '<p><a href="http://foo.com">http://foo.com</a> '
             '<a href="http://bar.com">http://bar.com</a> '
             '<span><a href="http://baz.com">http://baz.com</a> &lt;script&gt; '
             '<b><a href="http://nug.com">http://nug.com</a> '
             '<i>X &lt;foo&gt;</i></b></span></p>'))
+
+        h = ('<p><a href="http://foo.com">http://foo.com</a> http://bar.com '
+             '&lt;script&gt; http://baz.com &lt;/script&gt;\n'
+             'http://baze.com\n&lt;foo&gt;</p>')
+        self.assertEqual(test_pr.parse_html(h), (
+            '<p><a href="http://foo.com">http://foo.com</a> '
+            '<a href="http://bar.com">http://bar.com</a> &lt;script&gt; '
+            '<a href="http://baz.com">http://baz.com</a> &lt;/script&gt;\n'
+            '<a href="http://baze.com">http://baze.com</a>\n'
+            '&lt;foo&gt;</p>'))
 
 
 if __name__ == '__main__':
