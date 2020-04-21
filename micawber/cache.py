@@ -26,14 +26,13 @@ class PickleCache(Cache):
     
     def load(self):
         if os.path.exists(self.filename):
-            with closing(open(self.filename)) as fh:
-                contents = fh.read()
-            return pickle.loads(contents)
+            with closing(open(self.filename, 'rb')) as fh:
+                return pickle.load(fh)
         return {}
 
     def save(self):
-        with closing(open(self.filename, 'w')) as fh:
-            fh.write(pickle.dumps(self._cache))
+        with closing(open(self.filename, 'wb')) as fh:
+            pickle.dump(self._cache, fh)
 
 
 if Redis:
