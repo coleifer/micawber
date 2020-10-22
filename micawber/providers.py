@@ -310,5 +310,7 @@ def bootstrap_oembed(cache=None, registry=None, **params):
                 Provider('http://www.youtube.com/oembed'))
     pr.register(r'https://(\S*\.)?youtu(\.be/|be\.com/watch)\S+',
                 Provider('http://www.youtube.com/oembed?scheme=https&'))
+    pr.register(r'https://(\S*\.)?youtu(\.be/|be\.com/playlist)\S+',
+                Provider('http://www.youtube.com/oembed?scheme=https&'))
 
     return pr
