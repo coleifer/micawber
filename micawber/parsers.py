@@ -4,6 +4,8 @@ try:
     import simplejson as json
 except ImportError:
     import json
+
+bs_kwargs = {}
 try:
     from BeautifulSoup import BeautifulSoup
     bs_kwargs = {'convertEntities': BeautifulSoup.HTML_ENTITIES}
@@ -121,7 +123,7 @@ def parse_text(text, providers, urlize_all=True, handler=full_handler,
                     line = urlize(url, **urlize_params)
             else:
                 line = handler(url, response, **params)
-        else:
+        elif block_handler is not None:
             line = parse_text_full(line, providers, urlize_all, block_handler,
                                    urlize_params=urlize_params, **params)
 

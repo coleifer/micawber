@@ -129,9 +129,19 @@ class ParserTestCase(BaseTestCase):
             parsed = test_pr.parse_text('this is inline: %s' % url)
             self.assertHTMLEqual(parsed, 'this is inline: %s' % expected)
 
+        # We can disable parsing inline links by specifying block_handler=None.
+        for url, expected in self.inline_pairs.items():
+            parsed = test_pr.parse_text('this is inline: %s' % url, block_handler=None)
+            self.assertEqual(parsed, 'this is inline: %s' % url)
+
         # if the link comes on its own line it gets included in full
         for url, expected in self.full_pairs.items():
             parsed = test_pr.parse_text(url)
+            self.assertHTMLEqual(parsed, expected)
+
+            # Specifying block_handler=None only applies to inline links, so
+            # the behavior is the same for standalone links.
+            parsed = test_pr.parse_text(url, block_handler=None)
             self.assertHTMLEqual(parsed, expected)
 
         # links inside block tags will render as inline
@@ -161,6 +171,15 @@ class ParserTestCase(BaseTestCase):
 
             parsed = test_pr.parse_text(test_str)
             self.assertHTMLEqual(parsed, frame % (expected_inline, expected, expected_inline))
+
+        # On multi-line text, if we specify block_handler=None, only standalone
+        # links will be handled.
+        for url, expected in self.full_pairs.items():
+            frame = 'this is inline: %s\n%s\nand yet another %s'
+            test_str = frame % (url, url, url)
+
+            parsed = test_pr.parse_text(test_str, block_handler=None)
+            self.assertHTMLEqual(parsed, frame % (url, expected, url))
 
         for url, expected in self.full_pairs.items():
             expected_inline = self.inline_pairs[url]
