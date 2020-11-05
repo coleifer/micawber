@@ -187,7 +187,8 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register(r'https?://(?:www\.)?funnyordie\.com/videos/\S+', Provider('http://www.funnyordie.com/oembed'))
 
     # g
-    pr.register(r'https?://gist\.github\.com/\S*', Provider('https://github.com/api/oembed'))
+    # 2020-11-04: removed GitHub gist, as it seems to be unsupported now.
+    #pr.register(r'https?://gist\.github\.com/\S*', Provider('https://github.com/api/oembed'))
 
     # h
     pr.register(r'http://(?:www\.)hulu\.com/watch/\S+', Provider('http://www.hulu.com/api/oembed.json'))
