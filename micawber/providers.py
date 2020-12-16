@@ -227,8 +227,8 @@ def bootstrap_basic(cache=None, registry=None):
     pr.register(r'https?://wordpress\.tv/\S+', Provider('http://wordpress.tv/oembed/'))
 
     # y
-    pr.register(r'http://(\S*\.)?youtu(\.be/|be\.com/watch)\S+', Provider('http://www.youtube.com/oembed'))
-    pr.register(r'https://(\S*\.)?youtu(\.be/|be\.com/watch)\S+', Provider('http://www.youtube.com/oembed?scheme=https&'))
+    pr.register(r'http://(\S*\.)?youtu(\.be/|be\.com/watch)\S+', Provider('https://www.youtube.com/oembed'))
+    pr.register(r'https://(\S*\.)?youtu(\.be/|be\.com/watch)\S+', Provider('https://www.youtube.com/oembed?scheme=https&'))
 
     return pr
 
@@ -308,8 +308,8 @@ def bootstrap_oembed(cache=None, registry=None, **params):
     # Currently oembed.com does not provide patterns for YouTube, so we'll add
     # these ourselves.
     pr.register(r'http://(\S*\.)?youtu(\.be/|be\.com/watch)\S+',
-                Provider('http://www.youtube.com/oembed'))
+                Provider('https://www.youtube.com/oembed'))
     pr.register(r'https://(\S*\.)?youtu(\.be/|be\.com/watch)\S+',
-                Provider('http://www.youtube.com/oembed?scheme=https&'))
+                Provider('https://www.youtube.com/oembed?scheme=https&'))
 
     return pr
