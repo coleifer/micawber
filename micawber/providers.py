@@ -228,7 +228,7 @@ def bootstrap_basic(cache=None, registry=None):
 
     # y
     pr.register(r'http://(\S*\.)?youtu(\.be/|be\.com/watch)\S+', Provider('https://www.youtube.com/oembed'))
-    pr.register(r'https://(\S*\.)?youtu(\.be/|be\.com/watch)\S+', Provider('https://www.youtube.com/oembed?scheme=https&'))
+    pr.register(r'https://(\S*\.)?youtu(\.be/|be\.com/watch)\S+', Provider('https://www.youtube.com/oembed'))
 
     return pr
 
@@ -310,6 +310,6 @@ def bootstrap_oembed(cache=None, registry=None, **params):
     pr.register(r'http://(\S*\.)?youtu(\.be/|be\.com/watch)\S+',
                 Provider('https://www.youtube.com/oembed'))
     pr.register(r'https://(\S*\.)?youtu(\.be/|be\.com/watch)\S+',
-                Provider('https://www.youtube.com/oembed?scheme=https&'))
+                Provider('https://www.youtube.com/oembed'))
 
     return pr
