@@ -1,7 +1,6 @@
 from __future__ import with_statement
 import os
 import pickle
-from contextlib import closing
 try:
     from redis import Redis
 except ImportError:
@@ -26,12 +25,12 @@ class PickleCache(Cache):
     
     def load(self):
         if os.path.exists(self.filename):
-            with closing(open(self.filename, 'rb')) as fh:
+            with open(self.filename, 'rb') as fh:
                 return pickle.load(fh)
         return {}
 
     def save(self):
-        with closing(open(self.filename, 'wb')) as fh:
+        with open(self.filename, 'wb') as fh:
             pickle.dump(self._cache, fh)
 
 
