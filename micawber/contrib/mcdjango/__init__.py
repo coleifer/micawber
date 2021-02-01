@@ -1,4 +1,4 @@
-from collections import Callable
+from collections.abc import Callable
 from importlib import import_module
 
 from django import template
