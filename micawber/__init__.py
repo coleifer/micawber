@@ -1,3 +1,5 @@
+__version__ = '0.5.3'
+
 from micawber.cache import Cache
 from micawber.cache import PickleCache
 from micawber.exceptions import ProviderException
