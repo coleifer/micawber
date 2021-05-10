@@ -275,6 +275,7 @@ def bootstrap_oembed(cache=None, registry=None, **params):
     json_data = json.loads(contents)
 
     for item in json_data:
+        item['endpoints'].reverse()
         for endpoint in item['endpoints']:
             # Possibly this provider only supports discovery via <link> tags,
             # which is not supported by micawber.
