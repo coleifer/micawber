@@ -128,6 +128,17 @@ def fetch(request, timeout=None):
     return content
 
 
+def fetch_cache(cache, url, refresh=False, timeout=None):
+    contents = None
+    if cache is not None and not refresh:
+        contents = cache.get('micawber.%s' % url)
+    if contents is None:
+        contents = fetch(url, timeout=timeout)
+        if cache is not None:
+            cache.set('micawber.%s' % url, contents)
+    return contents
+
+
 class ProviderRegistry(object):
     def __init__(self, cache=None):
         self._registry = OrderedDict()
@@ -234,14 +245,14 @@ def bootstrap_basic(cache=None, registry=None):
     return pr
 
 
-def bootstrap_embedly(cache=None, registry=None, **params):
+def bootstrap_embedly(cache=None, registry=None, refresh=False, **params):
     endpoint = 'http://api.embed.ly/1/oembed'
     schema_url = 'http://api.embed.ly/1/services/python'
 
     pr = registry or ProviderRegistry(cache)
 
     # fetch the schema
-    contents = fetch(schema_url)
+    contents = fetch_cache(cache, schema_url, refresh=refresh)
     json_data = json.loads(contents)
 
     for provider_meta in json_data:
@@ -250,14 +261,14 @@ def bootstrap_embedly(cache=None, registry=None, **params):
     return pr
 
 
-def bootstrap_noembed(cache=None, registry=None, **params):
+def bootstrap_noembed(cache=None, registry=None, refresh=False, **params):
     endpoint = 'http://noembed.com/embed'
     schema_url = 'http://noembed.com/providers'
 
     pr = registry or ProviderRegistry(cache)
 
     # fetch the schema
-    contents = fetch(schema_url)
+    contents = fetch_cache(cache, schema_url, refresh=refresh)
     json_data = json.loads(contents)
 
     for provider_meta in json_data:
@@ -266,12 +277,12 @@ def bootstrap_noembed(cache=None, registry=None, **params):
     return pr
 
 
-def bootstrap_oembed(cache=None, registry=None, **params):
+def bootstrap_oembed(cache=None, registry=None, refresh=False, **params):
     schema_url = 'https://oembed.com/providers.json'
     pr = registry or ProviderRegistry(cache)
 
     # Fetch schema.
-    contents = fetch(schema_url)
+    contents = fetch_cache(cache, schema_url, refresh=refresh)
     json_data = json.loads(contents)
 
     for item in json_data:

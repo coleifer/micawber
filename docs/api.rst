@@ -185,7 +185,7 @@ Providers
     :rtype: a ``ProviderRegistry`` with a handful of providers registered
 
 
-.. py:function:: bootstrap_oembed([cache=None[, registry=None[, **kwargs]])
+.. py:function:: bootstrap_oembed([cache=None[, registry=None[, refresh=False[, **kwargs]]])
 
     Create a :py:class:`ProviderRegistry` and register as many providers as
     are described in the `oembed.com <https://oembed.com>`_ providers list.
@@ -195,11 +195,12 @@ Providers
 
     :param cache: an object that implements simple ``get`` and ``set``
     :param registry: a ``ProviderRegistry`` instance, which will be updated with the list of supported providers. If not specified, an empty ``ProviderRegistry`` will be used.
+    :param bool refresh: force refreshing the provider data rather than attempting to load it from cache (if cache is used).
     :param kwargs: any default keyword arguments to use with providers
     :rtype: a ProviderRegistry with support for noembed
 
 
-.. py:function:: bootstrap_embedly([cache=None[, registry=None[, **kwargs]])
+.. py:function:: bootstrap_embedly([cache=None[, registry=None[, refresh=False[, **kwargs]]])
 
     Create a :py:class:`ProviderRegistry` and register as many providers as
     are supported by `embed.ly <http://embed.ly>`_.  Valid services are
@@ -210,6 +211,7 @@ Providers
 
     :param cache: an object that implements simple ``get`` and ``set``
     :param registry: a ``ProviderRegistry`` instance, which will be updated with the list of supported providers. If not specified, an empty ``ProviderRegistry`` will be used.
+    :param bool refresh: force refreshing the provider data rather than attempting to load it from cache (if cache is used).
     :param kwargs: any default keyword arguments to use with providers, useful for
         specifying your API key
     :rtype: a ProviderRegistry with support for embed.ly
@@ -221,7 +223,7 @@ Providers
         pr.request('http://www.youtube.com/watch?v=54XHDUOHuzU')
 
 
-.. py:function:: bootstrap_noembed([cache=None[, registry=None[, **kwargs]])
+.. py:function:: bootstrap_noembed([cache=None[, registry=None[, refresh=False[, **kwargs]]])
 
     Create a :py:class:`ProviderRegistry` and register as many providers as
     are supported by `noembed.com <http://noembed.com>`_.  Valid services are
@@ -232,6 +234,7 @@ Providers
 
     :param cache: an object that implements simple ``get`` and ``set``
     :param registry: a ``ProviderRegistry`` instance, which will be updated with the list of supported providers. If not specified, an empty ``ProviderRegistry`` will be used.
+    :param bool refresh: force refreshing the provider data rather than attempting to load it from cache (if cache is used).
     :param kwargs: any default keyword arguments to use with providers, useful for
         passing the ``nowrap`` option to noembed.
     :rtype: a ProviderRegistry with support for noembed
