@@ -286,7 +286,7 @@ def bootstrap_oembed(cache=None, registry=None, refresh=False, **params):
     json_data = json.loads(contents)
 
     for item in json_data:
-        for endpoint in item['endpoints']:
+        for endpoint in reversed(item['endpoints']):
             # Possibly this provider only supports discovery via <link> tags,
             # which is not supported by micawber.
             if 'schemes' not in endpoint:
