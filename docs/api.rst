@@ -255,6 +255,15 @@ Cache
 
     A reference implementation for the cache interface used by the :py:class:`ProviderRegistry`.
 
+    .. code-block:: python
+
+        from micawber import Cache, bootstrap_oembed
+        cache = Cache()  # Simple in-memory cache.
+
+        # Now our oembed provider will cache the responses for each URL we
+        # request, which can provide a significant speedup.
+        pr = bootstrap_oembed(cache=cache)
+
     .. py:method:: get(key)
 
         Retrieve the key from the cache or ``None`` if not present
@@ -280,11 +289,12 @@ Cache
 
         Store the internal cache to an external file
 
-.. py:class:: RedisCache([namespace='micawber'[, **conn]])
+.. py:class:: RedisCache([namespace='micawber'[, timeout=None[, **conn]]])
 
     A cache that uses Redis to store data
 
     .. note:: requires the redis-py library, ``pip install redis``
 
     :param namespace: prefix for cache keys
+    :param int timeout: expiration timeout in seconds (optional)
     :param conn: keyword arguments to pass when initializing redis connection
