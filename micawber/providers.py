@@ -233,6 +233,8 @@ def bootstrap_basic(cache=None, registry=None):
     # v
     pr.register(r'http://vimeo\.com/\S+', Provider('http://vimeo.com/api/oembed.json'))
     pr.register(r'https://vimeo\.com/\S+', Provider('https://vimeo.com/api/oembed.json'))
+    pr.register(r'http://player.vimeo\.com/\S+', Provider('http://vimeo.com/api/oembed.json'))
+    pr.register(r'https://player.vimeo\.com/\S+', Provider('https://vimeo.com/api/oembed.json'))
 
     # w
     pr.register(r'http://\S+\.wordpress\.com/\S+', Provider('http://public-api.wordpress.com/oembed/'))
