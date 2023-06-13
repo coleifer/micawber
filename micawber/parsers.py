@@ -25,11 +25,14 @@ url_re = re.compile(url_pattern)
 standalone_url_re = re.compile('^\s*' + url_pattern + '\s*$')
 
 block_elements = set([
-    'address', 'blockquote', 'center', 'dir', 'div', 'dl', 'fieldset', 'form',
-    'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'isindex', 'menu', 'noframes',
-    'noscript', 'ol', 'p', 'pre', 'table', 'ul', 'dd', 'dt', 'frameset', 'li',
-    'tbody', 'td', 'tfoot', 'th', 'thead', 'tr', 'button', 'del', 'iframe',
-    'ins', 'map', 'object', 'script', '[document]'
+    'address', 'article', 'aside', 'blockquote', 'canvas', 'center', 'dir',
+    'dd', 'div', 'dl', 'dt', 'fieldset', 'figcaption', 'figure', 'footer',
+    'form', 'frameset', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'header', 'hr',
+    'isindex', 'li', 'main', 'menu', 'nav', 'noframes', 'noscript', 'ol', 'p',
+    'pre', 'section', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr',
+    'ul',
+    # Additional elements.
+    'button', 'del', 'iframe', 'ins', 'map', 'object', 'script', '[document]',
 ])
 
 skip_elements = set(['a', 'pre', 'code', 'input', 'textarea', 'select'])
