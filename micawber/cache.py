@@ -42,7 +42,7 @@ if Redis:
         """
         def __init__(self, namespace='micawber', timeout=None, **conn):
             self.namespace = namespace
-            self.key_fn = lambda self, k: '%s.%s' % (self.namespace, k)
+            self.key_fn = lambda k: '%s.%s' % (self.namespace, k)
             self.timeout = timeout
             self.conn = Redis(**conn)
 
