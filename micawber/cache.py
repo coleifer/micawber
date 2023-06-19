@@ -42,9 +42,11 @@ if Redis:
         """
         def __init__(self, namespace='micawber', timeout=None, **conn):
             self.namespace = namespace
-            self.key_fn = lambda self, k: '%s.%s' % (self.namespace, k)
             self.timeout = timeout
             self.conn = Redis(**conn)
+
+        def key_fn(self, k):
+            return '%s.%s' % (self.namespace, k)
 
         def get(self, k):
             cached = self.conn.get(self.key_fn(k))
