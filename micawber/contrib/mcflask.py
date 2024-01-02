@@ -1,4 +1,7 @@
-from flask import Markup
+try:
+    from markupsafe import Markup
+except ImportError:
+    from flask import Markup
 from micawber import parse_text, parse_html, extract, extract_html
 
 
