@@ -22,7 +22,7 @@ from micawber.exceptions import ProviderException
 
 url_pattern = '(https?://[-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@#/%=~_|])'
 url_re = re.compile(url_pattern)
-standalone_url_re = re.compile('^\s*' + url_pattern + '\s*$')
+standalone_url_re = re.compile(r'^\s*' + url_pattern + r'\s*$')
 
 block_elements = set([
     'address', 'article', 'aside', 'blockquote', 'canvas', 'center', 'dir',
