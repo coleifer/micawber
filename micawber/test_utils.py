@@ -45,10 +45,10 @@ test_cache = Cache()
 test_pr_cache = ProviderRegistry(test_cache)
 
 for pr in (test_pr, test_pr_cache):
-    pr.register('http://link\S*', TestProvider('link'))
-    pr.register('http://photo\S*', TestProvider('photo'))
-    pr.register('http://video\S*', TestProvider('video'))
-    pr.register('http://rich\S*', TestProvider('rich'))
+    pr.register(r'http://link\S*', TestProvider('link'))
+    pr.register(r'http://photo\S*', TestProvider('photo'))
+    pr.register(r'http://video\S*', TestProvider('video'))
+    pr.register(r'http://rich\S*', TestProvider('rich'))
 
 class BaseTestCase(unittest.TestCase):
     def setUp(self):

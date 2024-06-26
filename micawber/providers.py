@@ -302,7 +302,7 @@ def bootstrap_oembed(cache=None, registry=None, refresh=False, **params):
             for scheme in endpoint['schemes']:
                 # If a question-mark is being used, it is for the query-string
                 # and should be treated as a literal.
-                scheme = scheme.replace('?', '\?')
+                scheme = scheme.replace('?', r'\?')
 
                 # Transform the raw pattern into a reasonable regex. Match one
                 # or more of any character that is not a slash, whitespace, or
