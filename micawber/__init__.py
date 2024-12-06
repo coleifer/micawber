@@ -1,4 +1,4 @@
-__version__ = '0.5.4'
+__version__ = '0.5.6'
 
 from micawber.cache import Cache
 from micawber.cache import PickleCache
