@@ -1,9 +1,11 @@
 import hashlib
+import json
 import logging
 import pickle
 import re
 import socket
 import ssl
+
 from .compat import get_charset
 from .compat import HTTPError
 from .compat import OrderedDict
@@ -11,15 +13,6 @@ from .compat import Request
 from .compat import urlencode
 from .compat import URLError
 from .compat import urlopen
-try:
-    import simplejson as json
-    try:
-        InvalidJson = json.JSONDecodeError
-    except AttributeError:
-        InvalidJson = ValueError
-except ImportError:
-    import json
-    InvalidJson = ValueError
 
 from micawber.exceptions import InvalidResponseException
 from micawber.exceptions import ProviderException
@@ -80,7 +73,7 @@ class Provider(object):
     def handle_response(self, response, url):
         try:
             json_data = json.loads(response)
-        except InvalidJson as exc:
+        except ValueError as exc:
             try:
                 msg = exc.message
             except AttributeError:

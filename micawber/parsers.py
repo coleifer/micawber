@@ -1,19 +1,16 @@
+import json
 import re
 from .compat import text_type
-try:
-    import simplejson as json
-except ImportError:
-    import json
 
 bs_kwargs = {}
 try:
-    from BeautifulSoup import BeautifulSoup
-    bs_kwargs = {'convertEntities': BeautifulSoup.HTML_ENTITIES}
-    replace_kwargs = {}
+    from bs4 import BeautifulSoup
+    bs_kwargs = replace_kwargs = {'features': 'html.parser'}
 except ImportError:
     try:
-        from bs4 import BeautifulSoup
-        bs_kwargs = replace_kwargs = {'features': 'html.parser'}
+        from BeautifulSoup import BeautifulSoup
+        bs_kwargs = {'convertEntities': BeautifulSoup.HTML_ENTITIES}
+        replace_kwargs = {}
     except ImportError:
         BeautifulSoup = None
 
