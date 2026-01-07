@@ -24,5 +24,8 @@ cache = ["redis>=3.0.0"]
 Repository = "https://github.com/coleifer/micawber"
 Documentation = "https://micawber.readthedocs.io/"
 
+[tool.setuptools.packages.find]
+exclude = ["examples*"]
+
 [tool.setuptools.dynamic]
 version = { attr = "micawber.__version__" }
