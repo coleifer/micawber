@@ -25,7 +25,7 @@ Repository = "https://github.com/coleifer/micawber"
 Documentation = "https://micawber.readthedocs.io/"
 
 [tool.setuptools.packages.find]
-exclude = ["examples*"]
+exclude = ["examples*", "docs*"]
 
 [tool.setuptools.dynamic]
 version = { attr = "micawber.__version__" }
