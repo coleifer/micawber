@@ -178,6 +178,9 @@ def bootstrap_basic(cache=None, registry=None):
     # complements of oembed.com#section7
     pr = registry or ProviderRegistry(cache)
 
+    # a
+    pr.register(r"https://podcasts\.apple\.com/\S+", Provider("https://podcasts.apple.com/api/oembed"))
+
     # c
     pr.register(r'http://chirb\.it/\S+', Provider('http://chirb.it/oembed.json'))
     pr.register(r'https?://www\.circuitlab\.com/circuit/\S+', Provider('https://www.circuitlab.com/circuit/oembed'))
