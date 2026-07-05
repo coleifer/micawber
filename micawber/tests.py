@@ -105,6 +105,35 @@ class ProviderTestCase(BaseTestCase):
 
         self.assertFalse(resp == resp_p)
 
+    def test_bootstrap_basic_matching(self):
+        pr = bootstrap_basic()
+        urls = [
+            'https://podcasts.apple.com/us/podcast/the-daily/id1200361736',
+            'https://www.circuitlab.com/circuit/62vf6a/555-timer/',
+            'https://www.dailymotion.com/video/x8kjx7v',
+            'https://www.flickr.com/photos/bees/2341623661/',
+            'https://flic.kr/p/4yVr32',
+            'https://www.polleverywhere.com/polls/LTIwNzM4NTt8MQ',
+            'https://www.slideshare.net/haraldf/business-quotes-for-2011',
+            'https://soundcloud.com/forss/flickermood',
+            'https://speakerdeck.com/rocio/or-mad-men',
+            'https://www.scribd.com/document/110799637/Synthesis',
+            'https://www.tiktok.com/@scout2015/video/6718335390845095173',
+            'https://tiktok.com/@scout2015/video/6718335390845095173',
+            'https://twitter.com/jack/status/20',
+            'https://x.com/jack/status/20',
+            'https://vimeo.com/76979871',
+            'http://player.vimeo.com/76979871',
+            'https://someblog.wordpress.com/2011/10/28/1000-posts/',
+            'https://wordpress.tv/2026/06/06/fireside-chat/',
+            'http://www.youtube.com/watch?v=54XHDUOHuzU',
+            'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+            'https://youtu.be/dQw4w9WgXcQ',
+            'https://www.youtube.com/shorts/aqz-KE-bpKQ',
+        ]
+        for url in urls:
+            self.assertTrue(pr.provider_for_url(url) is not None, url)
+
     def test_invalid_json(self):
         pr = ProviderRegistry()
         class BadProvider(Provider):

@@ -172,69 +172,49 @@ class ProviderRegistry(object):
         return extract_html(html, self, **kwargs)
 
 
+youtube_re = r'https?://(?:\S*\.)?youtu(?:\.be/|be\.com/(?:watch|shorts/))\S+'
+
 def bootstrap_basic(cache=None, registry=None):
     # complements of oembed.com#section7
     pr = registry or ProviderRegistry(cache)
 
     # a
-    pr.register(r"https://podcasts\.apple\.com/\S+", Provider("https://podcasts.apple.com/api/oembed"))
+    pr.register(r'https://podcasts\.apple\.com/\S+', Provider('https://podcasts.apple.com/api/oembed'))
 
     # c
-    pr.register(r'http://chirb\.it/\S+', Provider('http://chirb.it/oembed.json'))
-    pr.register(r'https?://www\.circuitlab\.com/circuit/\S+', Provider('https://www.circuitlab.com/circuit/oembed'))
+    pr.register(r'https?://www\.circuitlab\.com/circuit/\S+', Provider('https://www.circuitlab.com/circuit/oembed/'))
 
     # d
-    pr.register(r'https?://(?:www\.)?dailymotion\.com/\S+', Provider('http://www.dailymotion.com/services/oembed'))
+    pr.register(r'https?://(?:www\.)?dailymotion\.com/\S+', Provider('https://www.dailymotion.com/services/oembed'))
 
     # f
     pr.register(r'https?://\S*?flickr\.com/\S+', Provider('https://www.flickr.com/services/oembed/'))
     pr.register(r'https?://flic\.kr/\S*', Provider('https://www.flickr.com/services/oembed/'))
-    pr.register(r'https?://(?:www\.)?funnyordie\.com/videos/\S+', Provider('http://www.funnyordie.com/oembed'))
-
-    # g
-    # 2020-11-04: removed GitHub gist, as it seems to be unsupported now.
-    #pr.register(r'https?://gist\.github\.com/\S*', Provider('https://github.com/api/oembed'))
-
-    # h
-    pr.register(r'http://(?:www\.)hulu\.com/watch/\S+', Provider('http://www.hulu.com/api/oembed.json'))
-
-    # i
-    pr.register(r'https?://\S*imgur\.com/\S+', Provider('https://api.imgur.com/oembed')),
-    pr.register(r'https?://(www\.)?instagr(\.am|am\.com)/p/\S+', Provider('http://api.instagram.com/oembed'))
-
-    # m
-    pr.register(r'http://www\.mobypicture\.com/user/\S*?/view/\S*', Provider('http://api.mobypicture.com/oEmbed'))
-    pr.register(r'http://moby\.to/\S*', Provider('http://api.mobypicture.com/oEmbed'))
 
     # p
-    pr.register(r'http://i\S*\.photobucket\.com/albums/\S+', Provider('http://photobucket.com/oembed'))
-    pr.register(r'http://gi\S*\.photobucket\.com/groups/\S+', Provider('http://photobucket.com/oembed'))
-    pr.register(r'http://www\.polleverywhere\.com/(polls|multiple_choice_polls|free_text_polls)/\S+', Provider('http://www.polleverywhere.com/services/oembed/'))
-    pr.register(r'https?://(.+\.)?polldaddy\.com/\S*', Provider('http://polldaddy.com/oembed/'))
+    pr.register(r'https?://(?:www\.)?polleverywhere\.com/(polls|multiple_choice_polls|free_text_polls)/\S+', Provider('https://www.polleverywhere.com/services/oembed/'))
 
     # s
-    pr.register(r'https?://(?:www\.)?slideshare\.net/[^\/]+/\S+', Provider('http://www.slideshare.net/api/oembed/2'))
-    pr.register(r'https?://slidesha\.re/\S*', Provider('http://www.slideshare.net/api/oembed/2'))
-    pr.register(r'http://\S*\.smugmug\.com/\S*', Provider('http://api.smugmug.com/services/oembed/'))
-    pr.register(r'https://\S*?soundcloud\.com/\S+', Provider('http://soundcloud.com/oembed'))
-    pr.register(r'https?://speakerdeck\.com/\S*', Provider('https://speakerdeck.com/oembed.json')),
-    pr.register(r'https?://(?:www\.)?scribd\.com/\S*', Provider('http://www.scribd.com/services/oembed'))
+    pr.register(r'https?://(?:www\.)?slideshare\.net/[^\/]+/\S+', Provider('https://www.slideshare.net/api/oembed/2'))
+    pr.register(r'https?://slidesha\.re/\S*', Provider('https://www.slideshare.net/api/oembed/2'))
+    pr.register(r'https?://\S*?soundcloud\.com/\S+', Provider('https://soundcloud.com/oembed'))
+    pr.register(r'https?://speakerdeck\.com/\S*', Provider('https://speakerdeck.com/oembed.json'))
+    pr.register(r'https?://(?:www\.)?scribd\.com/\S*', Provider('https://www.scribd.com/services/oembed'))
 
     # t
-    pr.register(r'https?://(www\.)tiktok\.com/\S+', Provider('https://www.tiktok.com/oembed'))
-    pr.register(r'https?://(www\.)?twitter\.com/\S+/status(es)?/\S+', Provider('https://publish.twitter.com/oembed'))
+    pr.register(r'https?://(?:www\.)?tiktok\.com/\S+', Provider('https://www.tiktok.com/oembed'))
+    pr.register(r'https?://(?:www\.)?(?:twitter|x)\.com/\S+/status(?:es)?/\S+', Provider('https://publish.x.com/oembed'))
 
     # v
-    pr.register(r'http://(?:player\.)?vimeo\.com/\S+', Provider('http://vimeo.com/api/oembed.json'))
-    pr.register(r'https://(?:player\.)?vimeo\.com/\S+', Provider('https://vimeo.com/api/oembed.json'))
+    pr.register(r'https?://(?:player\.)?vimeo\.com/\S+', Provider('https://vimeo.com/api/oembed.json'))
 
     # w
-    pr.register(r'http://\S+\.wordpress\.com/\S+', Provider('http://public-api.wordpress.com/oembed/'))
-    pr.register(r'https?://wordpress\.tv/\S+', Provider('http://wordpress.tv/oembed/'))
+    # wordpress.com requires identifying yourself via the "for" parameter.
+    pr.register(r'https?://\S+\.wordpress\.com/\S+', Provider('https://public-api.wordpress.com/oembed/', **{'for': 'micawber'}))
+    pr.register(r'https?://wordpress\.tv/\S+', Provider('https://wordpress.tv/oembed/'))
 
     # y
-    pr.register(r'http://(\S*\.)?youtu(\.be/|be\.com/watch)\S+', Provider('https://www.youtube.com/oembed'))
-    pr.register(r'https://(\S*\.)?youtu(\.be/|be\.com/watch)\S+', Provider('https://www.youtube.com/oembed?scheme=https&'))
+    pr.register(youtube_re, Provider('https://www.youtube.com/oembed'))
 
     return pr
 
@@ -313,9 +293,6 @@ def bootstrap_oembed(cache=None, registry=None, refresh=False, **params):
 
     # Currently oembed.com does not provide patterns for YouTube, so we'll add
     # these ourselves.
-    pr.register(r'http://(\S*\.)?youtu(\.be/|be\.com/watch)\S+',
-                Provider('https://www.youtube.com/oembed'))
-    pr.register(r'https://(\S*\.)?youtu(\.be/|be\.com/watch)\S+',
-                Provider('https://www.youtube.com/oembed?scheme=https&'))
+    pr.register(youtube_re, Provider('https://www.youtube.com/oembed'))
 
     return pr
