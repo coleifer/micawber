@@ -44,6 +44,17 @@ class MicawberDjangoTestCase(TestCase, BaseTestCase):
         self.assertEqual(fix_width_height('300x400', {}), {'maxwidth': 300, 'maxheight': 400})
         self.assertEqual(fix_width_height('300', {}), {'maxwidth': 300})
 
+    def test_default_settings_not_mutated(self):
+        from micawber.contrib.mcdjango import _extract_oembed
+        defaults = {'maxwidth': 500}
+        with self.settings(MICAWBER_DEFAULT_SETTINGS=defaults):
+            self.render('{{ text|oembed:"300x400" }}',
+                        text='http://link-test1')
+            self.assertEqual(defaults, {'maxwidth': 500})
+
+            _extract_oembed('http://link-test1', '300x400')
+            self.assertEqual(defaults, {'maxwidth': 500})
+
     def test_provider_loading(self):
         from micawber.contrib.mcdjango import providers
         self.assertEqual(providers, test_pr)

@@ -55,7 +55,7 @@ def extension(filter_name, providers=providers, urlize_all=True, html=False, han
     else:
         fn = text_fn
     def _extension(s, width_height=None):
-        params = getattr(settings, 'MICAWBER_DEFAULT_SETTINGS', {})
+        params = dict(getattr(settings, 'MICAWBER_DEFAULT_SETTINGS', None) or {})
         params.update(kwargs)
         params = fix_width_height(width_height, params)
         return mark_safe(fn(s, providers, urlize_all, handler, block_handler, **params))
@@ -70,7 +70,7 @@ def _extract_oembed(text, width_height=None, html=False):
         fn = extract_html
     else:
         fn = extract
-    params = getattr(settings, 'MICAWBER_DEFAULT_SETTINGS', {})
+    params = dict(getattr(settings, 'MICAWBER_DEFAULT_SETTINGS', None) or {})
     params = fix_width_height(width_height, params)
     url_list, url_data = fn(text, providers, **params)
     return [(u, url_data[u]) for u in url_list if u in url_data]
