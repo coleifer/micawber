@@ -110,11 +110,11 @@ pre-populated:
 
 .. code-block:: python
 
-    def bootstrap_basic(cache=None, registry=None, **params):
+    def bootstrap_basic(cache=None, registry=None):
         pr = registry or ProviderRegistry(cache)
-        pr.register('http://\S*?flickr.com/\S*', Provider('http://www.flickr.com/services/oembed/'))
-        pr.register('http://\S*.youtu(\.be|be\.com)/watch\S*', Provider('http://www.youtube.com/oembed'))
-        pr.register('http://www.hulu.com/watch/\S*', Provider('http://www.hulu.com/api/oembed.json'))
+        pr.register(r'https?://\S*?flickr\.com/\S+', Provider('https://www.flickr.com/services/oembed/'))
+        pr.register(r'https?://(?:player\.)?vimeo\.com/\S+', Provider('https://vimeo.com/api/oembed.json'))
+        pr.register(r'https?://(?:www\.)?tiktok\.com/\S+', Provider('https://www.tiktok.com/oembed'))
         return pr
 
 As you can see, the :py:meth:`~micawber.providers.ProviderRegistry.register` method takes
