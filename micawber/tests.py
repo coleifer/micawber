@@ -179,6 +179,25 @@ class ProviderTestCase(BaseTestCase):
         for url in urls:
             self.assertTrue(pr.provider_for_url(url) is not None, url)
 
+    def test_bootstrap_iframely(self):
+        # An api key (or md5-hashed "key") is required.
+        self.assertRaises(ValueError, bootstrap_iframely)
+
+        pr = bootstrap_iframely(api_key='secret')
+        for url in ('http://example.com/foo',
+                    'https://vimeo.com/76979871',
+                    'https://sub.domain.example/path?query=1'):
+            provider = pr.provider_for_url(url)
+            self.assertTrue(provider is not None, url)
+            self.assertEqual(provider.endpoint, 'https://iframe.ly/api/oembed')
+            self.assertEqual(provider.base_params['api_key'], 'secret')
+
+        self.assertTrue(pr.provider_for_url('ftp://example.com/f') is None)
+
+        pr = bootstrap_iframely(key='0123456789abcdef')
+        provider = pr.provider_for_url('https://example.com/')
+        self.assertEqual(provider.base_params['key'], '0123456789abcdef')
+
     def test_invalid_json(self):
         pr = ProviderRegistry()
         class BadProvider(Provider):

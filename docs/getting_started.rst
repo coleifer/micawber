@@ -126,6 +126,7 @@ You can use helper functions to get a populated registry:
 * :py:func:`~micawber.providers.bootstrap_oembed` - uses oembed.com's official providers list.
 * :py:func:`~micawber.providers.bootstrap_embedly`
 * :py:func:`~micawber.providers.bootstrap_noembed`
+* :py:func:`~micawber.providers.bootstrap_iframely` - requires an `iframely <https://iframely.com/>`_ API key.
 
 The ``bootstrap_oembed``, ``bootstrap_embedly``, and ``bootstrap_noembed``
 functions make a HTTP request to the API server asking for a list of supported

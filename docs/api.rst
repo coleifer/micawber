@@ -246,6 +246,35 @@ Providers
         pr.request('http://www.youtube.com/watch?v=54XHDUOHuzU')
 
 
+.. py:function:: bootstrap_iframely([cache=None[, registry=None[, **kwargs]]])
+
+    Create a :py:class:`ProviderRegistry` that routes requests through
+    `iframely <https://iframely.com/>`_, a commercial oEmbed proxy supporting
+    roughly 1900 domains. Iframely recommends sending all URLs to its API
+    rather than matching against a list of supported providers, so a single
+    catch-all pattern is registered. Unlike the other schema-based helpers,
+    this function does not make a request over the internet when called.
+
+    An iframely API key is required, passed as either ``api_key`` or ``key``
+    (the md5 hexdigest of the api key).
+
+    :param cache: an object that implements simple ``get`` and ``set``
+    :param registry: a ``ProviderRegistry`` instance, which will be updated with the list of supported providers. If not specified, an empty ``ProviderRegistry`` will be used.
+    :param kwargs: any default keyword arguments to use with providers - must
+        include ``api_key`` or ``key``.
+    :rtype: a ProviderRegistry with support for iframely
+
+    .. code-block:: python
+
+        pr = bootstrap_iframely(api_key='my-iframely-key')
+        pr.request('http://www.youtube.com/watch?v=54XHDUOHuzU')
+
+    .. note::
+        Because providers registered later take precedence, passing an
+        existing ``registry`` to this function will cause the catch-all
+        iframely provider to shadow any previously-registered providers.
+
+
 Cache
 -----
 

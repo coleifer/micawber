@@ -237,6 +237,22 @@ def bootstrap_noembed(cache=None, registry=None, refresh=False, **params):
     return pr
 
 
+def bootstrap_iframely(cache=None, registry=None, **params):
+    # Iframely requires authentication, either an "api_key" parameter or a
+    # "key" parameter containing the md5 hexdigest of the api key.
+    if not params.get('api_key') and not params.get('key'):
+        raise ValueError('bootstrap_iframely() requires an "api_key" (or '
+                         'md5-hashed "key") parameter.')
+
+    pr = registry or ProviderRegistry(cache)
+
+    # Iframely recommends sending all urls to the API rather than matching
+    # against a list of supported providers, so register a catch-all pattern.
+    pr.register(r'https?://\S+', Provider('https://iframe.ly/api/oembed',
+                                          **params))
+    return pr
+
+
 def bootstrap_oembed(cache=None, registry=None, refresh=False, **params):
     schema_url = 'https://oembed.com/providers.json'
     pr = registry or ProviderRegistry(cache)
