@@ -13,6 +13,10 @@ try:
     from micawber.contrib import mcflask
 except ImportError:
     mcflask = None
+try:
+    import flask
+except ImportError:
+    flask = None
 from micawber.parsers import full_handler
 from micawber.test_utils import test_pr, test_cache, test_pr_cache, TestProvider, BaseTestCase
 
@@ -233,6 +237,19 @@ class PickleCacheTestCase(unittest.TestCase):
         self.assertEqual(cache._cache, {})
         self.assertTrue(cache.get('key') is None)
 
+    def test_load_bad_file(self):
+        import pickle
+        for content in (b'', b'not a pickle', pickle.dumps([1, 2, 3])):
+            with open(self.filename, 'wb') as fh:
+                fh.write(content)
+            cache = PickleCache(self.filename)
+            self.assertEqual(cache._cache, {})
+
+        # The cache remains usable after recovering from a bad file.
+        cache.set('key', 'value')
+        cache.save()
+        self.assertEqual(PickleCache(self.filename).get('key'), 'value')
+
     def test_save_load_roundtrip(self):
         cache = PickleCache(self.filename)
         cache.set('key', {'title': 'test', 'type': 'link'})
@@ -285,6 +302,22 @@ class McFlaskTestCase(BaseTestCase):
 
         urls, data = filters['extract_oembed']('http://link-test1')
         self.assertEqual(urls, ['http://link-test1'])
+
+    @unittest.skipIf(flask is None, 'flask is not installed')
+    def test_flask_render(self):
+        app = flask.Flask(__name__)
+        mcflask.add_oembed_filters(app, test_pr)
+        with app.app_context():
+            # The oembed markup must survive jinja autoescaping...
+            rendered = flask.render_template_string(
+                '<div>{{ s|oembed }}</div>', s='http://link-test1')
+            self.assertEqual(rendered, '<div>%s</div>'
+                             % self.full_pairs['http://link-test1'])
+
+            # ...while everything else is escaped as usual.
+            rendered = flask.render_template_string(
+                '{{ s|oembed }}', s='http://link-unsafe')
+            self.assertTrue('<script>' not in rendered)
 
 
 class FakeRedisConn(object):

@@ -1,4 +1,3 @@
-import os
 import pickle
 try:
     from redis import Redis
@@ -23,10 +22,14 @@ class PickleCache(Cache):
         self._cache = self.load()
 
     def load(self):
-        if os.path.exists(self.filename):
+        try:
             with open(self.filename, 'rb') as fh:
-                return pickle.load(fh)
-        return {}
+                data = pickle.load(fh)
+        except Exception:
+            # A cache that cannot be read (missing file, truncated write,
+            # corrupt or incompatible pickle) is treated as empty.
+            return {}
+        return data if isinstance(data, dict) else {}
 
     def save(self):
         with open(self.filename, 'wb') as fh:
