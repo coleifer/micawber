@@ -1,5 +1,6 @@
 import json
 import re
+from html import escape
 
 try:
     from bs4 import BeautifulSoup
@@ -29,16 +30,23 @@ block_elements = set([
 skip_elements = set(['a', 'pre', 'code', 'input', 'textarea', 'select'])
 
 
+def _escape_data(response_data):
+    # The url and title in a provider response frequently contain end-user
+    # content (e.g. video titles) and cannot be trusted in html.
+    return {
+        'url': escape(str(response_data['url'])),
+        'title': escape(str(response_data['title']))}
+
 def full_handler(url, response_data, **params):
     if response_data['type'] == 'link':
-        return '<a href="%(url)s" title="%(title)s">%(title)s</a>' % response_data
+        return '<a href="%(url)s" title="%(title)s">%(title)s</a>' % _escape_data(response_data)
     elif response_data['type'] == 'photo':
-        return '<a href="%(url)s" title="%(title)s"><img alt="%(title)s" src="%(url)s" /></a>' % response_data
+        return '<a href="%(url)s" title="%(title)s"><img alt="%(title)s" src="%(url)s" /></a>' % _escape_data(response_data)
     else:
         return response_data['html']
 
 def inline_handler(url, response_data, **params):
-    return '<a href="%(url)s" title="%(title)s">%(title)s</a>' % response_data
+    return '<a href="%(url)s" title="%(title)s">%(title)s</a>' % _escape_data(response_data)
 
 def urlize(url, **params):
     params.setdefault('href', url)

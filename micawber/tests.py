@@ -6,6 +6,7 @@ try:
     from micawber.cache import RedisCache
 except ImportError:
     RedisCache = None
+from micawber.parsers import full_handler
 from micawber.test_utils import test_pr, test_cache, test_pr_cache, TestProvider, BaseTestCase
 
 
@@ -111,6 +112,44 @@ class ProviderTestCase(BaseTestCase):
                 return 'bad'
         pr.register('http://bad', BadProvider('link'))
         self.assertRaises(InvalidResponseException, pr.request, 'http://bad')
+
+
+class EscapingTestCase(BaseTestCase):
+    # html-escaped form of the title in the "link-unsafe" test fixture.
+    escaped_title = '&quot;&gt;&lt;script&gt;alert(0)&lt;/script&gt;'
+
+    def test_unsafe_title_escaped(self):
+        expected = '<a href="http://link-unsafe" title="%s">%s</a>' % (
+            self.escaped_title, self.escaped_title)
+
+        # Standalone link, rendered by the full handler.
+        self.assertEqual(test_pr.parse_text('http://link-unsafe'), expected)
+        self.assertEqual(test_pr.parse_text_full('http://link-unsafe'),
+                         expected)
+
+        # Inline link, rendered by the block handler.
+        self.assertEqual(test_pr.parse_text('see: http://link-unsafe'),
+                         'see: %s' % expected)
+
+        # BeautifulSoup re-serializes the replacement html (e.g. quoting the
+        # title attribute differently), so compare parse trees and verify no
+        # script tag survives.
+        parsed = test_pr.parse_html('<p>http://link-unsafe</p>')
+        self.assertHTMLEqual(parsed, '<p>%s</p>' % expected)
+        self.assertTrue('<script>' not in parsed)
+
+    def test_unsafe_url_escaped(self):
+        url = 'test.jpg&quot; onload=&quot;alert(0)'
+        expected = ('<a href="%(url)s" title="pic">'
+                    '<img alt="pic" src="%(url)s" /></a>' % {'url': url})
+        self.assertEqual(test_pr.parse_text('http://photo-unsafe'), expected)
+
+    def test_response_html_not_escaped(self):
+        # The html of a video/rich response is provider-supplied embed markup
+        # and is rendered as-is.
+        resp = test_pr.request('http://video-test1')
+        self.assertEqual(full_handler('http://video-test1', resp),
+                         '<test1>video</test1>')
 
 
 class FakeRedisConn(object):

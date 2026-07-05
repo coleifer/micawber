@@ -29,6 +29,10 @@ class TestProvider(Provider):
 
         # no title
         'photo?format=json&url=http%3A%2F%2Fphoto-notitle': {'url': 'notitle.jpg', 'type': 'photo'},
+
+        # title and url contain html and must be escaped when rendered
+        'link?format=json&url=http%3A%2F%2Flink-unsafe': {'title': '"><script>alert(0)</script>', 'type': 'link'},
+        'photo?format=json&url=http%3A%2F%2Fphoto-unsafe': {'title': 'pic', 'url': 'test.jpg" onload="alert(0)', 'type': 'photo'},
     }
 
     def fetch(self, url):
