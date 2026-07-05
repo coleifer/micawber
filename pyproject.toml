@@ -6,13 +6,13 @@ build-backend = "setuptools.build_meta"
 name = "micawber"
 dynamic = ["version"]
 description = "a small library for extracting rich content from urls"
-dependencies = ["lxml", "beautifulsoup4"]
+dependencies = ["beautifulsoup4"]
+requires-python = ">=3.8"
 readme = "README.rst"
 authors = [
     { name = "Charles Leifer", email = "coleifer@gmail.com" }
 ]
 classifiers = [
-    "Programming Language :: Python :: 2",
     "Programming Language :: Python :: 3",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]

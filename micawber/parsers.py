@@ -1,18 +1,12 @@
 import json
 import re
-from .compat import text_type
 
-bs_kwargs = {}
 try:
     from bs4 import BeautifulSoup
     bs_kwargs = replace_kwargs = {'features': 'html.parser'}
 except ImportError:
-    try:
-        from BeautifulSoup import BeautifulSoup
-        bs_kwargs = {'convertEntities': BeautifulSoup.HTML_ENTITIES}
-        replace_kwargs = {}
-    except ImportError:
-        BeautifulSoup = None
+    BeautifulSoup = None
+    bs_kwargs = replace_kwargs = {}
 
 from micawber.exceptions import ProviderException
 
@@ -161,7 +155,7 @@ def parse_html(html, providers, urlize_all=True, handler=full_handler,
                 **params)
             url.replaceWith(BeautifulSoup(replacement, **replace_kwargs))
 
-    return text_type(soup)
+    return str(soup)
 
 def extract_html(html, providers, **params):
     if not BeautifulSoup:
@@ -177,7 +171,7 @@ def extract_html(html, providers, **params):
         if _inside_skip(url):
             continue
 
-        block_all, block_ext = extract(text_type(url), providers, **params)
+        block_all, block_ext = extract(str(url), providers, **params)
         for extracted_url in block_all:
             if extracted_url in all_urls:
                 continue

@@ -1,8 +1,5 @@
+import json
 import unittest
-try:
-    import simplejson as json
-except ImportError:
-    import json
 
 from micawber import *
 from micawber.parsers import BeautifulSoup, bs_kwargs

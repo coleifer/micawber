@@ -6,7 +6,6 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
-from micawber.compat import string_types
 from micawber.parsers import full_handler, inline_handler, parse_text, \
     parse_html, extract, extract_html
 
@@ -85,7 +84,7 @@ def extract_oembed_html(text, width_height=None):
     return _extract_oembed(text, width_height, True)
 
 user_extensions = getattr(settings, 'MICAWBER_TEMPLATE_EXTENSIONS', [])
-if isinstance(user_extensions, string_types):
+if isinstance(user_extensions, str):
     user_extensions = _load_from_module(user_extensions)
 
 for filter_name, filter_params in user_extensions:

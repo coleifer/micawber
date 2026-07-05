@@ -6,13 +6,11 @@ import re
 import socket
 import ssl
 
-from .compat import get_charset
-from .compat import HTTPError
-from .compat import OrderedDict
-from .compat import Request
-from .compat import urlencode
-from .compat import URLError
-from .compat import urlopen
+from urllib.error import HTTPError
+from urllib.error import URLError
+from urllib.parse import urlencode
+from urllib.request import Request
+from urllib.request import urlopen
 
 from micawber.exceptions import InvalidResponseException
 from micawber.exceptions import ProviderException
@@ -114,7 +112,7 @@ def fetch(request, timeout=None):
         return False
 
     # by RFC, default HTTP charset is ISO-8859-1
-    charset = get_charset(resp) or 'iso-8859-1'
+    charset = resp.headers.get_param('charset') or 'iso-8859-1'
 
     content = resp.read().decode(charset)
     resp.close()
@@ -134,7 +132,7 @@ def fetch_cache(cache, url, refresh=False, timeout=None):
 
 class ProviderRegistry(object):
     def __init__(self, cache=None):
-        self._registry = OrderedDict()
+        self._registry = {}
         self.cache = cache
 
     def register(self, regex, provider):
