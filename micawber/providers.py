@@ -1,7 +1,6 @@
 import hashlib
 import json
 import logging
-import pickle
 import re
 import socket
 import ssl
@@ -36,16 +35,9 @@ class Provider(object):
     def fetch(self, url):
         req = Request(url, headers={'User-Agent': self.user_agent})
         try:
-            resp = fetch(req, self.socket_timeout)
-        except URLError:
-            return False
-        except HTTPError:
-            return False
-        except socket.timeout:
-            return False
-        except ssl.SSLError:
-            return False
-        return resp
+            return fetch(req, self.socket_timeout)
+        except (HTTPError, URLError, socket.timeout, ssl.SSLError) as exc:
+            raise ProviderException('Error fetching "%s"' % url) from exc
 
     def encode_params(self, url, **extra_params):
         params = dict(self.base_params)
@@ -87,7 +79,10 @@ class Provider(object):
 
 
 def make_key(*args, **kwargs):
-    return hashlib.md5(pickle.dumps((args, kwargs))).hexdigest()
+    # Serialized with json rather than pickle so that keys are stable across
+    # python versions and parameter ordering.
+    data = json.dumps((args, kwargs), sort_keys=True, separators=(',', ':'))
+    return hashlib.md5(data.encode('utf-8')).hexdigest()
 
 
 def url_cache(fn):
@@ -95,7 +90,7 @@ def url_cache(fn):
         if self.cache is not None:
             key = make_key(url, params)
             data = self.cache.get(key)
-            if not data:
+            if data is None:
                 data = fn(self, url, **params)
                 self.cache.set(key, data)
             return data
@@ -111,8 +106,9 @@ def fetch(request, timeout=None):
     if resp.code < 200 or resp.code >= 300:
         return False
 
-    # by RFC, default HTTP charset is ISO-8859-1
-    charset = resp.headers.get_param('charset') or 'iso-8859-1'
+    # oEmbed responses are JSON, for which the default charset is UTF-8
+    # (RFC 8259) -- many providers omit the charset parameter entirely.
+    charset = resp.headers.get_param('charset') or 'utf-8'
 
     content = resp.read().decode(charset)
     resp.close()

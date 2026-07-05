@@ -105,6 +105,30 @@ class ProviderTestCase(BaseTestCase):
 
         self.assertFalse(resp == resp_p)
 
+    def test_make_key_stable(self):
+        from micawber.providers import make_key
+        k1 = make_key('http://foo', {'maxwidth': 600, 'maxheight': 400})
+        k2 = make_key('http://foo', {'maxheight': 400, 'maxwidth': 600})
+        self.assertEqual(k1, k2)
+        self.assertEqual(make_key('http://foo', a=1, b=2),
+                         make_key('http://foo', b=2, a=1))
+        self.assertNotEqual(k1, make_key('http://foo', {'maxwidth': 600}))
+
+    def test_cache_falsy_value(self):
+        from micawber.providers import make_key
+        # A cached falsy value is a hit, not a miss -- link-test3 is unknown
+        # to the provider, so an attempt to re-fetch would raise instead.
+        test_cache.set(make_key('http://link-test3', {}), {})
+        self.assertEqual(test_pr_cache.request('http://link-test3'), {})
+
+    def test_fetch_error_chained(self):
+        pr = ProviderRegistry()
+        pr.register(r'http://refused\S*',
+                    Provider('http://127.0.0.1:1/oembed', timeout=1.0))
+        with self.assertRaises(ProviderException) as ctx:
+            pr.request('http://refused-test')
+        self.assertTrue(ctx.exception.__cause__ is not None)
+
     def test_bootstrap_basic_matching(self):
         pr = bootstrap_basic()
         urls = [
