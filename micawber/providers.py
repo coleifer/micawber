@@ -80,8 +80,11 @@ class Provider(object):
 
 def make_key(*args, **kwargs):
     # Serialized with json rather than pickle so that keys are stable across
-    # python versions and parameter ordering.
-    data = json.dumps((args, kwargs), sort_keys=True, separators=(',', ':'))
+    # python versions and parameter ordering. Values json cannot represent
+    # fall back to their string form -- the same form urlencode gives them in
+    # the actual request.
+    data = json.dumps((args, kwargs), sort_keys=True, separators=(',', ':'),
+                      default=str)
     return hashlib.md5(data.encode('utf-8')).hexdigest()
 
 

@@ -114,6 +114,16 @@ class ProviderTestCase(BaseTestCase):
                          make_key('http://foo', b=2, a=1))
         self.assertNotEqual(k1, make_key('http://foo', {'maxwidth': 600}))
 
+    def test_make_key_non_json_params(self):
+        import datetime
+        from decimal import Decimal
+        from micawber.providers import make_key
+        k1 = make_key('http://foo', {'maxwidth': Decimal('600'),
+                                     'since': datetime.date(2026, 7, 5)})
+        k2 = make_key('http://foo', {'since': datetime.date(2026, 7, 5),
+                                     'maxwidth': Decimal('600')})
+        self.assertEqual(k1, k2)
+
     def test_cache_falsy_value(self):
         from micawber.providers import make_key
         # A cached falsy value is a hit, not a miss -- link-test3 is unknown
