@@ -1,4 +1,7 @@
+import os
+import shutil
 import sys
+import tempfile
 import unittest
 
 from micawber import *
@@ -6,6 +9,10 @@ try:
     from micawber.cache import RedisCache
 except ImportError:
     RedisCache = None
+try:
+    from micawber.contrib import mcflask
+except ImportError:
+    mcflask = None
 from micawber.parsers import full_handler
 from micawber.test_utils import test_pr, test_cache, test_pr_cache, TestProvider, BaseTestCase
 
@@ -213,6 +220,71 @@ class EscapingTestCase(BaseTestCase):
         resp = test_pr.request('http://video-test1')
         self.assertEqual(full_handler('http://video-test1', resp),
                          '<test1>video</test1>')
+
+
+class PickleCacheTestCase(unittest.TestCase):
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.tmpdir)
+        self.filename = os.path.join(self.tmpdir, 'cache.db')
+
+    def test_load_missing_file(self):
+        cache = PickleCache(self.filename)
+        self.assertEqual(cache._cache, {})
+        self.assertTrue(cache.get('key') is None)
+
+    def test_save_load_roundtrip(self):
+        cache = PickleCache(self.filename)
+        cache.set('key', {'title': 'test', 'type': 'link'})
+        cache.set('key2', [1, 2, 3])
+        cache.save()
+
+        cache2 = PickleCache(self.filename)
+        self.assertEqual(cache2.get('key'), {'title': 'test', 'type': 'link'})
+        self.assertEqual(cache2.get('key2'), [1, 2, 3])
+        self.assertTrue(cache2.get('missing') is None)
+
+
+@unittest.skipIf(mcflask is None, 'markupsafe/flask is not installed')
+class McFlaskTestCase(BaseTestCase):
+    class FakeApp(object):
+        def __init__(self):
+            self.jinja_env = type('JinjaEnv', (), {'filters': {}})()
+
+    def test_oembed(self):
+        result = mcflask.oembed('http://link-test1', test_pr)
+        self.assertTrue(isinstance(result, mcflask.Markup))
+        self.assertEqual(result, self.full_pairs['http://link-test1'])
+
+        result = mcflask.oembed('<p>http://link-test1</p>', test_pr,
+                                html=True)
+        self.assertTrue(isinstance(result, mcflask.Markup))
+        self.assertHTMLEqual(result,
+                             '<p>%s</p>' % self.full_pairs['http://link-test1'])
+
+    def test_extract_oembed(self):
+        urls, data = mcflask.extract_oembed(
+            'http://link-test1 http://fapp.io/foo/', test_pr)
+        self.assertEqual(urls, ['http://link-test1', 'http://fapp.io/foo/'])
+        self.assertEqual(list(data), ['http://link-test1'])
+
+        urls, data = mcflask.extract_oembed(
+            '<p>http://link-test1</p>', test_pr, html=True)
+        self.assertEqual(urls, ['http://link-test1'])
+        self.assertEqual(list(data), ['http://link-test1'])
+
+    def test_add_oembed_filters(self):
+        app = self.FakeApp()
+        mcflask.add_oembed_filters(app, test_pr)
+        filters = app.jinja_env.filters
+        self.assertEqual(sorted(filters), ['extract_oembed', 'oembed'])
+
+        result = filters['oembed']('http://link-test1')
+        self.assertTrue(isinstance(result, mcflask.Markup))
+        self.assertEqual(result, self.full_pairs['http://link-test1'])
+
+        urls, data = filters['extract_oembed']('http://link-test1')
+        self.assertEqual(urls, ['http://link-test1'])
 
 
 class FakeRedisConn(object):
