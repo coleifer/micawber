@@ -400,6 +400,38 @@ class ParserTestCase(BaseTestCase):
             parsed = test_pr.parse_html(test_str, urlize_all=False)
             self.assertHTMLEqual(parsed, frame % (expected_inline, blank, url, blank))
 
+    def test_request_deduplication(self):
+        class CountingProvider(TestProvider):
+            fetch_count = 0
+            def fetch(self, url):
+                CountingProvider.fetch_count += 1
+                return super(CountingProvider, self).fetch(url)
+
+        pr = ProviderRegistry()
+        pr.register(r'http://link\S*', CountingProvider('link'))
+
+        def assertFetches(n, fn, *args):
+            CountingProvider.fetch_count = 0
+            fn(*args)
+            self.assertEqual(CountingProvider.fetch_count, n)
+
+        text = 'http://link-test1\nsee http://link-test1\nhttp://link-test1'
+        assertFetches(1, pr.parse_text, text)
+        assertFetches(1, pr.parse_text_full, text)
+
+        html = '<p>http://link-test1</p><p>x http://link-test1</p>'
+        assertFetches(1, pr.parse_html, html)
+        assertFetches(1, pr.extract_html, html)
+
+        # Failed lookups are not retried within a single parse either --
+        # link-test3 is unknown to the provider.
+        assertFetches(1, pr.parse_text,
+                      'http://link-test3\nhttp://link-test3')
+
+        # Distinct urls are of course fetched individually.
+        assertFetches(2, pr.parse_text,
+                      'http://link-test1\nhttp://link-test2')
+
     def test_replacement_backslash(self):
         # Replacements must be inserted literally, without backslash-escape
         # processing.

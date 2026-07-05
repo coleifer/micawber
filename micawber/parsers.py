@@ -57,6 +57,27 @@ def urlize(url, **params):
                           for key, value in sorted(params.items()))
     return '<a %s>%s</a>' % (param_html, url)
 
+class _RequestMemo(object):
+    # Collapse repeated requests (or failures) for the same url within a
+    # single parse call, e.g. one url appearing in several paragraphs.
+    def __init__(self, providers):
+        self.providers = providers
+        self.responses = {}
+
+    def request(self, url, **params):
+        if url in self.responses:
+            response, exc = self.responses[url]
+        else:
+            response = exc = None
+            try:
+                response = self.providers.request(url, **params)
+            except ProviderException as e:
+                exc = e
+            self.responses[url] = (response, exc)
+        if exc is not None:
+            raise exc
+        return response
+
 def extract(text, providers, **params):
     all_urls = set()
     urls = []
@@ -94,6 +115,7 @@ def parse_text(text, providers, urlize_all=True, handler=full_handler,
     lines = text.splitlines()
     parsed = []
     urlize_params = urlize_params or {}
+    providers = _RequestMemo(providers)
 
     for line in lines:
         if standalone_url_re.match(line):
@@ -122,6 +144,7 @@ def parse_html(html, providers, urlize_all=True, handler=full_handler,
                         'or beautifulsoup4, or use the text parser')
 
     soup = soup_class(html, **bs_kwargs)
+    providers = _RequestMemo(providers)
 
     for url in soup.find_all(string=url_re):
         if not _inside_skip(url):
@@ -154,6 +177,7 @@ def extract_html(html, providers, **params):
     all_urls = set()
     urls = []
     extracted_urls = {}
+    providers = _RequestMemo(providers)
 
     for url in soup.find_all(string=url_re):
         if _inside_skip(url):
