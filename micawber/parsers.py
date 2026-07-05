@@ -164,7 +164,7 @@ def parse_html(html, providers, urlize_all=True, handler=full_handler,
                 url_handler,
                 urlize_params=urlize_params,
                 **params)
-            url.replace_with(BeautifulSoup(replacement, **replace_kwargs))
+            url.replace_with(soup_class(replacement, **replace_kwargs))
 
     return str(soup)
 
