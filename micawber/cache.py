@@ -53,8 +53,4 @@ if Redis:
                 return pickle.loads(cached)
 
         def set(self, k, v):
-            ck, cv = self.key_fn(k), pickle.dumps(v)
-            if self.timeout is not None:
-                self.conn.setex(ck, cv, self.timeout)
-            else:
-                self.conn.set(ck, cv)
+            self.conn.set(self.key_fn(k), pickle.dumps(v), ex=self.timeout)

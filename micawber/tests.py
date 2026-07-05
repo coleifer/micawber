@@ -2,6 +2,10 @@ import sys
 import unittest
 
 from micawber import *
+try:
+    from micawber.cache import RedisCache
+except ImportError:
+    RedisCache = None
 from micawber.test_utils import test_pr, test_cache, test_pr_cache, TestProvider, BaseTestCase
 
 
@@ -107,6 +111,45 @@ class ProviderTestCase(BaseTestCase):
                 return 'bad'
         pr.register('http://bad', BadProvider('link'))
         self.assertRaises(InvalidResponseException, pr.request, 'http://bad')
+
+
+class FakeRedisConn(object):
+    # Implements the redis-py >= 3.0 API for the commands RedisCache uses.
+    def __init__(self):
+        self.data = {}
+        self.expiry = {}
+
+    def get(self, name):
+        return self.data.get(name)
+
+    def set(self, name, value, ex=None):
+        if ex is not None and not isinstance(ex, int):
+            raise ValueError('ex must be an integer number of seconds')
+        self.data[name] = value
+        if ex is not None:
+            self.expiry[name] = ex
+
+
+@unittest.skipIf(RedisCache is None, 'redis-py is not installed')
+class RedisCacheTestCase(unittest.TestCase):
+    def get_cache(self, **kwargs):
+        cache = RedisCache(**kwargs)
+        cache.conn = FakeRedisConn()
+        return cache
+
+    def test_get_set(self):
+        cache = self.get_cache()
+        self.assertTrue(cache.get('key') is None)
+        cache.set('key', {'title': 'test'})
+        self.assertEqual(cache.get('key'), {'title': 'test'})
+        self.assertTrue('micawber.key' in cache.conn.data)
+        self.assertEqual(cache.conn.expiry, {})
+
+    def test_timeout(self):
+        cache = self.get_cache(timeout=60)
+        cache.set('key', {'title': 'test'})
+        self.assertEqual(cache.get('key'), {'title': 'test'})
+        self.assertEqual(cache.conn.expiry['micawber.key'], 60)
 
 
 class ParserTestCase(BaseTestCase):
