@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "micawber"
 dynamic = ["version"]
 description = "a small library for extracting rich content from urls"
-dependencies = ["beautifulsoup4"]
+dependencies = ["beautifulsoup4>=4.4"]
 requires-python = ">=3.8"
 readme = "README.rst"
 authors = [

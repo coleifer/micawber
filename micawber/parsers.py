@@ -24,10 +24,13 @@ block_elements = set([
     'pre', 'section', 'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'tr',
     'ul',
     # Additional elements.
-    'button', 'del', 'iframe', 'ins', 'map', 'object', 'script', '[document]',
+    'button', 'del', 'iframe', 'ins', 'map', 'object', '[document]',
 ])
 
-skip_elements = set(['a', 'pre', 'code', 'input', 'textarea', 'select'])
+skip_elements = set([
+    'a', 'pre', 'code', 'input', 'textarea', 'select',
+    'head', 'script', 'style', 'svg', 'title',
+])
 
 
 def _escape_data(response_data):
@@ -84,30 +87,7 @@ def parse_text_full(text, providers, urlize_all=True, handler=full_handler,
         elif urlize_all:
             replacements[url] = urlize(url, **urlize_params)
 
-    # go through the text recording URLs that can be replaced
-    # taking note of their start & end indexes
-    urls = re.finditer(url_re, text)
-    matches = []
-    for match in urls:
-        if match.group() in replacements:
-            matches.append([match.start(), match.end(), match.group()])
-
-    # replace the URLs in order, offsetting the indices each go
-    for indx, (start, end, url) in enumerate(matches):
-        replacement = replacements[url]
-        difference = len(replacement) - len(url)
-
-        # insert the replacement between two slices of text surrounding the
-        # original url
-        text = text[:start] + replacement + text[end:]
-
-        # iterate through the rest of the matches offsetting their indices
-        # based on the difference between replacement/original
-        for j in range(indx + 1, len(matches)):
-            matches[j][0] += difference
-            matches[j][1] += difference
-
-    return text
+    return url_re.sub(lambda m: replacements.get(m.group(), m.group()), text)
 
 def parse_text(text, providers, urlize_all=True, handler=full_handler,
                block_handler=inline_handler, urlize_params=None, **params):
@@ -143,7 +123,7 @@ def parse_html(html, providers, urlize_all=True, handler=full_handler,
 
     soup = soup_class(html, **bs_kwargs)
 
-    for url in soup.findAll(text=url_re):
+    for url in soup.find_all(string=url_re):
         if not _inside_skip(url):
             if _is_standalone(url):
                 url_handler = handler
@@ -161,7 +141,7 @@ def parse_html(html, providers, urlize_all=True, handler=full_handler,
                 url_handler,
                 urlize_params=urlize_params,
                 **params)
-            url.replaceWith(BeautifulSoup(replacement, **replace_kwargs))
+            url.replace_with(BeautifulSoup(replacement, **replace_kwargs))
 
     return str(soup)
 
@@ -175,7 +155,7 @@ def extract_html(html, providers, **params):
     urls = []
     extracted_urls = {}
 
-    for url in soup.findAll(text=url_re):
+    for url in soup.find_all(string=url_re):
         if _inside_skip(url):
             continue
 

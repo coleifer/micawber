@@ -400,6 +400,23 @@ class ParserTestCase(BaseTestCase):
             parsed = test_pr.parse_html(test_str, urlize_all=False)
             self.assertHTMLEqual(parsed, frame % (expected_inline, blank, url, blank))
 
+    def test_replacement_backslash(self):
+        # Replacements must be inserted literally, without backslash-escape
+        # processing.
+        expected = '<x>\\1 \\g<0> C:\\path</x>'
+        self.assertEqual(test_pr.parse_text('http://rich-backslash'), expected)
+        self.assertEqual(
+            test_pr.parse_text_full('inline http://rich-backslash'),
+            'inline %s' % expected)
+
+    def test_skip_script_and_style(self):
+        for frame in ('<script>var u = "%s";</script>',
+                      '<style>body { background: url(%s) }</style>',
+                      '<svg><text>%s</text></svg>',
+                      '<title>%s</title>'):
+            html = frame % 'http://link-test1'
+            self.assertEqual(test_pr.parse_html(html), html)
+
     def test_urlize_params(self):
         text = 'test http://foo.com/'
         urlize_params = {'target': '_blank', 'rel': 'nofollow'}

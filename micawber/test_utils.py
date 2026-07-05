@@ -33,6 +33,9 @@ class TestProvider(Provider):
         # title and url contain html and must be escaped when rendered
         'link?format=json&url=http%3A%2F%2Flink-unsafe': {'title': '"><script>alert(0)</script>', 'type': 'link'},
         'photo?format=json&url=http%3A%2F%2Fphoto-unsafe': {'title': 'pic', 'url': 'test.jpg" onload="alert(0)', 'type': 'photo'},
+
+        # html contains backslash sequences that are meaningful to re.sub
+        'rich?format=json&url=http%3A%2F%2Frich-backslash': {'title': 'bs', 'html': '<x>\\1 \\g<0> C:\\path</x>', 'type': 'rich'},
     }
 
     def fetch(self, url):
