@@ -50,7 +50,7 @@ class GoogleMapsProvider(Provider):
 
         width = int(params.get('maxwidth', 640))
         height = int(params.get('maxheight', 480))
-        html = '<iframe width="%d" height="%d" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://maps.google.com/maps?%s"></iframe>' % \
+        html = '<iframe width="%d" height="%d" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?%s"></iframe>' % \
             (width, height, '&amp;'.join(map_params))
 
         return {

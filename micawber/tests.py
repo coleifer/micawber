@@ -17,6 +17,7 @@ try:
     import flask
 except ImportError:
     flask = None
+from micawber.contrib.providers import GoogleMapsProvider
 from micawber.parsers import full_handler
 from micawber.test_utils import test_pr, test_cache, test_pr_cache, TestProvider, BaseTestCase
 
@@ -668,11 +669,8 @@ class TestHTMLEntities(BaseTestCase):
             '<a href="http://baze.com">http://baze.com</a>\n'
             '&lt;foo&gt;</p>'))
 
-
-
 class GoogleMapsProviderTestCase(unittest.TestCase):
     def test_query_param_without_equals(self):
-        from micawber.contrib.providers import GoogleMapsProvider
         p = GoogleMapsProvider('')
         # Flag-style query params (no '=') must not raise.
         result = p.request('https://maps.google.com/maps?q')
@@ -680,7 +678,7 @@ class GoogleMapsProviderTestCase(unittest.TestCase):
         self.assertIn('output=embed', result['html'])
         result = p.request('https://maps.google.com/maps?foo&q=Paris')
         self.assertIn('q=Paris', result['html'])
-        self.assertNotIn('foo', result['html'].split('maps?')[1])
+        self.assertNotIn('foo', result['html'])
 
 
 if __name__ == '__main__':
