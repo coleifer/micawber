@@ -669,5 +669,19 @@ class TestHTMLEntities(BaseTestCase):
             '&lt;foo&gt;</p>'))
 
 
+
+class GoogleMapsProviderTestCase(unittest.TestCase):
+    def test_query_param_without_equals(self):
+        from micawber.contrib.providers import GoogleMapsProvider
+        p = GoogleMapsProvider('')
+        # Flag-style query params (no '=') must not raise.
+        result = p.request('https://maps.google.com/maps?q')
+        self.assertEqual(result['type'], 'rich')
+        self.assertIn('output=embed', result['html'])
+        result = p.request('https://maps.google.com/maps?foo&q=Paris')
+        self.assertIn('q=Paris', result['html'])
+        self.assertNotIn('foo', result['html'].split('maps?')[1])
+
+
 if __name__ == '__main__':
     unittest.main(argv=sys.argv)

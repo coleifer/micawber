@@ -42,6 +42,8 @@ class GoogleMapsProvider(Provider):
         map_params = ['output=embed']
 
         for param in url_params:
+            if '=' not in param:
+                continue
             k, v = param.split('=', 1)
             if k in self.valid_params:
                 map_params.append(param)
