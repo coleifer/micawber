@@ -62,6 +62,10 @@ class Provider(object):
         except ValueError as exc:
             raise InvalidResponseException(str(exc)) from exc
 
+        # oEmbed responses must be JSON objects.
+        if not isinstance(json_data, dict):
+            raise InvalidResponseException('Response is not a JSON object')
+
         if 'url' not in json_data:
             json_data['url'] = url
         if 'title' not in json_data:
