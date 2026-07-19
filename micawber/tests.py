@@ -151,6 +151,53 @@ class ProviderTestCase(BaseTestCase):
             pr.request('http://refused-test')
         self.assertTrue(ctx.exception.__cause__ is not None)
 
+    def test_fetch_decode_error_chained(self):
+        # Charset/decode failures must become ProviderException like network errors.
+        from email.message import Message
+        from unittest import mock
+
+        class FakeResp(object):
+            def __init__(self, body, charset):
+                self._body = body
+                self.headers = Message()
+                self.headers['Content-Type'] = (
+                    'application/json; charset=%s' % charset)
+
+            def read(self):
+                return self._body
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                pass
+
+        pr = ProviderRegistry()
+        pr.register(r'http://decode-test\S*',
+                    Provider('http://example.com/oembed'))
+
+        with mock.patch('micawber.providers.urlopen',
+                        return_value=FakeResp(b'{}', 'not-a-codec')):
+            with self.assertRaises(ProviderException) as ctx:
+                pr.request('http://decode-test1')
+            self.assertIsInstance(ctx.exception.__cause__, LookupError)
+            self.assertEqual(
+                str(ctx.exception),
+                'Error fetching "http://example.com/oembed?format=json'
+                '&url=http%3A%2F%2Fdecode-test1"')
+
+        with mock.patch('micawber.providers.urlopen',
+                        return_value=FakeResp(b'\xff', 'utf-8')):
+            with self.assertRaises(ProviderException) as ctx:
+                pr.request('http://decode-test2')
+            self.assertIsInstance(ctx.exception.__cause__, UnicodeDecodeError)
+
+        with mock.patch('micawber.providers.urlopen',
+                        return_value=FakeResp(b'{}', 'not-a-codec')):
+            urls, data = pr.extract('see http://decode-test3')
+            self.assertEqual(urls, ['http://decode-test3'])
+            self.assertEqual(data, {})
+
     def test_bootstrap_basic_matching(self):
         pr = bootstrap_basic()
         urls = [
