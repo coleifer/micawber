@@ -3,6 +3,8 @@ import shutil
 import sys
 import tempfile
 import unittest
+from email.message import Message
+from unittest import mock
 
 from micawber import *
 try:
@@ -153,9 +155,6 @@ class ProviderTestCase(BaseTestCase):
 
     def test_fetch_decode_error_chained(self):
         # Charset/decode failures must become ProviderException like network errors.
-        from email.message import Message
-        from unittest import mock
-
         class FakeResp(object):
             def __init__(self, body, charset):
                 self._body = body
@@ -256,13 +255,15 @@ class ProviderTestCase(BaseTestCase):
 
     def test_non_object_json(self):
         # Non-object JSON must raise InvalidResponseException.
-        bodies = ['[]', 'null', '"url and title"', '123', 'true', 'false']
-        for body in bodies:
-            pr = ProviderRegistry()
-            class BadProvider(Provider):
-                def fetch(self, url, _body=body):
-                    return _body
-            pr.register(r'http://bad\S*', BadProvider('link'))
+        class BadProvider(Provider):
+            body = None
+            def fetch(self, url):
+                return self.body
+        pr = ProviderRegistry()
+        provider = BadProvider('link')
+        pr.register(r'http://bad\S*', provider)
+        for body in ('[]', 'null', '"url and title"', '123', 'true', 'false'):
+            provider.body = body
             self.assertRaises(InvalidResponseException, pr.request,
                               'http://bad-test')
             urls, extracted = pr.extract('see http://bad-test here')
@@ -308,8 +309,6 @@ class EscapingTestCase(BaseTestCase):
                          '<test1>video</test1>')
 
     def test_full_handler_without_html_falls_back_to_link(self):
-        from micawber.parsers import parse_text_full
-
         resp = {'type': 'video', 'url': 'http://video-test1', 'title': 'vtest1'}
         expected = '<a href="http://video-test1" title="vtest1">vtest1</a>'
         self.assertEqual(full_handler('http://video-test1', resp), expected)
@@ -654,14 +653,14 @@ class ParserTestCase(BaseTestCase):
             self.assertEqual(test_pr.parse_html(html), html)
 
     def test_skip_html_comments(self):
-        html = ('<div><!-- keep http://link-test1 --><p>http://link-test1</p>'
+        html = ('<div><!-- keep http://link-test2 --><p>http://link-test1</p>'
                 '</div>')
         parsed = test_pr.parse_html(html)
-        self.assertIn('<!-- keep http://link-test1 -->', parsed)
+        self.assertIn('<!-- keep http://link-test2 -->', parsed)
         self.assertIn(self.full_pairs['http://link-test1'], parsed)
         urls, extracted = test_pr.extract_html(html)
         self.assertEqual(urls, ['http://link-test1'])
-        self.assertEqual(len(extracted), 1)
+        self.assertEqual(list(extracted), ['http://link-test1'])
 
     def test_urlize_params(self):
         text = 'test http://foo.com/'
