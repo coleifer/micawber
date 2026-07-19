@@ -3,10 +3,11 @@ import re
 from html import escape
 
 try:
-    from bs4 import BeautifulSoup
+    from bs4 import BeautifulSoup, Comment
     bs_kwargs = replace_kwargs = {'features': 'html.parser'}
 except ImportError:
     BeautifulSoup = None
+    Comment = None
     bs_kwargs = replace_kwargs = {}
 
 from micawber.exceptions import ProviderException
@@ -203,6 +204,9 @@ def _is_standalone(soup_elem):
     return False
 
 def _inside_skip(soup_elem):
+    # Comment nodes match url_re as strings; leave them like script/style skips.
+    if Comment is not None and isinstance(soup_elem, Comment):
+        return True
     parent = soup_elem.parent
     while parent is not None:
         if parent.name in skip_elements:
