@@ -254,6 +254,21 @@ class ProviderTestCase(BaseTestCase):
         pr.register('http://bad', BadProvider('link'))
         self.assertRaises(InvalidResponseException, pr.request, 'http://bad')
 
+    def test_non_object_json(self):
+        # Non-object JSON must raise InvalidResponseException.
+        bodies = ['[]', 'null', '"url and title"', '123', 'true', 'false']
+        for body in bodies:
+            pr = ProviderRegistry()
+            class BadProvider(Provider):
+                def fetch(self, url, _body=body):
+                    return _body
+            pr.register(r'http://bad\S*', BadProvider('link'))
+            self.assertRaises(InvalidResponseException, pr.request,
+                              'http://bad-test')
+            urls, extracted = pr.extract('see http://bad-test here')
+            self.assertEqual(urls, ['http://bad-test'])
+            self.assertEqual(extracted, {})
+
 
 class EscapingTestCase(BaseTestCase):
     # html-escaped form of the title in the "link-unsafe" test fixture.
