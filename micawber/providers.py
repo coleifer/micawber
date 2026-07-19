@@ -32,7 +32,9 @@ class Provider(object):
         req = Request(url, headers={'User-Agent': self.user_agent})
         try:
             return fetch(req, self.socket_timeout)
-        except (HTTPError, URLError, socket.timeout, ssl.SSLError) as exc:
+        except (HTTPError, URLError, socket.timeout, ssl.SSLError,
+                UnicodeDecodeError, LookupError) as exc:
+            # LookupError covers unknown charset names from bytes.decode.
             raise ProviderException('Error fetching "%s"' % url) from exc
 
     def encode_params(self, url, **extra_params):
