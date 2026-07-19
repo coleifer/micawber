@@ -245,6 +245,23 @@ class EscapingTestCase(BaseTestCase):
         self.assertEqual(full_handler('http://video-test1', resp),
                          '<test1>video</test1>')
 
+    def test_full_handler_without_html_falls_back_to_link(self):
+        from micawber.parsers import parse_text_full
+
+        resp = {'type': 'video', 'url': 'http://video-test1', 'title': 'vtest1'}
+        expected = '<a href="http://video-test1" title="vtest1">vtest1</a>'
+        self.assertEqual(full_handler('http://video-test1', resp), expected)
+
+        class NoHtmlVideoProvider(Provider):
+            def request(self, url, **params):
+                return {'type': 'video', 'title': 'broken', 'url': url}
+
+        pr = ProviderRegistry()
+        pr.register(r'http://video-nohtml', NoHtmlVideoProvider('video'))
+        self.assertEqual(
+            parse_text_full('http://video-nohtml/foo', pr),
+            '<a href="http://video-nohtml/foo" title="broken">broken</a>')
+
 
 class PickleCacheTestCase(unittest.TestCase):
     def setUp(self):

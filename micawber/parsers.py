@@ -46,7 +46,10 @@ def full_handler(url, response_data, **params):
     elif response_data['type'] == 'photo':
         return '<a href="%(url)s" title="%(title)s"><img alt="%(title)s" src="%(url)s" /></a>' % _escape_data(response_data)
     else:
-        return response_data['html']
+        html = response_data.get('html')
+        if html is None:
+            return '<a href="%(url)s" title="%(title)s">%(title)s</a>' % _escape_data(response_data)
+        return html
 
 def inline_handler(url, response_data, **params):
     return '<a href="%(url)s" title="%(title)s">%(title)s</a>' % _escape_data(response_data)
