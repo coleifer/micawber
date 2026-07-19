@@ -574,6 +574,16 @@ class ParserTestCase(BaseTestCase):
             html = frame % 'http://link-test1'
             self.assertEqual(test_pr.parse_html(html), html)
 
+    def test_skip_html_comments(self):
+        html = ('<div><!-- keep http://link-test1 --><p>http://link-test1</p>'
+                '</div>')
+        parsed = test_pr.parse_html(html)
+        self.assertIn('<!-- keep http://link-test1 -->', parsed)
+        self.assertIn(self.full_pairs['http://link-test1'], parsed)
+        urls, extracted = test_pr.extract_html(html)
+        self.assertEqual(urls, ['http://link-test1'])
+        self.assertEqual(len(extracted), 1)
+
     def test_urlize_params(self):
         text = 'test http://foo.com/'
         urlize_params = {'target': '_blank', 'rel': 'nofollow'}
