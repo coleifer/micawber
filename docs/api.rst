@@ -11,8 +11,8 @@ Providers
 .. py:class:: Provider(endpoint[, timeout=3.0[, user_agent=None[, **kwargs]]])
 
     The :py:class:`Provider` object is responsible for retrieving metadata about
-    a given URL.  It implements a method called :py:meth:`~Provider.request`, which
-    takes a URL and any parameters, which it sends off to an endpoint.  The endpoint
+    a given URL. It implements a method called :py:meth:`~Provider.request`, which
+    takes a URL and any parameters, which it sends off to an endpoint. The endpoint
     should return a JSON dictionary containing metadata about the resource, which is
     returned to the caller.
 
@@ -20,13 +20,13 @@ Providers
     :param float timeout: socket timeout, in seconds, for requests to the endpoint.
     :param str user_agent: value sent in the ``User-Agent`` header.
     :param kwargs: any additional url parameters to send to the endpoint on each
-        request, used for providing defaults.  An example use-case might be for
+        request, used for providing defaults. An example use-case might be for
         providing an API key on each request.
 
     .. py:method:: request(url, **extra_params)
 
-        Retrieve information about the given url.  By default, will make a HTTP
-        GET request to the endpoint.  The url will be sent to the endpoint, along
+        Retrieve information about the given url. By default, will make a HTTP
+        GET request to the endpoint. The url will be sent to the endpoint, along
         with any parameters specified in the ``extra_params`` and those parameters
         specified when the class was instantiated.
 
@@ -44,7 +44,7 @@ Providers
     A registry for encapsulating a group of :py:class:`Provider` instances,
     with optional caching support.
 
-    Handles matching regular expressions to providers.  URLs are sent to the
+    Handles matching regular expressions to providers. URLs are sent to the
     registry via its :py:meth:`~ProviderRegistry.request` method, it checks to
     see if it has a provider that matches the URL, and if so, requests the
     metadata from the provider instance.
@@ -54,9 +54,10 @@ Providers
 
     :param cache: the cache simply needs to implement two methods, ``.get(key)`` and ``.set(key, value)``.
 
-    .. py:method:: register(regex, provider)
+    .. py:method:: register(regex, provider[, skip_invalid=False])
 
-        Register the provider with the following regex.
+        Register the provider with the following regex. The regex is compiled
+        once here rather than on every lookup.
 
         Example:
 
@@ -64,17 +65,22 @@ Providers
 
             registry = ProviderRegistry()
             registry.register(
-                'http://\S*.youtu(\.be|be\.com)/watch\S*',
-                Provider('http://www.youtube.com/oembed'),
+                'https://\S*.youtu(\.be|be\.com)/watch\S*',
+                Provider('https://www.youtube.com/oembed'),
             )
 
         :param regex: a regex for matching URLs of a given type
         :param provider: a :py:class:`Provider` instance
+        :param bool skip_invalid: log a warning and skip the provider when the
+            regex will not compile, rather than raising ``re.error``. Used when
+            registering patterns from a third-party provider list, where one bad
+            pattern should not cost the whole list. Patterns you write yourself
+            should raise.
 
     .. py:method:: request(url, **extra_params)
 
         Retrieve information about the given url if it matches a regex in the
-        instance's registry.  If no provider matches the URL, a
+        instance's registry. If no provider matches the URL, a
         ``ProviderException`` is thrown, otherwise the URL and parameters are
         dispatched to the matching provider's :py:meth:`Provider.request`
         method.
@@ -89,7 +95,7 @@ Providers
     .. py:method:: parse_text_full(text[, urlize_all=True[, handler=full_handler[, urlize_params=None[, **params]]]])
 
         Parse a block of text, converting *all* links by passing them to the
-        given handler.  Links contained within a block of text (i.e. not on
+        given handler. Links contained within a block of text (i.e. not on
         their own line) will be handled as well.
 
         Example input and output::
@@ -158,7 +164,7 @@ Providers
         :param params: any additional parameters to use when requesting
             metadata, i.e. a maxwidth or maxheight.
         :rtype: returns a 2-tuple containing a list of all URLs and a dict
-            keyed by URL containing any metadata.  If a provider was not found
+            keyed by URL containing any metadata. If a provider was not found
             for a URL it is not listed in the dictionary.
 
     .. py:method:: extract_html(html, **params)
@@ -173,7 +179,7 @@ Providers
         :param params: any additional parameters to use when requesting
             metadata, i.e. a maxwidth or maxheight.
         :rtype: returns a 2-tuple containing a list of all URLs and a dict
-            keyed by URL containing any metadata.  If a provider was not found
+            keyed by URL containing any metadata. If a provider was not found
             for a URL it is not listed in the dictionary.
 
 
@@ -209,7 +215,7 @@ Providers
 .. py:function:: bootstrap_embedly([cache=None[, registry=None[, refresh=False[, timeout=3.0[, **kwargs]]]])
 
     Create a :py:class:`ProviderRegistry` and register as many providers as
-    are supported by `embed.ly <http://embed.ly>`_.  Valid services are
+    are supported by `embed.ly <http://embed.ly>`_. Valid services are
     fetched from http://api.embed.ly/1/services/python and parsed then registered.
 
     .. note::
@@ -236,7 +242,7 @@ Providers
 .. py:function:: bootstrap_noembed([cache=None[, registry=None[, refresh=False[, timeout=3.0[, **kwargs]]]])
 
     Create a :py:class:`ProviderRegistry` and register as many providers as
-    are supported by `noembed.com <http://noembed.com>`_.  Valid services are
+    are supported by `noembed.com <http://noembed.com>`_. Valid services are
     fetched from http://noembed.com/providers and parsed then registered.
 
     .. note::

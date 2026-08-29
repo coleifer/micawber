@@ -1,5 +1,6 @@
 import hashlib
 import json
+import logging
 import re
 import socket
 import ssl
@@ -19,6 +20,8 @@ from micawber.parsers import parse_html
 from micawber.parsers import parse_text
 from micawber.parsers import parse_text_full
 
+
+logger = logging.getLogger('micawber')
 
 DEFAULT_TIMEOUT = 3.0
 
@@ -129,18 +132,26 @@ class ProviderRegistry(object):
         self._registry = {}
         self.cache = cache
 
-    def register(self, regex, provider):
-        self._registry[regex] = provider
+    def register(self, regex, provider, skip_invalid=False):
+        try:
+            pattern = re.compile(regex)
+        except re.error as exc:
+            if not skip_invalid:
+                raise
+            logger.warning('Skipping unusable provider pattern %r: %s',
+                           regex, exc)
+            return
+        self._registry[regex] = (pattern, provider)
 
     def unregister(self, regex):
         del self._registry[regex]
 
     def __iter__(self):
-        return iter(reversed(list(self._registry.items())))
+        return iter(reversed(list(self._registry.values())))
 
     def provider_for_url(self, url):
-        for regex, provider in self:
-            if re.match(regex, url):
+        for pattern, provider in self:
+            if pattern.match(url):
                 return provider
 
     @url_cache
@@ -226,7 +237,8 @@ def bootstrap_embedly(cache=None, registry=None, refresh=False,
 
     for provider_meta in json_data:
         for regex in provider_meta['regex']:
-            pr.register(regex, Provider(endpoint, timeout=timeout, **params))
+            pr.register(regex, Provider(endpoint, timeout=timeout, **params),
+                        skip_invalid=True)
     return pr
 
 
@@ -243,7 +255,8 @@ def bootstrap_noembed(cache=None, registry=None, refresh=False,
 
     for provider_meta in json_data:
         for regex in provider_meta['patterns']:
-            pr.register(regex, Provider(endpoint, timeout=timeout, **params))
+            pr.register(regex, Provider(endpoint, timeout=timeout, **params),
+                        skip_invalid=True)
     return pr
 
 
