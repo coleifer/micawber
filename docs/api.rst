@@ -8,7 +8,7 @@ Providers
 
 .. py:module:: micawber.providers
 
-.. py:class:: Provider(endpoint, **kwargs)
+.. py:class:: Provider(endpoint[, timeout=3.0[, user_agent=None[, **kwargs]]])
 
     The :py:class:`Provider` object is responsible for retrieving metadata about
     a given URL.  It implements a method called :py:meth:`~Provider.request`, which
@@ -17,6 +17,8 @@ Providers
     returned to the caller.
 
     :param endpoint: the API endpoint which should return information about requested links
+    :param float timeout: socket timeout, in seconds, for requests to the endpoint.
+    :param str user_agent: value sent in the ``User-Agent`` header.
     :param kwargs: any additional url parameters to send to the endpoint on each
         request, used for providing defaults.  An example use-case might be for
         providing an API key on each request.
@@ -185,7 +187,7 @@ Providers
     :rtype: a ``ProviderRegistry`` with a handful of providers registered
 
 
-.. py:function:: bootstrap_oembed([cache=None[, registry=None[, refresh=False[, **kwargs]]])
+.. py:function:: bootstrap_oembed([cache=None[, registry=None[, refresh=False[, timeout=3.0[, **kwargs]]]])
 
     Create a :py:class:`ProviderRegistry` and register as many providers as
     are described in the `oembed.com <https://oembed.com>`_ providers list.
@@ -196,11 +198,15 @@ Providers
     :param cache: an object that implements simple ``get`` and ``set``
     :param registry: a ``ProviderRegistry`` instance, which will be updated with the list of supported providers. If not specified, an empty ``ProviderRegistry`` will be used.
     :param bool refresh: force refreshing the provider data rather than attempting to load it from cache (if cache is used).
+    :param float timeout: socket timeout, in seconds, applied to the
+        provider-list request made by this function and to the providers it
+        registers. Without a bounded default, a provider-list server that
+        accepts the connection and never replies blocks forever.
     :param kwargs: any default keyword arguments to use with providers
     :rtype: a ProviderRegistry with support for noembed
 
 
-.. py:function:: bootstrap_embedly([cache=None[, registry=None[, refresh=False[, **kwargs]]])
+.. py:function:: bootstrap_embedly([cache=None[, registry=None[, refresh=False[, timeout=3.0[, **kwargs]]]])
 
     Create a :py:class:`ProviderRegistry` and register as many providers as
     are supported by `embed.ly <http://embed.ly>`_.  Valid services are
@@ -212,6 +218,10 @@ Providers
     :param cache: an object that implements simple ``get`` and ``set``
     :param registry: a ``ProviderRegistry`` instance, which will be updated with the list of supported providers. If not specified, an empty ``ProviderRegistry`` will be used.
     :param bool refresh: force refreshing the provider data rather than attempting to load it from cache (if cache is used).
+    :param float timeout: socket timeout, in seconds, applied to the
+        provider-list request made by this function and to the providers it
+        registers. Without a bounded default, a provider-list server that
+        accepts the connection and never replies blocks forever.
     :param kwargs: any default keyword arguments to use with providers, useful for
         specifying your API key
     :rtype: a ProviderRegistry with support for embed.ly
@@ -223,7 +233,7 @@ Providers
         pr.request('http://www.youtube.com/watch?v=54XHDUOHuzU')
 
 
-.. py:function:: bootstrap_noembed([cache=None[, registry=None[, refresh=False[, **kwargs]]])
+.. py:function:: bootstrap_noembed([cache=None[, registry=None[, refresh=False[, timeout=3.0[, **kwargs]]]])
 
     Create a :py:class:`ProviderRegistry` and register as many providers as
     are supported by `noembed.com <http://noembed.com>`_.  Valid services are
@@ -235,6 +245,10 @@ Providers
     :param cache: an object that implements simple ``get`` and ``set``
     :param registry: a ``ProviderRegistry`` instance, which will be updated with the list of supported providers. If not specified, an empty ``ProviderRegistry`` will be used.
     :param bool refresh: force refreshing the provider data rather than attempting to load it from cache (if cache is used).
+    :param float timeout: socket timeout, in seconds, applied to the
+        provider-list request made by this function and to the providers it
+        registers. Without a bounded default, a provider-list server that
+        accepts the connection and never replies blocks forever.
     :param kwargs: any default keyword arguments to use with providers, useful for
         passing the ``nowrap`` option to noembed.
     :rtype: a ProviderRegistry with support for noembed

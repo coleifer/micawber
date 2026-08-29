@@ -20,8 +20,12 @@ from micawber.parsers import parse_text
 from micawber.parsers import parse_text_full
 
 
+DEFAULT_TIMEOUT = 3.0
+
+
 class Provider(object):
-    def __init__(self, endpoint, timeout=3.0, user_agent=None, **kwargs):
+    def __init__(self, endpoint, timeout=DEFAULT_TIMEOUT, user_agent=None,
+                 **kwargs):
         self.endpoint = endpoint
         self.socket_timeout = timeout
         self.user_agent = user_agent or 'python-micawber'
@@ -99,19 +103,17 @@ def url_cache(fn):
     return inner
 
 
-def fetch(request, timeout=None):
-    urlopen_params = {}
-    if timeout:
-        urlopen_params['timeout'] = timeout
+def fetch(request, timeout=DEFAULT_TIMEOUT):
+    # urlopen's own default is to block forever, so always pass a timeout.
     # urlopen raises HTTPError for any non-2xx response, so no status check.
-    with urlopen(request, **urlopen_params) as resp:
+    with urlopen(request, timeout=timeout) as resp:
         # oEmbed responses are JSON, for which the default charset is UTF-8
         # (RFC 8259) -- many providers omit the charset parameter entirely.
         charset = resp.headers.get_param('charset') or 'utf-8'
         return resp.read().decode(charset)
 
 
-def fetch_cache(cache, url, refresh=False, timeout=None):
+def fetch_cache(cache, url, refresh=False, timeout=DEFAULT_TIMEOUT):
     contents = None
     if cache is not None and not refresh:
         contents = cache.get('micawber.%s' % url)
@@ -211,35 +213,37 @@ def bootstrap_basic(cache=None, registry=None):
     return pr
 
 
-def bootstrap_embedly(cache=None, registry=None, refresh=False, **params):
+def bootstrap_embedly(cache=None, registry=None, refresh=False,
+                      timeout=DEFAULT_TIMEOUT, **params):
     endpoint = 'https://api.embed.ly/1/oembed'
     schema_url = 'https://api.embed.ly/1/services/python'
 
     pr = registry or ProviderRegistry(cache)
 
     # fetch the schema
-    contents = fetch_cache(cache, schema_url, refresh=refresh)
+    contents = fetch_cache(cache, schema_url, refresh=refresh, timeout=timeout)
     json_data = json.loads(contents)
 
     for provider_meta in json_data:
         for regex in provider_meta['regex']:
-            pr.register(regex, Provider(endpoint, **params))
+            pr.register(regex, Provider(endpoint, timeout=timeout, **params))
     return pr
 
 
-def bootstrap_noembed(cache=None, registry=None, refresh=False, **params):
+def bootstrap_noembed(cache=None, registry=None, refresh=False,
+                      timeout=DEFAULT_TIMEOUT, **params):
     endpoint = 'https://noembed.com/embed'
     schema_url = 'https://noembed.com/providers'
 
     pr = registry or ProviderRegistry(cache)
 
     # fetch the schema
-    contents = fetch_cache(cache, schema_url, refresh=refresh)
+    contents = fetch_cache(cache, schema_url, refresh=refresh, timeout=timeout)
     json_data = json.loads(contents)
 
     for provider_meta in json_data:
         for regex in provider_meta['patterns']:
-            pr.register(regex, Provider(endpoint, **params))
+            pr.register(regex, Provider(endpoint, timeout=timeout, **params))
     return pr
 
 
@@ -259,12 +263,13 @@ def bootstrap_iframely(cache=None, registry=None, **params):
     return pr
 
 
-def bootstrap_oembed(cache=None, registry=None, refresh=False, **params):
+def bootstrap_oembed(cache=None, registry=None, refresh=False,
+                     timeout=DEFAULT_TIMEOUT, **params):
     schema_url = 'https://oembed.com/providers.json'
     pr = registry or ProviderRegistry(cache)
 
     # Fetch schema.
-    contents = fetch_cache(cache, schema_url, refresh=refresh)
+    contents = fetch_cache(cache, schema_url, refresh=refresh, timeout=timeout)
     json_data = json.loads(contents)
 
     for item in json_data:
@@ -280,7 +285,7 @@ def bootstrap_oembed(cache=None, registry=None, refresh=False, **params):
             if '{format}' in url:
                 url = url.replace('{format}', 'json')
 
-            provider = Provider(url, **params)
+            provider = Provider(url, timeout=timeout, **params)
             for scheme in endpoint['schemes']:
                 # Transform the raw scheme into a regex. Everything is escaped
                 # as a literal (dots, question-marks, etc.) except the "*"
@@ -292,6 +297,7 @@ def bootstrap_oembed(cache=None, registry=None, refresh=False, **params):
 
     # Currently oembed.com does not provide patterns for YouTube, so we'll add
     # these ourselves.
-    pr.register(youtube_re, Provider('https://www.youtube.com/oembed'))
+    pr.register(youtube_re, Provider('https://www.youtube.com/oembed',
+                                     timeout=timeout, **params))
 
     return pr
