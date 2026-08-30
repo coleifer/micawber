@@ -3,6 +3,9 @@ __version__ = '0.7.1'
 from micawber.cache import Cache
 from micawber.cache import PickleCache
 from micawber.exceptions import ProviderException
+from micawber.exceptions import ProviderHTTPException
+from micawber.exceptions import ProviderNotFoundException
+from micawber.exceptions import ProviderTimeoutException
 from micawber.exceptions import InvalidResponseException
 from micawber.parsers import extract
 from micawber.parsers import extract_html

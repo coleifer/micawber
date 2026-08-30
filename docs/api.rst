@@ -30,8 +30,20 @@ Providers
         with any parameters specified in the ``extra_params`` and those parameters
         specified when the class was instantiated.
 
-        Will raise a :py:class:`ProviderException` in the event the URL is not
-        accessible or the API times out.
+        Raises :py:class:`ProviderException` when the request fails. The
+        subclass says why, so a caller can cache a 404, report a 401, and
+        retry a timeout:
+
+        * :py:class:`ProviderHTTPException` for a non-2xx response, with the
+          code on ``.status``
+        * :py:class:`ProviderTimeoutException` when the endpoint does not
+          answer in time
+        * :py:class:`InvalidResponseException` when the body is not a JSON
+          object
+        * :py:class:`ProviderException` itself for anything else, such as a
+          refused connection or a bad charset
+
+        The underlying error is on ``__cause__``.
 
         :param url: URL to retrieve metadata for
         :param extra_params: additional parameters to pass to the endpoint, for

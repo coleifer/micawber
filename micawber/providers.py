@@ -13,7 +13,9 @@ from urllib.request import urlopen
 
 from micawber.exceptions import InvalidResponseException
 from micawber.exceptions import ProviderException
+from micawber.exceptions import ProviderHTTPException
 from micawber.exceptions import ProviderNotFoundException
+from micawber.exceptions import ProviderTimeoutException
 from micawber.parsers import extract
 from micawber.parsers import extract_html
 from micawber.parsers import parse_html
@@ -40,8 +42,13 @@ class Provider(object):
         req = Request(url, headers={'User-Agent': self.user_agent})
         try:
             return fetch(req, self.socket_timeout)
-        except (HTTPError, URLError, socket.timeout, ssl.SSLError,
+        except HTTPError as exc:
+            raise ProviderHTTPException(url, exc.code) from exc
+        except (URLError, socket.timeout, ssl.SSLError,
                 UnicodeDecodeError, LookupError) as exc:
+            if isinstance(exc, socket.timeout) or \
+               isinstance(getattr(exc, 'reason', None), socket.timeout):
+                raise ProviderTimeoutException('Timed out fetching "%s"' % url) from exc
             raise ProviderException('Error fetching "%s"' % url) from exc
 
     def encode_params(self, url, **extra_params):
