@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import re
+import time
 import socket
 import ssl
 
@@ -28,6 +29,7 @@ from micawber.parsers import parse_text_full
 logger = logging.getLogger('micawber')
 
 DEFAULT_TIMEOUT = 3.0
+NEGATIVE_TTL = 300
 PROVIDERS_URL = 'https://oembed.com/providers.json'
 PROVIDERS_FILE = os.path.join(os.path.dirname(__file__), 'providers.json')
 MAX_RESPONSE_SIZE = 20 * 1024 * 1024
@@ -129,10 +131,11 @@ def fetch_cache(cache, url, refresh=False, timeout=DEFAULT_TIMEOUT,
 
 
 class ProviderRegistry(object):
-    def __init__(self, cache=None, max_workers=None):
+    def __init__(self, cache=None, max_workers=None, negative_ttl=NEGATIVE_TTL):
         self._registry = {}
         self.cache = cache
         self.max_workers = max_workers
+        self.negative_ttl = negative_ttl
 
     def register(self, regex, provider, skip_invalid=False):
         try:
@@ -166,8 +169,17 @@ class ProviderRegistry(object):
             return provider.request(url, **params)
         key = make_key(url, params)
         data = self.cache.get(key)
+        if isinstance(data, float):
+            if time.time() - data < self.negative_ttl:
+                raise ProviderException('Recent failure fetching "%s"' % url)
+            data = None
         if data is None:
-            data = provider.request(url, **params)
+            try:
+                data = provider.request(url, **params)
+            except ProviderException:
+                if self.negative_ttl:
+                    self.cache.set(key, time.time())
+                raise
             self.cache.set(key, data)
         return data
 

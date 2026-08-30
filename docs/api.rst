@@ -52,7 +52,7 @@ Providers
         :rtype: a dictionary of JSON data
 
 
-.. py:class:: ProviderRegistry([cache=None[, max_workers=None]])
+.. py:class:: ProviderRegistry([cache=None[, max_workers=None[, negative_ttl=300]]])
 
     A registry for encapsulating a group of :py:class:`Provider` instances,
     with optional caching support.
@@ -68,6 +68,11 @@ Providers
     :param cache: the cache simply needs to implement two methods, ``.get(key)`` and ``.set(key, value)``.
     :param int max_workers: fetch the URLs in a document concurrently, using
         a thread pool of this size. Unset, requests are made one at a time.
+    :param int negative_ttl: seconds to remember that a provider failed for a
+        URL, so a dead link is not re-requested on every render. Within that
+        window the request raises ``ProviderException`` without touching the
+        provider. ``0`` disables it. Needs nothing from the cache beyond
+        ``get`` and ``set``.
 
     .. py:method:: register(regex, provider[, skip_invalid=False])
 
