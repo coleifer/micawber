@@ -41,7 +41,6 @@ class Provider(object):
             return fetch(req, self.socket_timeout)
         except (HTTPError, URLError, socket.timeout, ssl.SSLError,
                 UnicodeDecodeError, LookupError) as exc:
-            # LookupError covers unknown charset names from bytes.decode.
             raise ProviderException('Error fetching "%s"' % url) from exc
 
     def encode_params(self, url, **extra_params):
@@ -79,17 +78,18 @@ class Provider(object):
             json_data['url'] = url
         if 'title' not in json_data:
             json_data['title'] = json_data['url']
+        if 'type' not in json_data:
+            json_data['type'] = 'link'
 
         return json_data
 
 
 def make_key(*args, **kwargs):
-    # Serialized with json rather than pickle so that keys are stable across
-    # python versions and parameter ordering. Values json cannot represent
-    # fall back to their string form -- the same form urlencode gives them in
-    # the actual request.
-    data = json.dumps((args, kwargs), sort_keys=True, separators=(',', ':'),
-                      default=str)
+    data = json.dumps(
+        (args, kwargs),
+        sort_keys=True,
+        separators=(',', ':'),
+        default=str)
     return hashlib.md5(data.encode('utf-8')).hexdigest()
 
 
@@ -107,11 +107,7 @@ def url_cache(fn):
 
 
 def fetch(request, timeout=DEFAULT_TIMEOUT):
-    # urlopen's own default is to block forever, so always pass a timeout.
-    # urlopen raises HTTPError for any non-2xx response, so no status check.
     with urlopen(request, timeout=timeout) as resp:
-        # oEmbed responses are JSON, for which the default charset is UTF-8
-        # (RFC 8259) -- many providers omit the charset parameter entirely.
         charset = resp.headers.get_param('charset') or 'utf-8'
         return resp.read().decode(charset)
 
@@ -302,14 +298,20 @@ def bootstrap_oembed(cache=None, registry=None, refresh=False,
             for scheme in endpoint['schemes']:
                 # Transform the raw scheme into a regex. Everything is escaped
                 # as a literal (dots, question-marks, etc.) except the "*"
-                # wildcards, which match one or more of any character that is
-                # not a slash, whitespace, or a parameter used for separating
-                # querystring/url params.
-                pattern = re.escape(scheme).replace(r'\*', r'[^\/\s\?&]+?')
+                # wildcards.
+                #
+                # An interior wildcard matches one or more of any character
+                # that is not a slash, whitespace, or a querystring separator.
+                # A trailing wildcard takes the rest of the url instead.
+                pattern = re.escape(scheme)
+                if pattern.endswith(r'\*'):
+                    pattern = pattern[:-2] + r'\S*'
+                pattern = pattern.replace(r'\*', r'[^\/\s\?&]+?')
                 pr.register(pattern, provider)
 
-    # Currently oembed.com does not provide patterns for YouTube, so we'll add
-    # these ourselves.
+    # oembed.com's YouTube schemes are all "https://*.youtube.com/...", which
+    # require a subdomain, and it publishes no http:// schemes at all. Keep our
+    # own pattern to cover bare youtube.com and http urls.
     pr.register(youtube_re, Provider('https://www.youtube.com/oembed',
                                      timeout=timeout, **params))
 

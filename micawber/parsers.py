@@ -13,6 +13,9 @@ except ImportError:
 from micawber.exceptions import ProviderException
 
 
+scheme_re = re.compile(r'^[\s\x00-\x1f]*[a-z][a-z0-9+.\-]*:', re.I)
+http_scheme_re = re.compile(r'^[\s\x00-\x1f]*https?:', re.I)
+
 url_pattern = '(https?://[-A-Za-z0-9+&@#/%?=~_()|!:,.;]*[-A-Za-z0-9+&@#/%=~_|])'
 url_re = re.compile(url_pattern)
 standalone_url_re = re.compile(r'^\s*' + url_pattern + r'\s*$')
@@ -34,32 +37,37 @@ skip_elements = set([
 ])
 
 
-def _escape_data(response_data):
+def _safe_url(candidate, fallback):
+    # Replace any non-http(s) scheme (e.g. javascript:).
+    if scheme_re.match(candidate) and not http_scheme_re.match(candidate):
+        return fallback
+    return candidate
+
+def _escape_data(url, response_data):
     # The url and title in a provider response frequently contain end-user
     # content (e.g. video titles) and cannot be trusted in html.
     return {
-        'url': escape(str(response_data['url'])),
+        'url': escape(_safe_url(str(response_data['url']), url)),
         'title': escape(str(response_data['title']))}
 
 def full_handler(url, response_data, **params):
-    if response_data['type'] == 'link':
-        return '<a href="%(url)s" title="%(title)s">%(title)s</a>' % _escape_data(response_data)
-    elif response_data['type'] == 'photo':
-        return '<a href="%(url)s" title="%(title)s"><img alt="%(title)s" src="%(url)s" /></a>' % _escape_data(response_data)
-    else:
+    data_type = response_data.get('type')
+    if data_type == 'photo':
+        return '<a href="%(url)s" title="%(title)s"><img alt="%(title)s" src="%(url)s" /></a>' % _escape_data(url, response_data)
+    elif data_type != 'link':
         html = response_data.get('html')
-        if html is None:
-            return '<a href="%(url)s" title="%(title)s">%(title)s</a>' % _escape_data(response_data)
-        return html
+        if html is not None:
+            return html
+    return '<a href="%(url)s" title="%(title)s">%(title)s</a>' % _escape_data(url, response_data)
 
 def inline_handler(url, response_data, **params):
-    return '<a href="%(url)s" title="%(title)s">%(title)s</a>' % _escape_data(response_data)
+    return '<a href="%(url)s" title="%(title)s">%(title)s</a>' % _escape_data(url, response_data)
 
 def urlize(url, **params):
     params.setdefault('href', url)
-    param_html = ' '.join('%s="%s"' % (key, value)
+    param_html = ' '.join('%s="%s"' % (key, escape(str(value)))
                           for key, value in sorted(params.items()))
-    return '<a %s>%s</a>' % (param_html, url)
+    return '<a %s>%s</a>' % (param_html, escape(url))
 
 class _RequestMemo(object):
     # Collapse repeated requests (or failures) for the same url within a
@@ -204,7 +212,6 @@ def _is_standalone(soup_elem):
     return False
 
 def _inside_skip(soup_elem):
-    # Comment nodes match url_re as strings; leave them like script/style skips.
     if Comment is not None and isinstance(soup_elem, Comment):
         return True
     parent = soup_elem.parent
