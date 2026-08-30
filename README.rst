@@ -23,14 +23,15 @@ here is a quick example:
     # load up rules for some default providers, such as youtube and flickr
     providers = micawber.bootstrap_basic()
 
-    providers.request('https://www.youtube.com/watch?v=54XHDUOHuzU', maxwidth=640)
+    # youtube defaults maxwidth and maxheight to 200 each, so pass both.
+    providers.request('https://www.youtube.com/watch?v=54XHDUOHuzU', maxwidth=640, maxheight=480)
 
     # returns the following dictionary:
     {
         'author_name': 'Pascal Brax',
         'author_url': 'https://www.youtube.com/@PascalBrax',
-        'height': 360,
-        'html': '<iframe width="640" height="360" src="https://www.youtube.com/embed/54XHDUOHuzU?feature=oembed" ...></iframe>',
+        'height': 480,
+        'html': '<iframe width="640" height="480" src="https://www.youtube.com/embed/54XHDUOHuzU?feature=oembed" ...></iframe>',
         'provider_name': 'YouTube',
         'provider_url': 'https://www.youtube.com/',
         'thumbnail_height': 360,

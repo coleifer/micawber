@@ -44,7 +44,7 @@ The following filters are exposed via the :py:mod:`micawber.contrib.mcflask` mod
 
     .. code-block:: python
 
-        {{ blog_entry.body|oembed(urlize_all=False, maxwidth=600) }}
+        {{ blog_entry.body|oembed(urlize_all=False, maxwidth=600, maxheight=600) }}
 
     :param text: the text to be parsed, can be HTML
     :param urlize_all: boolean indicating whether to convert bare links to clickable ones
