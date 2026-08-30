@@ -56,7 +56,7 @@ for pr in (test_pr, test_pr_cache):
 
 class BaseTestCase(unittest.TestCase):
     def setUp(self):
-        test_cache._cache = {}
+        test_cache._cache.clear()
 
         self.full_pairs = {
             'http://link-test1': '<a href="http://link-test1" title="test1">test1</a>',

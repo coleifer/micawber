@@ -24,6 +24,7 @@ from micawber.parsers import parse_text_full
 logger = logging.getLogger('micawber')
 
 DEFAULT_TIMEOUT = 3.0
+MAX_RESPONSE_SIZE = 20 * 1024 * 1024
 
 
 class Provider(object):
@@ -106,18 +107,22 @@ def url_cache(fn):
     return inner
 
 
-def fetch(request, timeout=DEFAULT_TIMEOUT):
+def fetch(request, timeout=DEFAULT_TIMEOUT, max_bytes=MAX_RESPONSE_SIZE):
     with urlopen(request, timeout=timeout) as resp:
         charset = resp.headers.get_param('charset') or 'utf-8'
-        return resp.read().decode(charset)
+        data = resp.read(max_bytes + 1)
+    if len(data) > max_bytes:
+        raise ProviderException('Response larger than %d bytes' % max_bytes)
+    return data.decode(charset)
 
 
-def fetch_cache(cache, url, refresh=False, timeout=DEFAULT_TIMEOUT):
+def fetch_cache(cache, url, refresh=False, timeout=DEFAULT_TIMEOUT,
+                max_bytes=MAX_RESPONSE_SIZE):
     contents = None
     if cache is not None and not refresh:
         contents = cache.get('micawber.%s' % url)
     if contents is None:
-        contents = fetch(url, timeout=timeout)
+        contents = fetch(url, timeout=timeout, max_bytes=max_bytes)
         if cache is not None:
             cache.set('micawber.%s' % url, contents)
     return contents
@@ -137,6 +142,8 @@ class ProviderRegistry(object):
             logger.warning('Skipping unusable provider pattern %r: %s',
                            regex, exc)
             return
+        if regex in self._registry:
+            logger.debug('Replacing provider registered for %r', regex)
         self._registry[regex] = (pattern, provider)
 
     def unregister(self, regex):

@@ -162,7 +162,7 @@ class ProviderTestCase(BaseTestCase):
                 self.headers['Content-Type'] = (
                     'application/json; charset=%s' % charset)
 
-            def read(self):
+            def read(self, n=-1):
                 return self._body
 
             def __enter__(self):
