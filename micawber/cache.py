@@ -1,4 +1,5 @@
 import pickle
+from collections import OrderedDict
 try:
     from redis import Redis
 except ImportError:
@@ -6,20 +7,28 @@ except ImportError:
 
 
 class Cache(object):
-    def __init__(self):
-        self._cache = {}
+    def __init__(self, max_size=1024):
+        self.max_size = max_size
+        self._cache = OrderedDict()
 
     def get(self, k):
-        return self._cache.get(k)
+        if k not in self._cache:
+            return None
+        self._cache.move_to_end(k)
+        return self._cache[k]
 
     def set(self, k, v):
         self._cache[k] = v
+        self._cache.move_to_end(k)
+        while self.max_size and len(self._cache) > self.max_size:
+            self._cache.popitem(last=False)
 
 
 class PickleCache(Cache):
-    def __init__(self, filename='cache.db'):
+    def __init__(self, filename='cache.db', max_size=None):
+        super(PickleCache, self).__init__(max_size)
         self.filename = filename
-        self._cache = self.load()
+        self._cache.update(self.load())
 
     def load(self):
         try:
