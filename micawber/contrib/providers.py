@@ -12,7 +12,7 @@ class ImageProvider(Provider):
     pr = micawber.bootstrap_basic()
     pr.register(ImageProvider.regex, ImageProvider(''))
     """
-    regex = r'http://.+?\.(jpg|gif|png)'
+    regex = r'(?i)https?://\S+\.(?:jpe?g|gif|png|webp|avif|svg)'
 
     def request(self, url, **params):
         return {
