@@ -206,23 +206,42 @@ Providers
     :rtype: a ``ProviderRegistry`` with a handful of providers registered
 
 
-.. py:function:: bootstrap_oembed([cache=None[, registry=None[, refresh=False[, timeout=3.0[, **kwargs]]]])
+.. py:function:: bootstrap_oembed([cache=None[, registry=None[, refresh=False[, timeout=3.0[, providers_file=None[, **kwargs]]]]])
 
     Create a :py:class:`ProviderRegistry` and register as many providers as
     are described in the `oembed.com <https://oembed.com>`_ providers list.
 
-    .. note::
-        This function makes a request over the internet whenever it is called.
+    By default the list is read from the copy shipped with micawber, so no
+    request is made. To use a newer list without waiting for a release,
+    either pass ``refresh=True`` to fetch it live, or regenerate a local copy
+    and point ``providers_file`` at it::
+
+        python -m micawber my_providers.json
+
+    Run with no argument, that command updates the copy inside the installed
+    package instead. The same thing is available as
+    :py:func:`refresh_providers`.
 
     :param cache: an object that implements simple ``get`` and ``set``
     :param registry: a ``ProviderRegistry`` instance, which will be updated with the list of supported providers. If not specified, an empty ``ProviderRegistry`` will be used.
-    :param bool refresh: force refreshing the provider data rather than attempting to load it from cache (if cache is used).
+    :param bool refresh: fetch the list from oembed.com instead of reading a
+        file. The result is stored in ``cache`` if one is given.
+    :param str providers_file: path to a provider list to read instead of
+        the shipped one. Ignored when ``refresh`` is set.
     :param float timeout: socket timeout, in seconds, applied to the
         provider-list request made by this function and to the providers it
         registers. Without a bounded default, a provider-list server that
         accepts the connection and never replies blocks forever.
     :param kwargs: any default keyword arguments to use with providers
     :rtype: a ProviderRegistry with support for noembed
+
+
+.. py:function:: refresh_providers([path])
+
+    Download the current oembed.com provider list and write it to ``path``,
+    which defaults to the copy inside the installed package. The download is
+    checked to be a JSON array before anything is overwritten. Returns the
+    path written.
 
 
 .. py:function:: bootstrap_embedly([cache=None[, registry=None[, refresh=False[, timeout=3.0[, **kwargs]]]])

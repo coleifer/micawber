@@ -1,6 +1,7 @@
 import hashlib
 import json
 import logging
+import os
 import re
 import socket
 import ssl
@@ -26,6 +27,8 @@ from micawber.parsers import parse_text_full
 logger = logging.getLogger('micawber')
 
 DEFAULT_TIMEOUT = 3.0
+PROVIDERS_URL = 'https://oembed.com/providers.json'
+PROVIDERS_FILE = os.path.join(os.path.dirname(__file__), 'providers.json')
 MAX_RESPONSE_SIZE = 20 * 1024 * 1024
 
 
@@ -289,12 +292,15 @@ def bootstrap_iframely(cache=None, registry=None, **params):
 
 
 def bootstrap_oembed(cache=None, registry=None, refresh=False,
-                     timeout=DEFAULT_TIMEOUT, **params):
-    schema_url = 'https://oembed.com/providers.json'
+                     timeout=DEFAULT_TIMEOUT, providers_file=None, **params):
     pr = registry or ProviderRegistry(cache)
 
-    # Fetch schema.
-    contents = fetch_cache(cache, schema_url, refresh=refresh, timeout=timeout)
+    if refresh:
+        contents = fetch_cache(cache, PROVIDERS_URL, refresh=True,
+                               timeout=timeout)
+    else:
+        with open(providers_file or PROVIDERS_FILE) as fh:
+            contents = fh.read()
     json_data = json.loads(contents)
 
     for item in json_data:
@@ -332,3 +338,12 @@ def bootstrap_oembed(cache=None, registry=None, refresh=False,
                                      timeout=timeout, **params))
 
     return pr
+
+
+def refresh_providers(path=PROVIDERS_FILE):
+    contents = fetch(PROVIDERS_URL)
+    if not isinstance(json.loads(contents), list):
+        raise InvalidResponseException('Provider list is not a JSON array')
+    with open(path, 'w') as fh:
+        fh.write(contents)
+    return path
