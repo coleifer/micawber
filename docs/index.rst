@@ -31,8 +31,7 @@ here is a quick example:
     # load up rules for some default providers, such as youtube and flickr
     providers = micawber.bootstrap_basic()
 
-    # youtube defaults maxwidth and maxheight to 200 each, so pass both.
-    providers.request('https://www.youtube.com/watch?v=54XHDUOHuzU', maxwidth=640, maxheight=480)
+    providers.request('https://www.youtube.com/watch?v=54XHDUOHuzU', maxwidth=640)
 
     # returns the following dictionary:
     {

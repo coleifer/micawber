@@ -138,6 +138,16 @@ class ProviderTestCase(BaseTestCase):
                                      'maxwidth': Decimal('600')})
         self.assertEqual(k1, k2)
 
+    def test_encode_params_maxheight(self):
+        from urllib.parse import parse_qs
+        provider = Provider('http://example.com/oembed')
+        def params(**kw):
+            return parse_qs(provider.encode_params('http://u', **kw))
+        self.assertNotIn('maxheight', params())
+        self.assertEqual(params(maxwidth=720)['maxheight'], ['1280'])
+        self.assertEqual(params(maxwidth=720, maxheight=400)['maxheight'],
+                         ['400'])
+
     def test_cache_falsy_value(self):
         from micawber.providers import make_key
         # A cached falsy value is a hit, not a miss -- link-test3 is unknown
