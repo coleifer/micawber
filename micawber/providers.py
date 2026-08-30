@@ -47,9 +47,7 @@ class Provider(object):
     def encode_params(self, url, **extra_params):
         params = dict(self.base_params)
         params.update(extra_params)
-        # YouTube caps height at 200 unless told otherwise, so a width on its
-        # own gets a tiny embed.
-        if 'maxwidth' in params and 'maxheight' not in params:
+        if 'maxwidth' in params and not params.get('maxheight'):
             params['maxheight'] = int(params['maxwidth']) * 16 // 9
         params['url'] = url
         return urlencode(sorted(params.items()))
