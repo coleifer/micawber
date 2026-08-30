@@ -52,7 +52,7 @@ def full_handler(url, response_data, **params):
     data_type = response_data.get('type')
     if data_type == 'photo':
         return ('<a href="%(url)s" title="%(title)s">'
-                '<img alt="%(title)s" src="%(url)s" />'
+                '<img alt="%(title)s" src="%(url)s" loading="lazy" decoding="async" />'
                 '</a>' % _escape_data(url, response_data))
     elif data_type != 'link':
         html = response_data.get('html')

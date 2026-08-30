@@ -60,10 +60,10 @@ class BaseTestCase(unittest.TestCase):
 
         self.full_pairs = {
             'http://link-test1': '<a href="http://link-test1" title="test1">test1</a>',
-            'http://photo-test2': '<a href="test2.jpg" title="ptest2"><img alt="ptest2" src="test2.jpg" /></a>',
+            'http://photo-test2': '<a href="test2.jpg" title="ptest2"><img alt="ptest2" src="test2.jpg" loading="lazy" decoding="async" /></a>',
             'http://video-test1': '<test1>video</test1>',
             'http://rich-test2': '<test2>rich</test2>',
-            'http://photo-notitle': '<a href="notitle.jpg" title="notitle.jpg"><img alt="notitle.jpg" src="notitle.jpg" /></a>',
+            'http://photo-notitle': '<a href="notitle.jpg" title="notitle.jpg"><img alt="notitle.jpg" src="notitle.jpg" loading="lazy" decoding="async" /></a>',
         }
 
         self.inline_pairs = {

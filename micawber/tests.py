@@ -327,7 +327,7 @@ class EscapingTestCase(BaseTestCase):
     def test_unsafe_url_escaped(self):
         url = 'test.jpg&quot; onload=&quot;alert(0)'
         expected = ('<a href="%(url)s" title="pic">'
-                    '<img alt="pic" src="%(url)s" /></a>' % {'url': url})
+                    '<img alt="pic" src="%(url)s" loading="lazy" decoding="async" /></a>' % {'url': url})
         self.assertEqual(test_pr.parse_text('http://photo-unsafe'), expected)
 
     def test_response_html_not_escaped(self):
