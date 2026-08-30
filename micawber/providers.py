@@ -192,49 +192,41 @@ class ProviderRegistry(object):
         return extract_html(html, self, **kwargs)
 
 
-youtube_re = r'https?://(?:\S*\.)?youtu(?:\.be/|be\.com/(?:watch|shorts/))\S+'
+youtube_re = r'https?://(?:\S*\.)?youtu(?:\.be/|be\.com/(?:watch|shorts/|live/|playlist))\S+'
 
 def bootstrap_basic(cache=None, registry=None):
-    # complements of oembed.com#section7
     pr = registry or ProviderRegistry(cache)
+    providers = (
+        (r'https://podcasts\.apple\.com/\S+', 'https://podcasts.apple.com/api/oembed'),
+        (r'https://music\.apple\.com/\S+', 'https://music.apple.com/api/oembed'),
+        (r'https://bsky\.app/profile/\S+/post/\S+', 'https://embed.bsky.app/oembed'),
+        (r'https?://(?:www\.)?dailymotion\.com/video/\S+', 'https://www.dailymotion.com/services/oembed'),
+        (r'https://www\.facebook\.com/\S+', 'https://graph.facebook.com/v16.0/oembed_page'),
+        (r'https://www\.facebook\.com/\S+/(?:posts|activity|photos)/\S+', 'https://graph.facebook.com/v16.0/oembed_post'),
+        (r'https://www\.facebook\.com/(?:photo|permalink)\.php\?\S+', 'https://graph.facebook.com/v16.0/oembed_post'),
+        (r'https://www\.facebook\.com/\S+/videos/\S+', 'https://graph.facebook.com/v16.0/oembed_video'),
+        (r'https://www\.facebook\.com/video\.php\?\S+', 'https://graph.facebook.com/v16.0/oembed_video'),
+        (r'https?://\S*?flickr\.com/\S+', 'https://www.flickr.com/services/oembed/'),
+        (r'https?://flic\.kr/\S+', 'https://www.flickr.com/services/oembed/'),
+        (r'https?://(?:www\.)?giphy\.com/(?:gifs|clips)/\S+', 'https://giphy.com/services/oembed'),
+        (r'https?://gph\.is/\S+', 'https://giphy.com/services/oembed'),
+        (r'https?://(?:www\.)?instagr(?:\.am|am\.com)/(?:\S+/)?(?:p|reel|tv)/\S+', 'https://graph.facebook.com/v16.0/instagram_oembed'),
+        (r'https?://(?:www\.)?pinterest\.com/pin/\S+', 'https://www.pinterest.com/oembed.json'),
+        (r'https?://(?:www\.)?reddit\.com/r/\S+/comments/\S+', 'https://www.reddit.com/oembed'),
+        (r'https?://\S*?soundcloud\.com/\S+', 'https://soundcloud.com/oembed'),
+        (r'https://open\.spotify\.com/\S+', 'https://open.spotify.com/oembed'),
+        (r'https://spotify\.link/\S+', 'https://open.spotify.com/oembed'),
+        (r'https?://(?:www\.)?tiktok\.com/\S+', 'https://www.tiktok.com/oembed'),
+        (r'https?://\S+\.tumblr\.com/post/\S+', 'https://www.tumblr.com/oembed/1.0'),
+        (r'https?://(?:www\.)?(?:twitter|x)\.com/\S+/status(?:es)?/\S+', 'https://publish.x.com/oembed'),
+        (r'https?://(?:player\.)?vimeo\.com/\S+', 'https://vimeo.com/api/oembed.json'),
+        (youtube_re, 'https://www.youtube.com/oembed'),
+    )
+    for regex, endpoint in providers:
+        pr.register(regex, Provider(endpoint))
 
-    # a
-    pr.register(r'https://podcasts\.apple\.com/\S+', Provider('https://podcasts.apple.com/api/oembed'))
-
-    # c
-    pr.register(r'https?://www\.circuitlab\.com/circuit/\S+', Provider('https://www.circuitlab.com/circuit/oembed/'))
-
-    # d
-    pr.register(r'https?://(?:www\.)?dailymotion\.com/\S+', Provider('https://www.dailymotion.com/services/oembed'))
-
-    # f
-    pr.register(r'https?://\S*?flickr\.com/\S+', Provider('https://www.flickr.com/services/oembed/'))
-    pr.register(r'https?://flic\.kr/\S*', Provider('https://www.flickr.com/services/oembed/'))
-
-    # p
-    pr.register(r'https?://(?:www\.)?polleverywhere\.com/(polls|multiple_choice_polls|free_text_polls)/\S+', Provider('https://www.polleverywhere.com/services/oembed/'))
-
-    # s
-    pr.register(r'https?://(?:www\.)?slideshare\.net/[^\/]+/\S+', Provider('https://www.slideshare.net/api/oembed/2'))
-    pr.register(r'https?://slidesha\.re/\S*', Provider('https://www.slideshare.net/api/oembed/2'))
-    pr.register(r'https?://\S*?soundcloud\.com/\S+', Provider('https://soundcloud.com/oembed'))
-    pr.register(r'https?://speakerdeck\.com/\S*', Provider('https://speakerdeck.com/oembed.json'))
-    pr.register(r'https?://(?:www\.)?scribd\.com/\S*', Provider('https://www.scribd.com/services/oembed'))
-
-    # t
-    pr.register(r'https?://(?:www\.)?tiktok\.com/\S+', Provider('https://www.tiktok.com/oembed'))
-    pr.register(r'https?://(?:www\.)?(?:twitter|x)\.com/\S+/status(?:es)?/\S+', Provider('https://publish.x.com/oembed'))
-
-    # v
-    pr.register(r'https?://(?:player\.)?vimeo\.com/\S+', Provider('https://vimeo.com/api/oembed.json'))
-
-    # w
     # wordpress.com requires identifying yourself via the "for" parameter.
-    pr.register(r'https?://\S+\.wordpress\.com/\S+', Provider('https://public-api.wordpress.com/oembed/', **{'for': 'micawber'}))
-    pr.register(r'https?://wordpress\.tv/\S+', Provider('https://wordpress.tv/oembed/'))
-
-    # y
-    pr.register(youtube_re, Provider('https://www.youtube.com/oembed'))
+    pr.register(r'https?://(?:\S+\.)?wordpress\.com/\S+', Provider('https://public-api.wordpress.com/oembed/', **{'for': 'micawber'}))
 
     return pr
 

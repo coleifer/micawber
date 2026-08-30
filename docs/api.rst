@@ -198,8 +198,12 @@ Providers
 
 .. py:function:: bootstrap_basic([cache=None[, registry=None]])
 
-    Create a :py:class:`ProviderRegistry` and register some basic providers,
-    including youtube, flickr, vimeo.
+    Create a :py:class:`ProviderRegistry` with the major platforms
+    registered: YouTube, Vimeo, X, TikTok, Instagram, Facebook, Reddit,
+    Spotify, Bluesky, SoundCloud, Flickr, Giphy, Pinterest, Tumblr,
+    Dailymotion, Apple Podcasts, Apple Music and WordPress.com. Every
+    endpoint was verified live against a real URL. No request is made by
+    this function itself. For the long tail, use :py:func:`bootstrap_oembed`.
 
     :param cache: an object that implements simple ``get`` and ``set``
     :param registry: a ``ProviderRegistry`` instance, which will be updated with the list of supported providers. If not specified, an empty ``ProviderRegistry`` will be used.
