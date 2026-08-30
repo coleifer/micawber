@@ -211,8 +211,8 @@ class ProviderRegistry(object):
 
 youtube_re = r'https?://(?:\S*\.)?youtu(?:\.be/|be\.com/(?:watch|shorts/|live/|playlist))\S+'
 
-def bootstrap_basic(cache=None, registry=None):
-    pr = registry or ProviderRegistry(cache)
+def bootstrap_basic(cache=None, registry=None, max_workers=None):
+    pr = registry or ProviderRegistry(cache, max_workers=max_workers)
     providers = (
         (r'https://podcasts\.apple\.com/\S+', 'https://podcasts.apple.com/api/oembed'),
         (r'https://music\.apple\.com/\S+', 'https://music.apple.com/api/oembed'),
@@ -249,11 +249,11 @@ def bootstrap_basic(cache=None, registry=None):
 
 
 def bootstrap_embedly(cache=None, registry=None, refresh=False,
-                      timeout=DEFAULT_TIMEOUT, **params):
+                      timeout=DEFAULT_TIMEOUT, max_workers=None, **params):
     endpoint = 'https://api.embed.ly/1/oembed'
     schema_url = 'https://api.embed.ly/1/services/python'
 
-    pr = registry or ProviderRegistry(cache)
+    pr = registry or ProviderRegistry(cache, max_workers=max_workers)
 
     # fetch the schema
     contents = fetch_cache(cache, schema_url, refresh=refresh, timeout=timeout)
@@ -267,11 +267,11 @@ def bootstrap_embedly(cache=None, registry=None, refresh=False,
 
 
 def bootstrap_noembed(cache=None, registry=None, refresh=False,
-                      timeout=DEFAULT_TIMEOUT, **params):
+                      timeout=DEFAULT_TIMEOUT, max_workers=None, **params):
     endpoint = 'https://noembed.com/embed'
     schema_url = 'https://noembed.com/providers'
 
-    pr = registry or ProviderRegistry(cache)
+    pr = registry or ProviderRegistry(cache, max_workers=max_workers)
 
     # fetch the schema
     contents = fetch_cache(cache, schema_url, refresh=refresh, timeout=timeout)
@@ -284,14 +284,14 @@ def bootstrap_noembed(cache=None, registry=None, refresh=False,
     return pr
 
 
-def bootstrap_iframely(cache=None, registry=None, **params):
+def bootstrap_iframely(cache=None, registry=None, max_workers=None, **params):
     # Iframely requires authentication, either an "api_key" parameter or a
     # "key" parameter containing the md5 hexdigest of the api key.
     if not params.get('api_key') and not params.get('key'):
         raise ValueError('bootstrap_iframely() requires an "api_key" (or '
                          'md5-hashed "key") parameter.')
 
-    pr = registry or ProviderRegistry(cache)
+    pr = registry or ProviderRegistry(cache, max_workers=max_workers)
 
     # Iframely recommends sending all urls to the API rather than matching
     # against a list of supported providers, so register a catch-all pattern.
@@ -301,8 +301,9 @@ def bootstrap_iframely(cache=None, registry=None, **params):
 
 
 def bootstrap_oembed(cache=None, registry=None, refresh=False,
-                     timeout=DEFAULT_TIMEOUT, providers_file=None, **params):
-    pr = registry or ProviderRegistry(cache)
+                     timeout=DEFAULT_TIMEOUT, providers_file=None,
+                     max_workers=None, **params):
+    pr = registry or ProviderRegistry(cache, max_workers=max_workers)
 
     if refresh:
         contents = fetch_cache(cache, PROVIDERS_URL, refresh=True,

@@ -209,7 +209,7 @@ Providers
             for a URL it is not listed in the dictionary.
 
 
-.. py:function:: bootstrap_basic([cache=None[, registry=None]])
+.. py:function:: bootstrap_basic([cache=None[, registry=None[, max_workers=None]]])
 
     Create a :py:class:`ProviderRegistry` with the major platforms
     registered: YouTube, Vimeo, X, TikTok, Instagram, Facebook, Reddit,
@@ -220,10 +220,13 @@ Providers
 
     :param cache: an object that implements simple ``get`` and ``set``
     :param registry: a ``ProviderRegistry`` instance, which will be updated with the list of supported providers. If not specified, an empty ``ProviderRegistry`` will be used.
+    :param int max_workers: thread pool size for the registry this function
+        creates, as :py:class:`ProviderRegistry` takes it. Ignored when
+        ``registry`` is given, since that registry already has its own.
     :rtype: a ``ProviderRegistry`` with a handful of providers registered
 
 
-.. py:function:: bootstrap_oembed([cache=None[, registry=None[, refresh=False[, timeout=3.0[, providers_file=None[, **kwargs]]]]])
+.. py:function:: bootstrap_oembed([cache=None[, registry=None[, refresh=False[, timeout=3.0[, providers_file=None[, max_workers=None[, **kwargs]]]]]])
 
     Create a :py:class:`ProviderRegistry` and register as many providers as
     are described in the `oembed.com <https://oembed.com>`_ providers list.
@@ -241,6 +244,9 @@ Providers
 
     :param cache: an object that implements simple ``get`` and ``set``
     :param registry: a ``ProviderRegistry`` instance, which will be updated with the list of supported providers. If not specified, an empty ``ProviderRegistry`` will be used.
+    :param int max_workers: thread pool size for the registry this function
+        creates, as :py:class:`ProviderRegistry` takes it. Ignored when
+        ``registry`` is given, since that registry already has its own.
     :param bool refresh: fetch the list from oembed.com instead of reading a
         file. The result is stored in ``cache`` if one is given.
     :param str providers_file: path to a provider list to read instead of
@@ -261,7 +267,7 @@ Providers
     path written.
 
 
-.. py:function:: bootstrap_embedly([cache=None[, registry=None[, refresh=False[, timeout=3.0[, **kwargs]]]])
+.. py:function:: bootstrap_embedly([cache=None[, registry=None[, refresh=False[, timeout=3.0[, max_workers=None[, **kwargs]]]]])
 
     Create a :py:class:`ProviderRegistry` and register as many providers as
     are supported by `embed.ly <https://embed.ly>`_. Valid services are
@@ -272,6 +278,9 @@ Providers
 
     :param cache: an object that implements simple ``get`` and ``set``
     :param registry: a ``ProviderRegistry`` instance, which will be updated with the list of supported providers. If not specified, an empty ``ProviderRegistry`` will be used.
+    :param int max_workers: thread pool size for the registry this function
+        creates, as :py:class:`ProviderRegistry` takes it. Ignored when
+        ``registry`` is given, since that registry already has its own.
     :param bool refresh: force refreshing the provider data rather than attempting to load it from cache (if cache is used).
     :param float timeout: socket timeout, in seconds, applied to the
         provider-list request made by this function and to the providers it
@@ -288,7 +297,7 @@ Providers
         pr.request('https://www.youtube.com/watch?v=54XHDUOHuzU')
 
 
-.. py:function:: bootstrap_noembed([cache=None[, registry=None[, refresh=False[, timeout=3.0[, **kwargs]]]])
+.. py:function:: bootstrap_noembed([cache=None[, registry=None[, refresh=False[, timeout=3.0[, max_workers=None[, **kwargs]]]]])
 
     Create a :py:class:`ProviderRegistry` and register as many providers as
     are supported by `noembed.com <https://noembed.com>`_. Valid services are
@@ -299,6 +308,9 @@ Providers
 
     :param cache: an object that implements simple ``get`` and ``set``
     :param registry: a ``ProviderRegistry`` instance, which will be updated with the list of supported providers. If not specified, an empty ``ProviderRegistry`` will be used.
+    :param int max_workers: thread pool size for the registry this function
+        creates, as :py:class:`ProviderRegistry` takes it. Ignored when
+        ``registry`` is given, since that registry already has its own.
     :param bool refresh: force refreshing the provider data rather than attempting to load it from cache (if cache is used).
     :param float timeout: socket timeout, in seconds, applied to the
         provider-list request made by this function and to the providers it
@@ -315,7 +327,7 @@ Providers
         pr.request('https://www.youtube.com/watch?v=54XHDUOHuzU')
 
 
-.. py:function:: bootstrap_iframely([cache=None[, registry=None[, **kwargs]]])
+.. py:function:: bootstrap_iframely([cache=None[, registry=None[, max_workers=None[, **kwargs]]]])
 
     Create a :py:class:`ProviderRegistry` that routes requests through
     `iframely <https://iframely.com/>`_, a commercial oEmbed proxy supporting
@@ -329,6 +341,9 @@ Providers
 
     :param cache: an object that implements simple ``get`` and ``set``
     :param registry: a ``ProviderRegistry`` instance, which will be updated with the list of supported providers. If not specified, an empty ``ProviderRegistry`` will be used.
+    :param int max_workers: thread pool size for the registry this function
+        creates, as :py:class:`ProviderRegistry` takes it. Ignored when
+        ``registry`` is given, since that registry already has its own.
     :param kwargs: any default keyword arguments to use with providers - must
         include ``api_key`` or ``key``.
     :rtype: a ProviderRegistry with support for iframely
