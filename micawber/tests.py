@@ -94,6 +94,17 @@ class ProviderTestCase(BaseTestCase):
         self.assertRaises(ProviderException, test_pr.request, 'http://not-here')
         self.assertRaises(ProviderException, test_pr.request, 'http://link-test3')
 
+    def test_no_provider_skips_cache(self):
+        from micawber.providers import make_key
+        with mock.patch.object(test_cache, 'get', return_value=None) as get:
+            self.assertRaises(ProviderNotFoundException, test_pr_cache.request,
+                              'http://nothing-matches')
+            urls, data = test_pr_cache.extract(
+                'http://nothing-matches http://link-test1')
+        get.assert_called_once_with(make_key('http://link-test1', {}))
+        self.assertEqual(urls, ['http://nothing-matches', 'http://link-test1'])
+        self.assertEqual(list(data), ['http://link-test1'])
+
     def test_caching(self):
         resp = test_pr_cache.request('http://link-test1')
         self.assertCached('http://link-test1', resp)
