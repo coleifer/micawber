@@ -107,19 +107,6 @@ def make_key(*args, **kwargs):
     return hashlib.md5(data.encode('utf-8')).hexdigest()
 
 
-def url_cache(fn):
-    def inner(self, url, **params):
-        if self.cache is not None:
-            key = make_key(url, params)
-            data = self.cache.get(key)
-            if data is None:
-                data = fn(self, url, **params)
-                self.cache.set(key, data)
-            return data
-        return fn(self, url, **params)
-    return inner
-
-
 def fetch(request, timeout=DEFAULT_TIMEOUT, max_bytes=MAX_RESPONSE_SIZE):
     with urlopen(request, timeout=timeout) as resp:
         charset = resp.headers.get_param('charset') or 'utf-8'
@@ -171,12 +158,18 @@ class ProviderRegistry(object):
             if pattern.match(url):
                 return provider
 
-    @url_cache
     def request(self, url, **params):
         provider = self.provider_for_url(url)
-        if provider:
+        if provider is None:
+            raise ProviderNotFoundException('Provider not found for "%s"' % url)
+        if self.cache is None:
             return provider.request(url, **params)
-        raise ProviderNotFoundException('Provider not found for "%s"' % url)
+        key = make_key(url, params)
+        data = self.cache.get(key)
+        if data is None:
+            data = provider.request(url, **params)
+            self.cache.set(key, data)
+        return data
 
     def request_many(self, urls, **params):
         def attempt(url):
