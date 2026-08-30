@@ -6,6 +6,7 @@ import re
 import socket
 import ssl
 
+from concurrent.futures import ThreadPoolExecutor
 from urllib.error import HTTPError
 from urllib.error import URLError
 from urllib.parse import urlencode
@@ -141,9 +142,10 @@ def fetch_cache(cache, url, refresh=False, timeout=DEFAULT_TIMEOUT,
 
 
 class ProviderRegistry(object):
-    def __init__(self, cache=None):
+    def __init__(self, cache=None, max_workers=None):
         self._registry = {}
         self.cache = cache
+        self.max_workers = max_workers
 
     def register(self, regex, provider, skip_invalid=False):
         try:
@@ -175,6 +177,21 @@ class ProviderRegistry(object):
         if provider:
             return provider.request(url, **params)
         raise ProviderNotFoundException('Provider not found for "%s"' % url)
+
+    def request_many(self, urls, **params):
+        def attempt(url):
+            try:
+                return url, self.request(url, **params)
+            except ProviderException:
+                return url, None
+
+        urls = list(dict.fromkeys(urls))
+        if self.max_workers:
+            with ThreadPoolExecutor(self.max_workers) as pool:
+                results = list(pool.map(attempt, urls))
+        else:
+            results = [attempt(url) for url in urls]
+        return {url: data for url, data in results if data is not None}
 
     def parse_text(self, text, **kwargs):
         return parse_text(text, self, **kwargs)

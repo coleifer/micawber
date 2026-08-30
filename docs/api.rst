@@ -52,7 +52,7 @@ Providers
         :rtype: a dictionary of JSON data
 
 
-.. py:class:: ProviderRegistry([cache=None])
+.. py:class:: ProviderRegistry([cache=None[, max_workers=None]])
 
     A registry for encapsulating a group of :py:class:`Provider` instances,
     with optional caching support.
@@ -66,6 +66,8 @@ Providers
     either rendering oembed media inline or extracting embeddable links.
 
     :param cache: the cache simply needs to implement two methods, ``.get(key)`` and ``.set(key, value)``.
+    :param int max_workers: fetch the URLs in a document concurrently, using
+        a thread pool of this size. Unset, requests are made one at a time.
 
     .. py:method:: register(regex, provider[, skip_invalid=False])
 
@@ -104,6 +106,17 @@ Providers
         :param extra_params: additional parameters to pass to the endpoint, for
             example a maxwidth or an API key.
         :rtype: a dictionary of JSON data
+
+    .. py:method:: request_many(urls, **extra_params)
+
+        Retrieve information about each url, concurrently when
+        ``max_workers`` is set. Returns a dict of url to metadata holding only
+        the urls that resolved. Duplicates are requested once. This is what
+        the parsers call, once per document.
+
+        :param urls: an iterable of URLs
+        :param extra_params: additional parameters to pass to each provider
+        :rtype: dict
 
     .. py:method:: parse_text_full(text[, urlize_all=True[, handler=full_handler[, urlize_params=None[, **params]]]])
 

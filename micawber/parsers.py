@@ -10,8 +10,6 @@ except ImportError:
     Comment = None
     bs_kwargs = replace_kwargs = {}
 
-from micawber.exceptions import ProviderException
-
 
 scheme_re = re.compile(r'^[\s\x00-\x1f]*[a-z][a-z0-9+.\-]*:', re.I)
 http_scheme_re = re.compile(r'^[\s\x00-\x1f]*https?:', re.I)
@@ -53,15 +51,19 @@ def _escape_data(url, response_data):
 def full_handler(url, response_data, **params):
     data_type = response_data.get('type')
     if data_type == 'photo':
-        return '<a href="%(url)s" title="%(title)s"><img alt="%(title)s" src="%(url)s" /></a>' % _escape_data(url, response_data)
+        return ('<a href="%(url)s" title="%(title)s">'
+                '<img alt="%(title)s" src="%(url)s" />'
+                '</a>' % _escape_data(url, response_data))
     elif data_type != 'link':
         html = response_data.get('html')
         if html is not None:
             return html
-    return '<a href="%(url)s" title="%(title)s">%(title)s</a>' % _escape_data(url, response_data)
+    return ('<a href="%(url)s" title="%(title)s">%(title)s</a>' %
+            _escape_data(url, response_data))
 
 def inline_handler(url, response_data, **params):
-    return '<a href="%(url)s" title="%(title)s">%(title)s</a>' % _escape_data(url, response_data)
+    return ('<a href="%(url)s" title="%(title)s">%(title)s</a>' %
+            _escape_data(url, response_data))
 
 def urlize(url, **params):
     params.setdefault('href', url)
@@ -69,80 +71,53 @@ def urlize(url, **params):
                           for key, value in sorted(params.items()))
     return '<a %s>%s</a>' % (param_html, escape(url))
 
-class _RequestMemo(object):
-    # Collapse repeated requests (or failures) for the same url within a
-    # single parse call, e.g. one url appearing in several paragraphs.
-    def __init__(self, providers):
-        self.providers = providers
-        self.responses = {}
-
-    def request(self, url, **params):
-        if url in self.responses:
-            response, exc = self.responses[url]
-        else:
-            response = exc = None
-            try:
-                response = self.providers.request(url, **params)
-            except ProviderException as e:
-                exc = e
-            self.responses[url] = (response, exc)
-        if exc is not None:
-            raise exc
-        return response
+def _extract_all(texts, providers, **params):
+    urls = []
+    for text in texts:
+        urls.extend(url_re.findall(text))
+    urls = list(dict.fromkeys(urls))
+    return urls, providers.request_many(urls, **params)
 
 def extract(text, providers, **params):
-    all_urls = set()
-    urls = []
-    extracted_urls = {}
+    return _extract_all([text], providers, **params)
 
-    for url in re.findall(url_re, text):
-        if url in all_urls:
-            continue
-
-        all_urls.add(url)
-        urls.append(url)
-        try:
-            extracted_urls[url] = providers.request(url, **params)
-        except ProviderException:
-            pass
-
-    return urls, extracted_urls
+def _render(text, urls, extracted, urlize_all, handler, urlize_params,
+            **params):
+    replacements = {}
+    for url in urls:
+        if url in extracted:
+            replacements[url] = handler(url, extracted[url], **params)
+        elif urlize_all:
+            replacements[url] = urlize(url, **urlize_params)
+    return url_re.sub(lambda m: replacements.get(m.group(), m.group()), text)
 
 def parse_text_full(text, providers, urlize_all=True, handler=full_handler,
                     urlize_params=None, **params):
-    all_urls, extracted_urls = extract(text, providers, **params)
-    replacements = {}
-    urlize_params = urlize_params or {}
-
-    for url in all_urls:
-        if url in extracted_urls:
-            replacements[url] = handler(url, extracted_urls[url], **params)
-        elif urlize_all:
-            replacements[url] = urlize(url, **urlize_params)
-
-    return url_re.sub(lambda m: replacements.get(m.group(), m.group()), text)
+    urls, extracted = extract(text, providers, **params)
+    return _render(text, urls, extracted, urlize_all, handler,
+                   urlize_params or {}, **params)
 
 def parse_text(text, providers, urlize_all=True, handler=full_handler,
                block_handler=inline_handler, urlize_params=None, **params):
-    lines = text.splitlines()
-    parsed = []
     urlize_params = urlize_params or {}
-    providers = _RequestMemo(providers)
+    lines = text.splitlines()
+    if block_handler is None:
+        wanted = [line for line in lines if standalone_url_re.match(line)]
+    else:
+        wanted = lines
+    _urls, extracted = _extract_all(wanted, providers, **params)
 
+    parsed = []
     for line in lines:
         if standalone_url_re.match(line):
             url = line.strip()
-            try:
-                response = providers.request(url, **params)
-            except ProviderException:
-                if urlize_all:
-                    line = urlize(url, **urlize_params)
-            else:
-                line = handler(url, response, **params)
+            if url in extracted:
+                line = handler(url, extracted[url], **params)
+            elif urlize_all:
+                line = urlize(url, **urlize_params)
         elif block_handler is not None:
-            line = parse_text_full(line, providers, urlize_all, block_handler,
-                                   urlize_params=urlize_params, **params)
-
+            line = _render(line, url_re.findall(line), extracted, urlize_all,
+                           block_handler, urlize_params, **params)
         parsed.append(line)
 
     return '\n'.join(parsed)
@@ -151,60 +126,36 @@ def parse_html(html, providers, urlize_all=True, handler=full_handler,
                block_handler=inline_handler, soup_class=BeautifulSoup,
                urlize_params=None, **params):
 
-    if not soup_class:
-        raise Exception('Unable to parse HTML, please install BeautifulSoup '
-                        'or beautifulsoup4, or use the text parser')
+    if soup_class is None:
+        raise Exception('Unable to parse HTML, please install beautifulsoup4 '
+                        'or use the text parser')
 
+    urlize_params = urlize_params or {}
     soup = soup_class(html, **bs_kwargs)
-    providers = _RequestMemo(providers)
+    nodes = [node for node in soup.find_all(string=url_re)
+             if not _inside_skip(node)]
+    texts = [node.string.replace('<', '&lt;').replace('>', '&gt;')
+             for node in nodes]
+    _urls, extracted = _extract_all(texts, providers, **params)
 
-    for url in soup.find_all(string=url_re):
-        if not _inside_skip(url):
-            if _is_standalone(url):
-                url_handler = handler
-            else:
-                url_handler = block_handler
-
-            url_unescaped = (url.string
-                             .replace('<', '&lt;')
-                             .replace('>', '&gt;'))
-
-            replacement = parse_text_full(
-                url_unescaped,
-                providers,
-                urlize_all,
-                url_handler,
-                urlize_params=urlize_params,
-                **params)
-            url.replace_with(soup_class(replacement, **replace_kwargs))
+    for node, text in zip(nodes, texts):
+        url_handler = handler if _is_standalone(node) else block_handler
+        replacement = _render(text, url_re.findall(text), extracted,
+                              urlize_all, url_handler, urlize_params,
+                              **params)
+        node.replace_with(soup_class(replacement, **replace_kwargs))
 
     return str(soup)
 
-def extract_html(html, providers, **params):
-    if not BeautifulSoup:
-        raise Exception('Unable to parse HTML, please install BeautifulSoup '
+def extract_html(html, providers, soup_class=BeautifulSoup, **params):
+    if soup_class is None:
+        raise Exception('Unable to parse HTML, please install beautifulsoup4 '
                         'or use the text parser')
 
-    soup = BeautifulSoup(html, **bs_kwargs)
-    all_urls = set()
-    urls = []
-    extracted_urls = {}
-    providers = _RequestMemo(providers)
-
-    for url in soup.find_all(string=url_re):
-        if _inside_skip(url):
-            continue
-
-        block_all, block_ext = extract(str(url), providers, **params)
-        for extracted_url in block_all:
-            if extracted_url in all_urls:
-                continue
-
-            extracted_urls.update(block_ext)
-            urls.append(extracted_url)
-            all_urls.add(extracted_url)
-
-    return urls, extracted_urls
+    soup = soup_class(html, **bs_kwargs)
+    nodes = [node for node in soup.find_all(string=url_re)
+             if not _inside_skip(node)]
+    return _extract_all([str(node) for node in nodes], providers, **params)
 
 def _is_standalone(soup_elem):
     if standalone_url_re.match(soup_elem):
