@@ -215,7 +215,7 @@ Providers
 .. py:function:: bootstrap_embedly([cache=None[, registry=None[, refresh=False[, timeout=3.0[, **kwargs]]]])
 
     Create a :py:class:`ProviderRegistry` and register as many providers as
-    are supported by `embed.ly <http://embed.ly>`_. Valid services are
+    are supported by `embed.ly <https://embed.ly>`_. Valid services are
     fetched from http://api.embed.ly/1/services/python and parsed then registered.
 
     .. note::
@@ -236,14 +236,14 @@ Providers
 
         # if you have an API key, you can specify that here
         pr = bootstrap_embedly(key='my-embedly-key')
-        pr.request('http://www.youtube.com/watch?v=54XHDUOHuzU')
+        pr.request('https://www.youtube.com/watch?v=54XHDUOHuzU')
 
 
 .. py:function:: bootstrap_noembed([cache=None[, registry=None[, refresh=False[, timeout=3.0[, **kwargs]]]])
 
     Create a :py:class:`ProviderRegistry` and register as many providers as
-    are supported by `noembed.com <http://noembed.com>`_. Valid services are
-    fetched from http://noembed.com/providers and parsed then registered.
+    are supported by `noembed.com <https://noembed.com>`_. Valid services are
+    fetched from https://noembed.com/providers and parsed then registered.
 
     .. note::
         This function makes a request over the internet whenever it is called.
@@ -263,7 +263,7 @@ Providers
 
         # if you have an API key, you can specify that here
         pr = bootstrap_noembed(nowrap=1)
-        pr.request('http://www.youtube.com/watch?v=54XHDUOHuzU')
+        pr.request('https://www.youtube.com/watch?v=54XHDUOHuzU')
 
 
 .. py:function:: bootstrap_iframely([cache=None[, registry=None[, **kwargs]]])
@@ -287,7 +287,7 @@ Providers
     .. code-block:: python
 
         pr = bootstrap_iframely(api_key='my-iframely-key')
-        pr.request('http://www.youtube.com/watch?v=54XHDUOHuzU')
+        pr.request('https://www.youtube.com/watch?v=54XHDUOHuzU')
 
     .. note::
         Because providers registered later take precedence, passing an

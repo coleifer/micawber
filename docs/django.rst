@@ -36,11 +36,11 @@ Each filter accepts one argument and one optional argument, due to django's temp
 filters being wack.
 
 Piping a string through the ``oembed`` filter (or ``oembed_html``) will convert
-URLs to things like youtube videos into video players.  A couple things to
+URLs to things like youtube videos into video players. A couple things to
 understand about the parsers:
 
 * the plaintext parser (``oembed``) will convert URLs *on their own line* into
-  full images/video-players/etc.  URLs that are interspersed within text will
+  full images/video-players/etc. URLs that are interspersed within text will
   simply be converted into clickable links so as not to disrupt the flow of text.
 * the HTML parser (``oembed_html``) will convert URLs that *are not already links*
   into full images/video-players/etc. URLs within block elements along with other
@@ -111,7 +111,7 @@ Extending the filters
 ---------------------
 
 For simplicity, micawber provides a setting allowing you to create custom template
-filters.  An example use case would be to add a template filter that could embed
+filters. An example use case would be to add a template filter that could embed
 rich content, but did not automatically "urlize" all links.
 
 Extensions are configured in the ``settings`` module and take the form of a list of
@@ -173,8 +173,8 @@ Providers
 ^^^^^^^^^
 
 The most important setting to configure is the module / attribute
-path to the providers you wish to use.  The attribute can either
-be a ProviderRegistry instance or a callable.  The default is:
+path to the providers you wish to use. The attribute can either
+be a ProviderRegistry instance or a callable. The default is:
 
 ``MICAWBER_PROVIDERS = 'micawber.contrib.mcdjango.providers.bootstrap_basic'``
 
@@ -188,7 +188,7 @@ that in the settings:
 
 ``MICAWBER_EMBEDLY_KEY = 'foo'``
 
-You can also customize this with your own set of providers.  This must be either
+You can also customize this with your own set of providers. This must be either
 
 * the module path to a :py:class:`~micawber.providers.ProviderRegistry` instance
 * the module path to a callable which returns a :py:class:`~micawber.providers.ProviderRegistry` instance
@@ -234,6 +234,6 @@ Trying it out in the python shell
 .. code-block:: python
 
     >>> from django.template import Template, Context
-    >>> t = Template('{% load micawber_tags %}{{ "http://www.youtube.com/watch?v=mQEWI1cn7HY"|oembed }}')
+    >>> t = Template('{% load micawber_tags %}{{ "https://www.youtube.com/watch?v=mQEWI1cn7HY"|oembed }}')
     >>> t.render(Context())
-    u'<iframe width="480" height="270" src="http://www.youtube.com/embed/mQEWI1cn7HY?fs=1&feature=oembed" frameborder="0" allowfullscreen></iframe>'
+    '<iframe width="480" height="270" src="https://www.youtube.com/embed/mQEWI1cn7HY?feature=oembed" ...></iframe>'

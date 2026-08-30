@@ -71,7 +71,7 @@ The following filters are exposed via the :py:mod:`micawber.contrib.mcflask` mod
 Adding filters to the Jinja Environment
 ---------------------------------------
 
-To actually use these filters they must be made available to the application.  Use the
+To actually use these filters they must be made available to the application. Use the
 following function to do this sometime after initializing your ``Flask`` app:
 
 .. py:function:: add_oembed_filters(app, providers)

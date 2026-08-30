@@ -26,16 +26,16 @@ Installing via git
 
     git clone https://github.com/coleifer/micawber.git
     cd micawber
-    python setup.py test
-    sudo python setup.py install
+    python runtests.py
+    pip install .
 
 
 Adding to your Django Project
 --------------------------------
 
-After installing, adding django-utils to your projects is a snap.  Simply
-add it to your projects' INSTALLED_APPs and run 'syncdb'::
-    
+micawber defines no models, so there is nothing to migrate. Add it to
+``INSTALLED_APPS`` to pick up the template filters::
+
     # settings.py
     INSTALLED_APPS = [
         ...

@@ -8,21 +8,21 @@ If you want the dead simple get-me-up-and-running, try the following:
 .. code-block:: python
 
     >>> import micawber
-    >>> providers = micawber.bootstrap_basic() # may take a second
-    >>> print providers.parse_text('this is a test:\nhttp://www.youtube.com/watch?v=54XHDUOHuzU')
+    >>> providers = micawber.bootstrap_basic()
+    >>> print(providers.parse_text('this is a test:\nhttps://www.youtube.com/watch?v=54XHDUOHuzU'))
     this is a test:
-    <iframe width="640" height="360" src="http://www.youtube.com/embed/54XHDUOHuzU?fs=1&feature=oembed" frameborder="0" allowfullscreen></iframe>
+    <iframe width="200" height="150" src="https://www.youtube.com/embed/54XHDUOHuzU?feature=oembed" ...></iframe>
 
-Using django?  Add ``micawber.contrib.mcdjango`` to your ``INSTALLED_APP``, then
+Using django? Add ``micawber.contrib.mcdjango`` to your ``INSTALLED_APP``, then
 in your templates:
 
 .. code-block:: html
 
     {% load micawber_tags %}
     {# show a video player for the youtube video #}
-    {{ "http://www.youtube.com/watch?v=mQEWI1cn7HY"|oembed }}
+    {{ "https://www.youtube.com/watch?v=mQEWI1cn7HY"|oembed }}
 
-Using flask?  Use the ``add_oembed_filters`` function to register two jinja
+Using flask? Use the ``add_oembed_filters`` function to register two jinja
 template filters, ``oembed`` and ``extract_oembed``:
 
 .. code-block:: python
@@ -39,17 +39,17 @@ template filters, ``oembed`` and ``extract_oembed``:
 .. code-block:: html
 
     {# show a video player for the youtube video #}
-    {{ "http://www.youtube.com/watch?v=mQEWI1cn7HY"|oembed() }}
+    {{ "https://www.youtube.com/watch?v=mQEWI1cn7HY"|oembed() }}
 
 Overview
 --------
 
-micawber is rather simple.  It is built to use the `oembed <http://oembed.com/>`_ spec,
-which is designed for converting URLs into rich, embeddable content.  Many popular sites
-support this, including youtube and flickr.  There is also a 3rd-party service called
-`embedly <http://embed.ly>`_ that can convert many types of links into rich content.
+micawber is rather simple. It is built to use the `oembed <https://oembed.com/>`_ spec,
+which is designed for converting URLs into rich, embeddable content. Many popular sites
+support this, including youtube and flickr. There is also a 3rd-party service called
+`embedly <https://embed.ly>`_ that can convert many types of links into rich content.
 
-micawber was designed to make it easy to integrate with these APIs.  There are
+micawber was designed to make it easy to integrate with these APIs. There are
 two concepts to understand when using micawber:
 
 * :py:class:`~micawber.providers.Provider` objects - which describe how to
@@ -62,7 +62,7 @@ two concepts to understand when using micawber:
 Providers
 ---------
 
-Providers are used to convert URLs into rich metadata.  They have an endpoint
+Providers are used to convert URLs into rich metadata. They have an endpoint
 associated with them and can have any number of arbitrary URL parameters (such
 as API keys) which are used when making API requests.
 
@@ -72,26 +72,26 @@ Example:
 
     from micawber.providers import Provider
 
-    youtube = Provider('http://www.youtube.com/oembed')
-    youtube.request('http://www.youtube.com/watch?v=nda_OSWeyn8')
+    youtube = Provider('https://www.youtube.com/oembed')
+    youtube.request('https://www.youtube.com/watch?v=nda_OSWeyn8')
 
 The above code returns a dictionary containing metadata about the requested
 video, including the markup for an embeddable player::
 
-    {'author_name': u'botmib',
-     'author_url': u'http://www.youtube.com/user/botmib',
-     'height': 344,
-     'html': u'<iframe width="459" height="344" src="http://www.youtube.com/embed/nda_OSWeyn8?fs=1&feature=oembed" frameborder="0" allowfullscreen></iframe>',
-     'provider_name': u'YouTube',
-     'provider_url': u'http://www.youtube.com/',
+    {'author_name': 'botmib',
+     'author_url': 'https://www.youtube.com/@botmib',
+     'height': 150,
+     'html': '<iframe width="200" height="150" src="https://www.youtube.com/embed/nda_OSWeyn8?feature=oembed" ...></iframe>',
+     'provider_name': 'YouTube',
+     'provider_url': 'https://www.youtube.com/',
      'thumbnail_height': 360,
-     'thumbnail_url': u'http://i3.ytimg.com/vi/nda_OSWeyn8/hqdefault.jpg',
+     'thumbnail_url': 'https://i.ytimg.com/vi/nda_OSWeyn8/hqdefault.jpg',
      'thumbnail_width': 480,
-     'title': u'Leprechaun in Mobile, Alabama',
-     'type': u'video',
-     'url': 'http://www.youtube.com/watch?v=nda_OSWeyn8',
-     'version': u'1.0',
-     'width': 459}
+     'title': 'Leprechaun in Mobile, Alabama',
+     'type': 'video',
+     'url': 'https://www.youtube.com/watch?v=nda_OSWeyn8',
+     'version': '1.0',
+     'width': 200}
 
 More information can be found in the :py:class:`~micawber.providers.Provider` API docs.
 
@@ -99,7 +99,7 @@ ProviderRegistry
 ----------------
 
 The :py:class:`~micawber.providers.ProviderRegistry` is a way of organizing lists
-of providers.  URLs can be requested from the registry and if *any* provider matches
+of providers. URLs can be requested from the registry and if *any* provider matches
 it will be used, otherwise a ``ProviderException`` will be raised.
 
 The ``ProviderRegistry`` also supports an optional simple caching mechanism.
@@ -157,21 +157,21 @@ A quick example:
 
     providers = micawber.bootstrap_basic()
 
-    providers.parse_text('this is a test:\nhttp://www.youtube.com/watch?v=54XHDUOHuzU')
+    providers.parse_text('this is a test:\nhttps://www.youtube.com/watch?v=54XHDUOHuzU')
 
 This will result in the following output::
 
     this is a test:
-    <iframe width="459" height="344" src="http://www.youtube.com/embed/54XHDUOHuzU?fs=1&feature=oembed" frameborder="0" allowfullscreen></iframe>
+    <iframe width="200" height="150" src="https://www.youtube.com/embed/54XHDUOHuzU?feature=oembed" ...></iframe>
 
 You can also parse HTML using the :py:meth:`~micawber.providers.ProviderRegistry.parse_html` method:
 
 .. code-block:: python
 
-    providers.parse_html('<p>http://www.youtube.com/watch?v=54XHDUOHuzU</p>')
+    providers.parse_html('<p>https://www.youtube.com/watch?v=54XHDUOHuzU</p>')
 
     # yields the following output:
-    <p><iframe width="459" height="344" src="http://www.youtube.com/embed/54XHDUOHuzU?fs=1&amp;feature=oembed" frameborder="0" allowfullscreen="allowfullscreen"></iframe></p>
+    <p><iframe width="200" height="150" src="https://www.youtube.com/embed/54XHDUOHuzU?feature=oembed" ...></iframe></p>
 
 If you would rather extract metadata, there are two functions:
 
