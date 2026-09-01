@@ -74,11 +74,7 @@ class Provider(object):
         else:
             endpoint_url = '%s?%s' % (endpoint_url, encoded_params)
 
-        response = self.fetch(endpoint_url)
-        if response:
-            return self.handle_response(response, url)
-        else:
-            raise ProviderException('Error fetching "%s"' % endpoint_url)
+        return self.handle_response(self.fetch(endpoint_url), url)
 
     def handle_response(self, response, url):
         try:

@@ -39,9 +39,9 @@ class TestProvider(Provider):
     }
 
     def fetch(self, url):
-        if url in self.test_data:
-            return json.dumps(self.test_data[url])
-        return False
+        if url not in self.test_data:
+            raise ProviderException('Error fetching "%s"' % url)
+        return json.dumps(self.test_data[url])
 
 test_pr = ProviderRegistry()
 
