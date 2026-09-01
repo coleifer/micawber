@@ -48,7 +48,8 @@ Providers
         :param url: URL to retrieve metadata for
         :param extra_params: additional parameters to pass to the endpoint, for
             example a maxwidth or an API key. A ``maxwidth`` given without a
-            ``maxheight`` implies a 16:9 ``maxheight``.
+            ``maxheight`` implies a ``maxheight`` of 16/9 the width, tall
+            enough that a portrait embed is not squashed.
         :rtype: a dictionary of JSON data
 
 

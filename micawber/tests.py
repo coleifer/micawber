@@ -21,6 +21,7 @@ except ImportError:
     flask = None
 from micawber.contrib.providers import GoogleMapsProvider
 from micawber.parsers import full_handler
+from micawber.providers import make_key
 from micawber.test_utils import test_pr, test_cache, test_pr_cache, TestProvider, BaseTestCase
 
 
@@ -95,7 +96,6 @@ class ProviderTestCase(BaseTestCase):
         self.assertRaises(ProviderException, test_pr.request, 'http://link-test3')
 
     def test_no_provider_skips_cache(self):
-        from micawber.providers import make_key
         with mock.patch.object(test_cache, 'get', return_value=None) as get:
             self.assertRaises(ProviderNotFoundException, test_pr_cache.request,
                               'http://nothing-matches')
@@ -131,7 +131,6 @@ class ProviderTestCase(BaseTestCase):
         self.assertFalse(resp == resp_p)
 
     def test_make_key_stable(self):
-        from micawber.providers import make_key
         k1 = make_key('http://foo', {'maxwidth': 600, 'maxheight': 400})
         k2 = make_key('http://foo', {'maxheight': 400, 'maxwidth': 600})
         self.assertEqual(k1, k2)
@@ -142,7 +141,6 @@ class ProviderTestCase(BaseTestCase):
     def test_make_key_non_json_params(self):
         import datetime
         from decimal import Decimal
-        from micawber.providers import make_key
         k1 = make_key('http://foo', {'maxwidth': Decimal('600'),
                                      'since': datetime.date(2026, 7, 5)})
         k2 = make_key('http://foo', {'since': datetime.date(2026, 7, 5),
@@ -160,7 +158,6 @@ class ProviderTestCase(BaseTestCase):
                          ['400'])
 
     def test_cache_falsy_value(self):
-        from micawber.providers import make_key
         # A cached falsy value is a hit, not a miss -- link-test3 is unknown
         # to the provider, so an attempt to re-fetch would raise instead.
         test_cache.set(make_key('http://link-test3', {}), {})
