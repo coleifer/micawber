@@ -86,7 +86,8 @@ class BaseTestCase(unittest.TestCase):
     def assertCached(self, url, data, **params):
         key = make_key(url, params)
         self.assertTrue(key in test_cache._cache)
-        self.assertEqual(test_cache._cache[key], data)
+        value, ttl = test_cache._cache[key]
+        self.assertEqual(value, data)
 
 
     def assertHTMLEqual(self, first, second, msg=None):

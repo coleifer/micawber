@@ -1,5 +1,6 @@
-import pickle
 from collections import OrderedDict
+import pickle
+import time
 try:
     from redis import Redis
 except ImportError:
@@ -7,18 +8,31 @@ except ImportError:
 
 
 class Cache(object):
-    def __init__(self, max_size=1024):
+    def __init__(self, timeout=None, max_size=1024):
         self.max_size = max_size
+        self.timeout = timeout
         self._cache = OrderedDict()
 
     def get(self, k):
         if k not in self._cache:
             return None
-        self._cache.move_to_end(k)
-        return self._cache[k]
 
-    def set(self, k, v):
-        self._cache[k] = v
+        self._cache.move_to_end(k)
+        v = self._cache[k]
+        if isinstance(v, tuple):
+            v, ttl = v
+            if ttl is not None and time.time() <= ttl:
+                self._cache.popitem()
+                v = None
+        return v
+
+    def set(self, k, v, timeout=None):
+        timeout = timeout or self.timeout
+        if timeout:
+            ttl = time.time() + timeout
+        else:
+            ttl = None
+        self._cache[k] = (v, ttl)
         self._cache.move_to_end(k)
         while self.max_size and len(self._cache) > self.max_size:
             self._cache.popitem(last=False)
@@ -64,5 +78,6 @@ if Redis:
             if cached:
                 return pickle.loads(cached)
 
-        def set(self, k, v):
-            self.conn.set(self.key_fn(k), pickle.dumps(v), ex=self.timeout)
+        def set(self, k, v, timeout=None):
+            timeout = timeout or self.timeout
+            self.conn.set(self.key_fn(k), pickle.dumps(v), ex=timeout)
