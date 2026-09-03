@@ -370,14 +370,22 @@ Cache
 
 .. py:module:: micawber.cache
 
-.. py:class:: Cache()
+.. py:class:: Cache([timeout=None[, max_size=1024]])
 
     A reference implementation for the cache interface used by the :py:class:`ProviderRegistry`.
+
+    :param int timeout: seconds a value stays fresh. Unset, values never
+        expire and are only dropped to stay within ``max_size``.
+    :param int max_size: how many entries to keep. Once full, the
+        least-recently-used entry is evicted. ``0`` or ``None`` is unbounded.
 
     .. code-block:: python
 
         from micawber import Cache, bootstrap_oembed
         cache = Cache()  # Simple in-memory cache.
+
+        # Entries expire after an hour, and at most 4096 are kept.
+        cache = Cache(timeout=3600, max_size=4096)
 
         # Now our oembed provider will cache the responses for each URL we
         # request, which can provide a significant speedup.
@@ -385,15 +393,19 @@ Cache
 
     .. py:method:: get(key)
 
-        Retrieve the key from the cache or ``None`` if not present
+        Retrieve the key from the cache or ``None`` if not present or expired.
 
-    .. py:method:: set(key, value)
+    .. py:method:: set(key, value[, timeout=None])
 
         Set the cache key ``key`` to the given ``value``.
 
-.. py:class:: PickleCache([filename='cache.db'])
+        :param int timeout: expiration for this value, overriding the cache
+            default.
 
-    A cache that uses pickle to store data.
+.. py:class:: PickleCache([filename='cache.db'[, timeout=None[, max_size=None]]])
+
+    A cache that uses pickle to store data. Accepts the same ``timeout`` and
+    ``max_size`` as :py:class:`Cache`, and by default keeps every entry.
 
     .. note::
         To use this cache class be sure to call :py:meth:`~PickleCache.load` when
@@ -415,5 +427,6 @@ Cache
     .. note:: requires the redis-py library, ``pip install redis``
 
     :param namespace: prefix for cache keys
-    :param int timeout: expiration timeout in seconds (optional)
+    :param int timeout: expiration timeout in seconds (optional), applied to
+        every value written. :py:meth:`~Cache.set` can override it per-value.
     :param conn: keyword arguments to pass when initializing redis connection

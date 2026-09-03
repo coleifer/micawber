@@ -350,6 +350,76 @@ class EscapingTestCase(BaseTestCase):
             '<a href="http://video-nohtml/foo" title="broken">broken</a>')
 
 
+class CacheTestCase(unittest.TestCase):
+    def test_get_set(self):
+        cache = Cache()
+        self.assertTrue(cache.get('key') is None)
+        cache.set('key', {'title': 'test'})
+        self.assertEqual(cache.get('key'), {'title': 'test'})
+        cache.set('key', {'title': 'updated'})
+        self.assertEqual(cache.get('key'), {'title': 'updated'})
+
+    def test_no_timeout(self):
+        cache = Cache()
+        with mock.patch('micawber.cache.time.time', return_value=1000):
+            cache.set('key', 'value')
+        with mock.patch('micawber.cache.time.time', return_value=1e9):
+            self.assertEqual(cache.get('key'), 'value')
+
+    def test_timeout(self):
+        cache = Cache(timeout=60)
+        with mock.patch('micawber.cache.time.time', return_value=1000):
+            cache.set('key', 'value')
+            self.assertEqual(cache.get('key'), 'value')
+        with mock.patch('micawber.cache.time.time', return_value=1059):
+            self.assertEqual(cache.get('key'), 'value')
+        with mock.patch('micawber.cache.time.time', return_value=1061):
+            self.assertTrue(cache.get('key') is None)
+
+        # The expired value is discarded rather than left to take up space.
+        self.assertEqual(len(cache._cache), 0)
+
+    def test_timeout_per_value(self):
+        cache = Cache(timeout=60)
+        with mock.patch('micawber.cache.time.time', return_value=1000):
+            cache.set('short', 'a', timeout=10)
+            cache.set('long', 'b', timeout=600)
+            cache.set('default', 'c')
+
+        with mock.patch('micawber.cache.time.time', return_value=1030):
+            self.assertTrue(cache.get('short') is None)
+            self.assertEqual(cache.get('default'), 'c')
+            self.assertEqual(cache.get('long'), 'b')
+
+        with mock.patch('micawber.cache.time.time', return_value=1100):
+            self.assertTrue(cache.get('default') is None)
+            self.assertEqual(cache.get('long'), 'b')
+
+    def test_max_size(self):
+        cache = Cache(max_size=3)
+        for i in range(3):
+            cache.set('k%s' % i, i)
+
+        # Reading k0 leaves k1 as the least-recently-used.
+        self.assertEqual(cache.get('k0'), 0)
+        cache.set('k3', 3)
+        self.assertEqual(sorted(cache._cache), ['k0', 'k2', 'k3'])
+
+    def test_registry_timeout(self):
+        cache = Cache(timeout=60)
+        pr = ProviderRegistry(cache)
+        pr.register(r'http://link\S*', TestProvider('link'))
+
+        with mock.patch('micawber.cache.time.time', return_value=1000):
+            resp = pr.request('http://link-test1')
+            self.assertEqual(resp['title'], 'test1')
+            self.assertEqual(len(cache._cache), 1)
+
+        with mock.patch('micawber.cache.time.time', return_value=1100):
+            self.assertEqual(len(cache._cache), 1)
+            self.assertEqual(pr.request('http://link-test1'), resp)
+
+
 class PickleCacheTestCase(unittest.TestCase):
     def setUp(self):
         self.tmpdir = tempfile.mkdtemp()
@@ -384,6 +454,27 @@ class PickleCacheTestCase(unittest.TestCase):
         self.assertEqual(cache2.get('key'), {'title': 'test', 'type': 'link'})
         self.assertEqual(cache2.get('key2'), [1, 2, 3])
         self.assertTrue(cache2.get('missing') is None)
+
+    def test_timeout(self):
+        cache = PickleCache(self.filename, timeout=60)
+        with mock.patch('micawber.cache.time.time', return_value=1000):
+            cache.set('key', 'value')
+        cache.save()
+
+        cache2 = PickleCache(self.filename)
+        with mock.patch('micawber.cache.time.time', return_value=1030):
+            self.assertEqual(cache2.get('key'), 'value')
+        with mock.patch('micawber.cache.time.time', return_value=1100):
+            self.assertTrue(cache2.get('key') is None)
+
+    def test_load_values_without_expiration(self):
+        # Cache files written before values carried an expiration.
+        import pickle
+        with open(self.filename, 'wb') as fh:
+            pickle.dump({'key': 'value'}, fh)
+
+        cache = PickleCache(self.filename)
+        self.assertEqual(cache.get('key'), 'value')
 
 
 @unittest.skipIf(mcflask is None, 'markupsafe/flask is not installed')
@@ -481,6 +572,15 @@ class RedisCacheTestCase(unittest.TestCase):
         cache.set('key', {'title': 'test'})
         self.assertEqual(cache.get('key'), {'title': 'test'})
         self.assertEqual(cache.conn.expiry['micawber.key'], 60)
+
+    def test_timeout_per_value(self):
+        cache = self.get_cache(timeout=60)
+        cache.set('key', {'title': 'test'}, timeout=10)
+        self.assertEqual(cache.conn.expiry['micawber.key'], 10)
+
+        cache = self.get_cache()
+        cache.set('key', {'title': 'test'}, timeout=10)
+        self.assertEqual(cache.conn.expiry['micawber.key'], 10)
 
 
 class ParserTestCase(BaseTestCase):

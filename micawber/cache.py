@@ -17,13 +17,13 @@ class Cache(object):
         if k not in self._cache:
             return None
 
-        self._cache.move_to_end(k)
         v = self._cache[k]
         if isinstance(v, tuple):
             v, ttl = v
-            if ttl is not None and time.time() <= ttl:
-                self._cache.popitem()
-                v = None
+            if ttl is not None and time.time() > ttl:
+                del self._cache[k]
+                return None
+        self._cache.move_to_end(k)
         return v
 
     def set(self, k, v, timeout=None):
@@ -39,8 +39,8 @@ class Cache(object):
 
 
 class PickleCache(Cache):
-    def __init__(self, filename='cache.db', max_size=None):
-        super(PickleCache, self).__init__(max_size)
+    def __init__(self, filename='cache.db', timeout=None, max_size=None):
+        super(PickleCache, self).__init__(timeout, max_size)
         self.filename = filename
         self._cache.update(self.load())
 
