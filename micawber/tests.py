@@ -5,6 +5,8 @@ import tempfile
 import threading
 import unittest
 from email.message import Message
+from http.client import IncompleteRead
+from http.client import RemoteDisconnected
 from unittest import mock
 
 from micawber import *
@@ -59,6 +61,13 @@ class ProviderTestCase(BaseTestCase):
         self.assertEqual(pr.provider_for_url('11'), provider2)
         pr.unregister(r'1\d+')
         self.assertEqual(pr.provider_for_url('11'), provider1)
+
+        # Re-registering a pattern also gives it precedence.
+        pr.register(r'1\d+', provider2)
+        provider3 = TestProvider('link')
+        pr.register(r'1(\d+)', provider3)
+        self.assertEqual(pr.provider_for_url('11'), provider3)
+        self.assertEqual(len(pr._registry), 2)
 
     def test_provider_matching(self):
         provider = test_pr.provider_for_url('http://link-test1')
@@ -220,6 +229,14 @@ class ProviderTestCase(BaseTestCase):
         with self.assertRaises(ProviderException) as ctx:
             pr.request('http://refused-test')
         self.assertTrue(ctx.exception.__cause__ is not None)
+
+        for exc in (RemoteDisconnected('closed'), IncompleteRead(b''),
+                    ValueError('unknown url type')):
+            with mock.patch('micawber.providers.urlopen', side_effect=exc):
+                with self.assertRaises(ProviderException) as ctx:
+                    pr.request('http://refused-test2')
+                self.assertTrue(ctx.exception.__cause__ is exc)
+                self.assertEqual(pr.request_many(['http://refused-test2']), {})
 
     def test_fetch_decode_error_chained(self):
         # Charset/decode failures must become ProviderException like network errors.
@@ -724,6 +741,12 @@ class ParserTestCase(BaseTestCase):
             parsed = test_pr.parse_html(test_str)
             self.assertHTMLEqual(parsed, frame % (expected, expected_inline, expected, expected_inline))
 
+        # block_handler=None applies to HTML as well.
+        for url, expected in self.full_pairs.items():
+            frame = '<p>%s</p>\n<p>this is inline: %s</p>'
+            parsed = test_pr.parse_html(frame % (url, url), block_handler=None)
+            self.assertHTMLEqual(parsed, frame % (expected, url))
+
         for url, expected in self.full_pairs.items():
             expected_inline = self.inline_pairs[url]
             frame = '<p><a href="#foo">%s</a></p>\n<p>this is inline: %s</p>\n<p>last test\n%s\n</p>'
@@ -732,6 +755,27 @@ class ParserTestCase(BaseTestCase):
 
             parsed = test_pr.parse_html(test_str)
             self.assertHTMLEqual(parsed, frame % (url, expected_inline, expected_inline))
+
+    def test_handler_called_once_per_url(self):
+        calls = []
+        def handler(url, response_data, **params):
+            calls.append(url)
+            return full_handler(url, response_data, **params)
+
+        test_pr.parse_text_full('http://link-test1 http://link-test1 '
+                                'http://photo-test2', handler=handler)
+        self.assertEqual(sorted(calls), ['http://link-test1',
+                                         'http://photo-test2'])
+
+        calls = []
+        test_pr.parse_text('http://link-test1\nhttp://link-test1\n'
+                           'see http://link-test1', handler=handler)
+        self.assertEqual(calls, ['http://link-test1'])
+
+        calls = []
+        test_pr.parse_html('<p>http://link-test1</p><p>http://link-test1</p>',
+                           handler=handler)
+        self.assertEqual(calls, ['http://link-test1'])
 
     def test_multiline_full(self):
         for url, expected in self.full_pairs.items():

@@ -160,7 +160,8 @@ Providers
         :param str text: a string to parse
         :param bool urlize_all: convert unmatched urls into links
         :param handler: function to use to convert links found on their own line
-        :param block_handler: function to use to convert links found within blocks of text
+        :param block_handler: function to use to convert links found within blocks of text,
+            or ``None`` to leave them untouched.
         :param dict urlize_params: keyword arguments to be used to construct a link
             when a provider is not found and urlize is enabled.
         :param params: any additional parameters to use when requesting metadata, i.e.
@@ -183,7 +184,8 @@ Providers
         :param str html: a string of HTML to parse
         :param bool urlize_all: convert unmatched urls into links
         :param handler: function to use to convert links found on their own within a block element
-        :param block_handler: function to use to convert links found within blocks of text
+        :param block_handler: function to use to convert links found within blocks of text,
+            or ``None`` to leave them untouched.
         :param dict urlize_params: keyword arguments to be used to construct a link
             when a provider is not found and urlize is enabled.
         :param params: any additional parameters to use when requesting metadata, i.e.

@@ -5,11 +5,9 @@ import os
 import re
 import time
 import socket
-import ssl
 
 from concurrent.futures import ThreadPoolExecutor
 from urllib.error import HTTPError
-from urllib.error import URLError
 from urllib.parse import urlencode
 from urllib.request import Request
 from urllib.request import urlopen
@@ -50,8 +48,7 @@ class Provider(object):
             return fetch(req, self.socket_timeout)
         except HTTPError as exc:
             raise ProviderHTTPException(url, exc.code) from exc
-        except (URLError, socket.timeout, ssl.SSLError,
-                UnicodeDecodeError, LookupError) as exc:
+        except Exception as exc:
             if isinstance(exc, socket.timeout) or \
                isinstance(getattr(exc, 'reason', None), socket.timeout):
                 raise ProviderTimeoutException('Timed out fetching "%s"' % url) from exc
@@ -142,7 +139,7 @@ class ProviderRegistry(object):
             logger.warning('Skipping unusable provider pattern %r: %s',
                            regex, exc)
             return
-        if regex in self._registry:
+        if self._registry.pop(regex, None) is not None:
             logger.debug('Replacing provider registered for %r', regex)
         self._registry[regex] = (pattern, provider)
 
@@ -168,9 +165,12 @@ class ProviderRegistry(object):
                 if not isinstance(data, ProviderException)}
 
     def _resolve(self, urls, params):
-        results = dict.fromkeys(urls)
+        results = {}
         misses = []
-        for url in results:
+        for url in urls:
+            if url in results:
+                continue
+            results[url] = None
             provider = self.provider_for_url(url)
             if provider is None:
                 results[url] = ProviderNotFoundException(
