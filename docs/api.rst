@@ -69,6 +69,8 @@ Providers
     :param cache: the cache simply needs to implement two methods, ``.get(key)`` and ``.set(key, value)``.
     :param int max_workers: fetch the URLs in a document concurrently, using
         a thread pool of this size. Unset, requests are made one at a time.
+        The workers only fetch. The cache is read and written by the calling
+        thread.
     :param int negative_ttl: seconds to remember that a provider failed for a
         URL, so a dead link is not re-requested on every render. Within that
         window the request raises ``ProviderException`` without touching the

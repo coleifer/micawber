@@ -2,6 +2,7 @@ import os
 import shutil
 import sys
 import tempfile
+import threading
 import unittest
 from email.message import Message
 from unittest import mock
@@ -162,6 +163,55 @@ class ProviderTestCase(BaseTestCase):
         # to the provider, so an attempt to re-fetch would raise instead.
         test_cache.set(make_key('http://link-test3', {}), {})
         self.assertEqual(test_pr_cache.request('http://link-test3'), {})
+
+    def test_negative_cache(self):
+        provider = TestProvider('link')
+        pr = ProviderRegistry(Cache(), negative_ttl=60)
+        pr.register(r'http://link\S*', provider)
+
+        with mock.patch.object(provider, 'fetch', wraps=provider.fetch) as fetch:
+            with mock.patch('micawber.providers.time.time', return_value=1000.0):
+                self.assertRaises(ProviderException, pr.request, 'http://link-bad')
+                self.assertRaises(ProviderException, pr.request, 'http://link-bad')
+                self.assertEqual(pr.request_many(['http://link-bad']), {})
+                self.assertEqual(fetch.call_count, 1)
+
+            with mock.patch('micawber.providers.time.time', return_value=1061.0):
+                self.assertRaises(ProviderException, pr.request, 'http://link-bad')
+                self.assertEqual(fetch.call_count, 2)
+
+    def test_request_many_cache_in_calling_thread(self):
+        cache_threads = []
+        fetch_threads = []
+
+        class RecordingCache(Cache):
+            def get(self, k):
+                cache_threads.append(threading.get_ident())
+                return super().get(k)
+
+            def set(self, k, v, timeout=None):
+                cache_threads.append(threading.get_ident())
+                super().set(k, v, timeout)
+
+        class RecordingProvider(TestProvider):
+            def fetch(self, url):
+                fetch_threads.append(threading.get_ident())
+                return super().fetch(url)
+
+        pr = ProviderRegistry(RecordingCache(), max_workers=4)
+        pr.register(r'http://link\S*', RecordingProvider('link'))
+        urls = ['http://link-test1', 'http://link-test2', 'http://link-bad']
+        self.assertEqual(sorted(pr.request_many(urls)), urls[:2])
+
+        main = threading.get_ident()
+        self.assertEqual(cache_threads, [main] * 6)
+        self.assertEqual(len(fetch_threads), 3)
+        self.assertTrue(main not in fetch_threads)
+
+        # Hits and the recent failure are answered without fetching.
+        self.assertEqual(sorted(pr.request_many(urls)), urls[:2])
+        self.assertEqual(cache_threads, [main] * 9)
+        self.assertEqual(len(fetch_threads), 3)
 
     def test_fetch_error_chained(self):
         pr = ProviderRegistry()

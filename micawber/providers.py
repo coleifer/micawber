@@ -158,41 +158,61 @@ class ProviderRegistry(object):
                 return provider
 
     def request(self, url, **params):
-        provider = self.provider_for_url(url)
-        if provider is None:
-            raise ProviderNotFoundException('Provider not found for "%s"' % url)
-        if self.cache is None:
-            return provider.request(url, **params)
-        key = make_key(url, params)
-        data = self.cache.get(key)
-        if isinstance(data, float):
-            if time.time() - data < self.negative_ttl:
-                raise ProviderException('Recent failure fetching "%s"' % url)
-            data = None
-        if data is None:
-            try:
-                data = provider.request(url, **params)
-            except ProviderException:
-                if self.negative_ttl:
-                    self.cache.set(key, time.time())
-                raise
-            self.cache.set(key, data)
+        data = self._resolve([url], params)[url]
+        if isinstance(data, ProviderException):
+            raise data
         return data
 
     def request_many(self, urls, **params):
-        def attempt(url):
-            try:
-                return url, self.request(url, **params)
-            except ProviderException:
-                return url, None
+        return {url: data for url, data in self._resolve(urls, params).items()
+                if not isinstance(data, ProviderException)}
 
-        urls = list(dict.fromkeys(urls))
-        if self.max_workers:
+    def _resolve(self, urls, params):
+        results = dict.fromkeys(urls)
+        misses = []
+        for url in results:
+            provider = self.provider_for_url(url)
+            if provider is None:
+                results[url] = ProviderNotFoundException(
+                    'Provider not found for "%s"' % url)
+                continue
+            key = data = None
+            if self.cache is not None:
+                key = make_key(url, params)
+                data = self.cache.get(key)
+            if isinstance(data, float):
+                if time.time() - data < self.negative_ttl:
+                    results[url] = ProviderException(
+                        'Recent failure fetching "%s"' % url)
+                    continue
+                data = None
+            if data is None:
+                misses.append((url, key, provider))
+            else:
+                results[url] = data
+
+        def fetch(miss):
+            url, _, provider = miss
+            try:
+                return provider.request(url, **params)
+            except ProviderException as exc:
+                return exc
+
+        if self.max_workers and len(misses) > 1:
             with ThreadPoolExecutor(self.max_workers) as pool:
-                results = list(pool.map(attempt, urls))
+                fetched = list(pool.map(fetch, misses))
         else:
-            results = [attempt(url) for url in urls]
-        return {url: data for url, data in results if data is not None}
+            fetched = [fetch(miss) for miss in misses]
+
+        for (url, key, _), data in zip(misses, fetched):
+            results[url] = data
+            if key is None:
+                continue
+            if not isinstance(data, ProviderException):
+                self.cache.set(key, data)
+            elif self.negative_ttl:
+                self.cache.set(key, time.time())
+        return results
 
     def parse_text(self, text, **kwargs):
         return parse_text(text, self, **kwargs)
