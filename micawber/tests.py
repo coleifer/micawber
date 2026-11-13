@@ -882,6 +882,19 @@ class ParserTestCase(BaseTestCase):
         self.assertEqual(urls, ['http://link-test1'])
         self.assertEqual(list(extracted), ['http://link-test1'])
 
+    def test_skip_doctype(self):
+        doctype = ('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" '
+                   '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">')
+        pi = '<?xml-stylesheet href="http://link-test2"?>'
+        html = doctype + pi + '<p>http://link-test1</p>'
+        parsed = test_pr.parse_html(html)
+        self.assertIn(doctype, parsed)
+        self.assertIn(pi, parsed)
+        self.assertIn(self.full_pairs['http://link-test1'], parsed)
+        urls, extracted = test_pr.extract_html(html)
+        self.assertEqual(urls, ['http://link-test1'])
+        self.assertEqual(list(extracted), ['http://link-test1'])
+
     def test_urlize_params(self):
         text = 'test http://foo.com/'
         urlize_params = {'target': '_blank', 'rel': 'nofollow'}

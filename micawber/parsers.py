@@ -3,10 +3,11 @@ from functools import lru_cache
 from html import escape
 
 try:
-    from bs4 import BeautifulSoup, Comment
+    from bs4 import BeautifulSoup
+    from bs4.element import PreformattedString
     bs_kwargs = {'features': 'html.parser'}
 except ImportError:
-    BeautifulSoup = Comment = None
+    BeautifulSoup = PreformattedString = None
     bs_kwargs = {}
 
 
@@ -123,7 +124,7 @@ def _text_nodes(html, soup_class):
     soup = soup_class(html, **bs_kwargs)
     nodes = []
     for node in soup.find_all(string=url_re):
-        if isinstance(node, Comment):
+        if isinstance(node, PreformattedString):
             continue
         for parent in node.parents:
             if parent.name in skip_elements:
