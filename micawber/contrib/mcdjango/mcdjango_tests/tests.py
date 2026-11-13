@@ -128,3 +128,20 @@ class MicawberDjangoTestCase(TestCase, BaseTestCase):
             test_str = frame_html % (url, blank, url, blank)
             rendered = self.render(t, test_str=test_str)
             self.assertEqual(rendered, url)
+
+    def test_handler_fallbacks(self):
+        from micawber.contrib.mcdjango import django_template_handler
+        from micawber.parsers import full_handler
+
+        responses = (
+            {'type': 'link', 'title': 't', 'url': 'javascript:alert(1)'},
+            {'type': 'photo', 'title': 't', 'url': 'javascript:alert(1)'},
+            {'type': 'video', 'title': 't', 'url': 'http://v'},
+            {'type': 'audio', 'title': 't', 'url': 'http://v', 'html': '<x/>'},
+            {'type': 'audio', 'title': 't', 'url': 'http://v'},
+            {'type': 'rich', 'title': 't', 'html': '<x/>'},
+        )
+        for response in responses:
+            self.assertEqual(
+                django_template_handler('http://orig', response),
+                full_handler('http://orig', response))

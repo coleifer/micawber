@@ -34,11 +34,16 @@ skip_elements = set([
 ])
 
 
-def _escape_data(url, response_data):
-    href = str(response_data['url'])
+def safe_url(url, response_data):
+    href = str(response_data.get('url', url))
     # Replace any non-http(s) scheme (e.g. javascript:).
     if scheme_re.match(href) and not http_scheme_re.match(href):
         href = url
+    return href
+
+
+def _escape_data(url, response_data):
+    href = safe_url(url, response_data)
     return {'url': escape(href), 'title': escape(str(response_data['title']))}
 
 

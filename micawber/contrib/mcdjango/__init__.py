@@ -7,7 +7,7 @@ from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
 from micawber.parsers import full_handler, inline_handler, parse_text, \
-    parse_html, extract, extract_html
+    parse_html, extract, extract_html, safe_url
 
 
 def _load_from_module(path):
@@ -26,9 +26,16 @@ if isinstance(providers, Callable):
 register = template.Library()
 
 def django_template_handler(url, response_data, **params):
+    response_data = dict(response_data)
+    response_data['url'] = safe_url(url, response_data)
+
+    data_type = response_data['type']
+    if data_type != 'photo' and response_data.get('html') is None:
+        data_type = 'link'
     names = (
         response_data.get('provider_name'),
-        response_data['type'],
+        data_type,
+        'rich',
     )
     template_names = ['micawber/%s.html' % name for name in names if name]
     return mark_safe(
