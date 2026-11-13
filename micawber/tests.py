@@ -363,6 +363,24 @@ class ProviderTestCase(BaseTestCase):
             self.assertEqual(urls, ['http://bad-test'])
             self.assertEqual(extracted, {})
 
+    def test_null_values_defaulted(self):
+        class NullProvider(Provider):
+            body = None
+            def fetch(self, url):
+                return self.body
+        pr = ProviderRegistry()
+        provider = NullProvider('link')
+        pr.register(r'http://null\S*', provider)
+        for body in ('{"title": null}', '{"url": null}', '{"type": null}'):
+            provider.body = body
+            self.assertEqual(pr.request('http://null-test'), {
+                'title': 'http://null-test',
+                'type': 'link',
+                'url': 'http://null-test'})
+
+        provider.body = '{"title": ""}'
+        self.assertEqual(pr.request('http://null-test')['title'], '')
+
 
 class EscapingTestCase(BaseTestCase):
     # html-escaped form of the title in the "link-unsafe" test fixture.

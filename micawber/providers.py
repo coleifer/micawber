@@ -83,11 +83,11 @@ class Provider(object):
         if not isinstance(json_data, dict):
             raise InvalidResponseException('Response is not a JSON object')
 
-        if 'url' not in json_data:
+        if json_data.get('url') is None:
             json_data['url'] = url
-        if 'title' not in json_data:
+        if json_data.get('title') is None:
             json_data['title'] = json_data['url']
-        if 'type' not in json_data:
+        if json_data.get('type') is None:
             json_data['type'] = 'link'
 
         return json_data
