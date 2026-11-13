@@ -23,6 +23,7 @@ try:
 except ImportError:
     flask = None
 from micawber.contrib.providers import GoogleMapsProvider
+from micawber.contrib.providers import ImageProvider
 from micawber.parsers import full_handler
 from micawber.providers import make_key
 from micawber.test_utils import test_pr, test_cache, test_pr_cache, TestProvider, BaseTestCase
@@ -1018,6 +1019,24 @@ class GoogleMapsProviderTestCase(unittest.TestCase):
         result = p.request('https://maps.google.com/maps?foo&q=Paris')
         self.assertIn('q=Paris', result['html'])
         self.assertNotIn('foo', result['html'])
+
+    def test_inline(self):
+        pr = ProviderRegistry()
+        pr.register(GoogleMapsProvider.regex, GoogleMapsProvider(''))
+        url = 'https://maps.google.com/maps?q=Paris'
+        self.assertEqual(
+            pr.parse_text('see %s here' % url),
+            'see <a href="%s" title="">%s</a> here' % (url, url))
+
+
+class ImageProviderTestCase(unittest.TestCase):
+    def test_inline(self):
+        pr = ProviderRegistry()
+        pr.register(ImageProvider.regex, ImageProvider(''))
+        url = 'http://example.com/a.png'
+        self.assertEqual(
+            pr.parse_text('see %s here' % url),
+            'see <a href="%s" title="">%s</a> here' % (url, url))
 
 
 if __name__ == '__main__':

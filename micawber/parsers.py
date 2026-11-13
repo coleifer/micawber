@@ -62,8 +62,9 @@ def full_handler(url, response_data, **params):
 
 
 def inline_handler(url, response_data, **params):
-    return ('<a href="%(url)s" title="%(title)s">%(title)s</a>' %
-            _escape_data(url, response_data))
+    data = _escape_data(url, response_data)
+    data['text'] = data['title'] or data['url']
+    return '<a href="%(url)s" title="%(title)s">%(text)s</a>' % data
 
 
 def urlize(url, **params):

@@ -1,1 +1,1 @@
-<a href="{{ response.url }}" title="{{ response.title }}">{{ response.title }}</a>
+<a href="{{ response.url }}" title="{{ response.title }}">{{ response.title|default:response.url }}</a>

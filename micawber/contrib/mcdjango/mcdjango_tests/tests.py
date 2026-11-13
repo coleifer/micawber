@@ -140,6 +140,7 @@ class MicawberDjangoTestCase(TestCase, BaseTestCase):
             {'type': 'audio', 'title': 't', 'url': 'http://v', 'html': '<x/>'},
             {'type': 'audio', 'title': 't', 'url': 'http://v'},
             {'type': 'rich', 'title': 't', 'html': '<x/>'},
+            {'type': 'link', 'title': '', 'url': 'http://v'},
         )
         for response in responses:
             self.assertEqual(
