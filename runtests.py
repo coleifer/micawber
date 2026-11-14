@@ -23,17 +23,7 @@ def run_django_tests():
     from django.conf import settings
     if not settings.configured:
         settings.configure(
-            DATABASES={
-                'default': {
-                    'ENGINE': 'django.db.backends.sqlite3',
-                    },
-                },
-            SITE_ID=1,
             INSTALLED_APPS=[
-                'django.contrib.auth',
-                'django.contrib.contenttypes',
-                'django.contrib.sessions',
-                'django.contrib.sites',
                 'micawber.contrib.mcdjango',
                 'micawber.contrib.mcdjango.mcdjango_tests',
             ],
@@ -52,12 +42,7 @@ def run_django_tests():
         settings.MICAWBER_PROVIDERS = providers
         settings.MICAWBER_TEMPLATE_EXTENSIONS = extensions
 
-    try:
-        from django import setup
-    except ImportError:
-        pass
-    else:
-        setup()
+    django.setup()
 
     from django.test.runner import DiscoverRunner
     parent = os.path.dirname(os.path.abspath(__file__))

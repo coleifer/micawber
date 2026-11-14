@@ -1,6 +1,6 @@
 from django.template import Context
 from django.template import Template
-from django.test import TestCase
+from django.test import SimpleTestCase
 
 from micawber.parsers import parse_text
 from micawber.test_utils import BaseTestCase
@@ -10,7 +10,7 @@ from micawber.test_utils import test_pr_cache
 from micawber.test_utils import TestProvider
 
 
-class MicawberDjangoTestCase(TestCase, BaseTestCase):
+class MicawberDjangoTestCase(SimpleTestCase, BaseTestCase):
     def render(self, s, **params):
         s = '{%% load micawber_tags %%}%s' % s
         return Template(s).render(Context(params)).strip()
