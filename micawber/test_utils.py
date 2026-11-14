@@ -71,7 +71,6 @@ class BaseTestCase(unittest.TestCase):
             'http://photo-test2': '<a href="test2.jpg" title="ptest2">ptest2</a>',
             'http://video-test1': '<a href="http://video-test1" title="vtest1">vtest1</a>',
             'http://rich-test2': '<a href="http://rich-test2" title="rtest2">rtest2</a>',
-            'http://rich-test2': '<a href="http://rich-test2" title="rtest2">rtest2</a>',
             'http://photo-notitle': '<a href="notitle.jpg" title="notitle.jpg">notitle.jpg</a>',
         }
 

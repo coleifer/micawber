@@ -40,7 +40,6 @@ class ProviderTestCase(BaseTestCase):
         pr.unregister('2')
         self.assertEqual(len(pr._registry), 2)
 
-        # Multiple calls to remove() are OK.
         self.assertRaises(KeyError, pr.unregister, '2')
 
         self.assertEqual(pr.provider_for_url('1'), provider1)
@@ -306,7 +305,7 @@ class ProviderTestCase(BaseTestCase):
             'https://www.instagram.com/p/abc/',
             'https://www.instagram.com/reel/abc/',
             'https://www.pinterest.com/pin/123/',
-            'https://www.reddit.com/r/abc/comments/123/'
+            'https://www.reddit.com/r/abc/comments/123/',
             'https://soundcloud.com/abc/def',
             'https://open.spotify.com/track/abc',
             'https://www.tiktok.com/@abc/video/123',
