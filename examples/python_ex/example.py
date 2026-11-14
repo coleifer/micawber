@@ -3,7 +3,6 @@ from micawber import bootstrap_oembed, ProviderException
 
 
 def main():
-    print('Please wait, loading providers from oembed.com')
     providers = bootstrap_oembed()
 
     while 1:

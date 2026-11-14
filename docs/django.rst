@@ -162,7 +162,7 @@ The magic happens in :py:func:`micawber.contrib.mcdjango.extension` -- check
 out the `source code <https://github.com/coleifer/micawber/blob/master/micawber/contrib/mcdjango/__init__.py>`_ for more details.
 
 .. note::
-    The ``MICAWBER_EXTENSIONS`` setting can also be a string path to
+    The ``MICAWBER_TEMPLATE_EXTENSIONS`` setting can also be a string path to
     a module and an attribute containing a similar data structure.
 
 
@@ -206,7 +206,7 @@ Here is a quick example showing a custom ``ProviderRegistry``:
     from django.core.cache import cache
     from micawber.providers import Provider, bootstrap_basic
 
-    oembed_providers = boostrap_basic(cache)
+    oembed_providers = bootstrap_basic(cache)
 
     # add a custom provider
     oembed_providers.register('http://example.com/\S*', Provider('http://example.com/oembed/'))

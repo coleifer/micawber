@@ -264,7 +264,7 @@ Providers
         registers. Without a bounded default, a provider-list server that
         accepts the connection and never replies blocks forever.
     :param kwargs: any default keyword arguments to use with providers
-    :rtype: a ProviderRegistry with support for noembed
+    :rtype: a ProviderRegistry with the oembed.com providers registered
 
 
 .. py:function:: refresh_providers([path])
@@ -330,7 +330,6 @@ Providers
 
     .. code-block:: python
 
-        # if you have an API key, you can specify that here
         pr = bootstrap_noembed(nowrap=1)
         pr.request('https://www.youtube.com/watch?v=54XHDUOHuzU')
 
@@ -410,9 +409,9 @@ Cache
     ``max_size`` as :py:class:`Cache`, and by default keeps every entry.
 
     .. note::
-        To use this cache class be sure to call :py:meth:`~PickleCache.load` when
-        initializing your cache and :py:meth:`~PickleCache.save` before your app
-        terminates to persist cached data.
+        The file is loaded when the cache is created. Call
+        :py:meth:`~PickleCache.save` before your app terminates to persist
+        cached data.
 
     .. py:method:: load()
 

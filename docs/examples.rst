@@ -32,8 +32,8 @@ Python example
 --------------
 
 The python example is a command-line app that shows the use of the :py:class:`micawber.providers.ProviderRegistry`
-and :py:class:`micawber.providers.bootstrap_embedly`. It runs a loop asking the user to input
-URLs, outputting rich metadata when possible (view https://embed.ly for a full list of providers).
+and :py:func:`micawber.providers.bootstrap_oembed`. It runs a loop asking the user to input
+URLs, outputting rich metadata when possible (view https://oembed.com for a full list of providers).
 
 To run the example::
 

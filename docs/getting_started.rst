@@ -128,12 +128,10 @@ You can use helper functions to get a populated registry:
 * :py:func:`~micawber.providers.bootstrap_noembed`
 * :py:func:`~micawber.providers.bootstrap_iframely` - requires an `iframely <https://iframely.com/>`_ API key.
 
-The ``bootstrap_oembed``, ``bootstrap_embedly``, and ``bootstrap_noembed``
-functions make a HTTP request to the API server asking for a list of supported
-providers, so you may experience some latency when using these helpers. For
-most WSGI applications this will not be an issue, but if you'd like to speed it
-up I suggest fetching the results, storing them in the db or a file, and then
-pulling from there.
+The ``bootstrap_embedly`` and ``bootstrap_noembed`` functions make a HTTP
+request to the API server asking for a list of supported providers, so you may
+experience some latency when using these helpers. ``bootstrap_oembed`` reads
+the list shipped with micawber and makes no request.
 
 More information can be found in the :py:class:`~micawber.providers.ProviderRegistry` API docs.
 
