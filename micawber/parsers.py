@@ -2,13 +2,10 @@ import re
 from functools import lru_cache
 from html import escape
 
-try:
-    from bs4 import BeautifulSoup
-    from bs4.element import PreformattedString
-    bs_kwargs = {'features': 'html.parser'}
-except ImportError:
-    BeautifulSoup = PreformattedString = None
-    bs_kwargs = {}
+from bs4 import BeautifulSoup
+from bs4.element import PreformattedString
+
+bs_kwargs = {'features': 'html.parser'}
 
 
 scheme_re = re.compile(r'^[\s\x00-\x1f]*[a-z][a-z0-9+.\-]*:', re.I)
@@ -119,9 +116,6 @@ def parse_html(html, providers, urlize_all=True, handler=full_handler,
 
 
 def _text_nodes(html, soup_class):
-    if soup_class is None:
-        raise Exception('Unable to parse HTML, please install beautifulsoup4 '
-                        'or use the text parser')
     soup = soup_class(html, **bs_kwargs)
     nodes = []
     for node in soup.find_all(string=url_re):

@@ -179,8 +179,6 @@ Providers
         * URLs on their own in block tags are converted into full representations
         * URLs interspersed with text are converted into clickable links
 
-        .. note:: requires BeautifulSoup or beautifulsoup4
-
         :param str html: a string of HTML to parse
         :param bool urlize_all: convert unmatched urls into links
         :param handler: function to use to convert links found on their own within a block element
