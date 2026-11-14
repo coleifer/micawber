@@ -256,7 +256,7 @@ Providers
         creates, as :py:class:`ProviderRegistry` takes it. Ignored when
         ``registry`` is given, since that registry already has its own.
     :param bool refresh: fetch the list from oembed.com instead of reading a
-        file. The result is stored in ``cache`` if one is given.
+        file.
     :param str providers_file: path to a provider list to read instead of
         the shipped one. Ignored when ``refresh`` is set.
     :param float timeout: socket timeout, in seconds, applied to the

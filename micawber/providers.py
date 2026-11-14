@@ -327,8 +327,7 @@ def bootstrap_oembed(cache=None, registry=None, refresh=False,
     pr = registry or ProviderRegistry(cache, max_workers=max_workers)
 
     if refresh:
-        contents = fetch_cache(cache, PROVIDERS_URL, refresh=True,
-                               timeout=timeout)
+        contents = fetch(PROVIDERS_URL, timeout=timeout)
     else:
         with open(providers_file or PROVIDERS_FILE) as fh:
             contents = fh.read()
