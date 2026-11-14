@@ -53,7 +53,7 @@ Providers
         :rtype: a dictionary of JSON data
 
 
-.. py:class:: ProviderRegistry([cache=None[, max_workers=None[, negative_ttl=300]]])
+.. py:class:: ProviderRegistry([cache=None[, max_workers=None[, failed_ttl=300]]])
 
     A registry for encapsulating a group of :py:class:`Provider` instances,
     with optional caching support.
@@ -71,11 +71,11 @@ Providers
         a thread pool of this size. Unset, requests are made one at a time.
         The workers only fetch. The cache is read and written by the calling
         thread.
-    :param int negative_ttl: seconds to remember that a provider failed for a
+    :param int failed_ttl: seconds to remember that a provider failed for a
         URL, so a dead link is not re-requested on every render. Within that
         window the request raises ``ProviderException`` without touching the
-        provider. ``0`` disables it. Needs nothing from the cache beyond
-        ``get`` and ``set``.
+        provider. ``0`` or ``None`` disables it. Needs nothing from the cache
+        beyond ``get`` and ``set``.
 
     .. py:method:: register(regex, provider[, skip_invalid=False])
 

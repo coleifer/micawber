@@ -176,7 +176,7 @@ class ProviderTestCase(BaseTestCase):
 
     def test_negative_cache(self):
         provider = TestProvider('link')
-        pr = ProviderRegistry(Cache(), negative_ttl=60)
+        pr = ProviderRegistry(Cache(), failed_ttl=60)
         pr.register(r'http://link\S*', provider)
 
         with mock.patch.object(provider, 'fetch', wraps=provider.fetch) as fetch:
@@ -189,6 +189,13 @@ class ProviderTestCase(BaseTestCase):
             with mock.patch('micawber.providers.time.time', return_value=1061.0):
                 self.assertRaises(ProviderException, pr.request, 'http://link-bad')
                 self.assertEqual(fetch.call_count, 2)
+
+    def test_failed_ttl_none(self):
+        cache = Cache()
+        cache.set(make_key('http://link-test1', {}), 1000.0)
+        pr = ProviderRegistry(cache, failed_ttl=None)
+        pr.register(r'http://link\S*', TestProvider('link'))
+        self.assertEqual(pr.request('http://link-test1')['title'], 'test1')
 
     def test_request_many_cache_in_calling_thread(self):
         cache_threads = []
